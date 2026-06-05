@@ -53,12 +53,18 @@ Verification is *not* available, so login uses SMS OTP via Twilio.)
 Get `client_id` / `client_secret` from the Orange Developer portal.
 
 ```
-# apps/api/.env
+# apps/api/.env  — set CLIENT_ID + CLIENT_SECRET, OR paste the portal's
+# ready-made "Authorization header" into ORANGE_AUTH_HEADER (either works).
 ORANGE_CLIENT_ID=...
 ORANGE_CLIENT_SECRET=...
+ORANGE_AUTH_HEADER=          # e.g. "Basic YUxh..." (alternative to the two above)
 ORANGE_API_BASE=https://api.orange.com
 ORANGE_TOKEN_PATH=/oauth/v3/token
 ```
+This is a 2-legged (client_credentials) app. Note: the API *subscriptions* must
+also be **Approved** on the portal (separate from the app being approved) before
+calls succeed — until then they 403 and the app falls back gracefully.
+
 How we use them:
 - **SIM Swap** — checked at login (after OTP) as an account-takeover signal.
 - **KYC Match** — verify a passenger's identity matches the SIM owner on file.

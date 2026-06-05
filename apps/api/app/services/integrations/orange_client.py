@@ -34,15 +34,20 @@ class OrangeClient:
     def __init__(self) -> None:
         self._token: str | None = None
 
+    def _basic_header(self) -> str:
+        # Prefer the portal's ready-made header; otherwise build it ourselves.
+        if settings.ORANGE_AUTH_HEADER:
+            return settings.ORANGE_AUTH_HEADER
+        creds = f"{settings.ORANGE_CLIENT_ID}:{settings.ORANGE_CLIENT_SECRET}"
+        return f"Basic {base64.b64encode(creds.encode()).decode()}"
+
     async def _get_token(self) -> str:
         if self._token:
             return self._token
-        creds = f"{settings.ORANGE_CLIENT_ID}:{settings.ORANGE_CLIENT_SECRET}"
-        basic = base64.b64encode(creds.encode()).decode()
         async with httpx.AsyncClient(base_url=settings.ORANGE_API_BASE) as http:
             resp = await http.post(
                 settings.ORANGE_TOKEN_PATH,
-                headers={"Authorization": f"Basic {basic}"},
+                headers={"Authorization": self._basic_header()},
                 data={"grant_type": "client_credentials"},
             )
             resp.raise_for_status()

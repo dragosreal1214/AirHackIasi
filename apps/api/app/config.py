@@ -48,9 +48,13 @@ class Settings(BaseSettings):
     TWILIO_WHATSAPP_FROM: str = ""  # e.g. "whatsapp:+14155238886" (sandbox)
     TWILIO_SMS_FROM: str = ""
 
-    # --- Orange CAMARA (Romania). Confirm which APIs are enabled. ---
+    # --- Orange CAMARA (Romania): SIM Swap + KYC Match. ---
     ORANGE_CLIENT_ID: str = ""
     ORANGE_CLIENT_SECRET: str = ""
+    # Optional: paste the portal's ready-made "Authorization header" value
+    # (e.g. "Basic YUxh..."). If set, it's used directly for the token call
+    # instead of base64-encoding CLIENT_ID:CLIENT_SECRET ourselves.
+    ORANGE_AUTH_HEADER: str = ""
     ORANGE_API_BASE: str = "https://api.orange.com"
     ORANGE_TOKEN_PATH: str = "/oauth/v3/token"
 
@@ -70,7 +74,10 @@ class Settings(BaseSettings):
 
     @property
     def orange_enabled(self) -> bool:
-        return bool(self.ORANGE_CLIENT_ID and self.ORANGE_CLIENT_SECRET)
+        return bool(
+            self.ORANGE_AUTH_HEADER
+            or (self.ORANGE_CLIENT_ID and self.ORANGE_CLIENT_SECRET)
+        )
 
 
 @lru_cache
