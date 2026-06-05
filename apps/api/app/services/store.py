@@ -86,11 +86,34 @@ FLIGHT_CATALOG: list[FlightSummary] = [
     FLIGHT_A9101,
 ]
 
-_RISK_HIGH = CurrentRisk(
-    level="high",
-    probability=0.78,
-    prediction_for=FLIGHT_RO632.scheduled_departure,
-    fog_window=FogWindow(start=_hours_from_now(3), end=_hours_from_now(6)),
+# Representative pre-dawn December fog at LRIA — fed to the trained model so the
+# demo disruption's risk + explanation are real model output, not hardcoded.
+_DEMO_FOG_FEATURES = {
+    "temperature": 1.0,
+    "dewpoint_depression": 0.0,
+    "wind_speed": 1.0,
+    "humidity": 100.0,
+    "hour": 5.0,
+    "month": 12.0,
+}
+
+
+def _model_risk(prediction_for: str, fog_window: FogWindow) -> CurrentRisk:
+    from app.ml.fog_model import fog_model
+
+    prob = fog_model.predict_proba(_DEMO_FOG_FEATURES)
+    return CurrentRisk(
+        level=fog_model.risk_level(prob),
+        probability=round(prob, 4),
+        prediction_for=prediction_for,
+        fog_window=fog_window,
+        explanation=fog_model.explain(_DEMO_FOG_FEATURES, prob),
+    )
+
+
+_RISK_HIGH = _model_risk(
+    FLIGHT_RO632.scheduled_departure,
+    FogWindow(start=_hours_from_now(3), end=_hours_from_now(6)),
 )
 
 DISRUPTIONS: dict[str, Disruption] = {

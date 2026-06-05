@@ -11,7 +11,7 @@ from slowapi.errors import RateLimitExceeded
 
 from app.config import settings
 from app.rate_limit import limiter
-from app.routers import auth, dev, disruptions, flights, health, pnrs
+from app.routers import auth, dev, disruptions, flights, health, ml, pnrs
 
 logger = structlog.get_logger(__name__)
 
@@ -28,12 +28,18 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     if settings.ENV == "production" and settings.JWT_SECRET in _INSECURE_SECRETS:
         raise RuntimeError("JWT_SECRET must be set to a strong value in production")
 
+    # Load the fog model once at startup (not per request).
+    from app.ml.fog_model import fog_model
+
+    fog_model.load()
+
     logger.info(
         "api_starting",
         env=settings.ENV,
         db=settings.db_enabled,
         twilio=settings.twilio_enabled,
         orange=settings.orange_enabled,
+        fog_model="loaded" if not fog_model.using_fallback else "fallback",
     )
     yield
     logger.info("api_stopping")
@@ -65,6 +71,7 @@ app.include_router(auth.router, prefix=prefix)
 app.include_router(flights.router, prefix=prefix)
 app.include_router(pnrs.router, prefix=prefix)
 app.include_router(disruptions.router, prefix=prefix)
+app.include_router(ml.router, prefix=prefix)
 
 if settings.DEBUG:
     app.include_router(dev.router, prefix=prefix)

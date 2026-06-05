@@ -31,6 +31,11 @@ export function RiskMeter({ risk }: { risk: CurrentRisk }) {
           </span>
         </p>
       )}
+      {risk.explanation && (
+        <p className="mt-2 rounded-lg bg-white/60 px-3 py-2 text-xs text-slate-600">
+          🤖 {risk.explanation}
+        </p>
+      )}
     </div>
   );
 }

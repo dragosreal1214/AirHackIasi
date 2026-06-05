@@ -49,6 +49,7 @@ class CurrentRisk(CamelModel):
     probability: float
     prediction_for: str
     fog_window: FogWindow | None = None
+    explanation: str | None = None
 
 
 class PnrWithFlight(CamelModel):

@@ -52,3 +52,6 @@ pnpm-debug.log*
 
 # Playwright MCP scratch
 .playwright-mcp/
+
+# ML scratch extract
+_ml_incoming/

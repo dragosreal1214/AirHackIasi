@@ -57,6 +57,7 @@ export interface CurrentRisk {
   probability: number; // 0..1
   predictionFor: string; // ISO 8601
   fogWindow?: { start: string; end: string };
+  explanation?: string; // ML "why", Romanian
 }
 
 export interface FogPrediction {
