@@ -21,7 +21,10 @@ async def db_status() -> dict[str, Any]:
         from sqlalchemy import text
         from sqlalchemy.ext.asyncio import create_async_engine
 
-        engine = create_async_engine(settings.DATABASE_URL)
+        # statement_cache_size=0 keeps asyncpg happy behind the Supabase pooler.
+        engine = create_async_engine(
+            settings.DATABASE_URL, connect_args={"statement_cache_size": 0}
+        )
         async with engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
         await engine.dispose()
