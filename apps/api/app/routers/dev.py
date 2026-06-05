@@ -7,7 +7,7 @@ from fastapi import APIRouter
 from app.config import settings
 from app.models.schemas import TestNotificationRequest
 from app.services import notification_service
-from app.services.integrations import orange_client
+from app.services.integrations import orange_client, twilio_client
 
 router = APIRouter(prefix="/dev", tags=["dev"])
 
@@ -39,6 +39,12 @@ async def send_test_notification(payload: TestNotificationRequest) -> dict[str, 
     return await notification_service.dispatch(
         payload.phone_number, payload.disruption_id
     )
+
+
+@router.get("/twilio/status")
+async def twilio_status() -> dict[str, Any]:
+    """Validate Twilio creds + Verify service (sends no SMS)."""
+    return await twilio_client.healthcheck()
 
 
 @router.get("/orange/status")

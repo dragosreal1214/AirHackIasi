@@ -24,6 +24,26 @@ def _client():  # pragma: no cover - thin wrapper over the SDK
     return Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
 
 
+async def healthcheck() -> dict:
+    """Validate creds by fetching the Verify service — sends no SMS."""
+    if not settings.twilio_enabled:
+        return {"enabled": False}
+    import asyncio  # noqa: PLC0415
+
+    def _fetch() -> dict:
+        svc = (
+            _client()
+            .verify.v2.services(settings.TWILIO_VERIFY_SERVICE_SID)
+            .fetch()
+        )
+        return {"enabled": True, "ok": True, "service": svc.friendly_name}
+
+    try:
+        return await asyncio.to_thread(_fetch)
+    except Exception as exc:  # noqa: BLE001
+        return {"enabled": True, "ok": False, "error": str(exc)}
+
+
 async def start_verification(phone_number: str) -> None:
     """Send an OTP via Twilio Verify (or log it in dev mode)."""
     if not settings.twilio_enabled:
