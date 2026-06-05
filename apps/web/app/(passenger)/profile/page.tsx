@@ -1,8 +1,10 @@
 "use client";
 
-import { MessageCircle, Smartphone, User } from "lucide-react";
+import { LogOut, MessageCircle, Smartphone, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { AppBar } from "@/components/passenger/app-bar";
+import { clearTokens } from "@/lib/auth";
 
 const CHANNELS = [
   { icon: MessageCircle, label: "WhatsApp", note: "Recomandat", on: true },
@@ -11,6 +13,13 @@ const CHANNELS = [
 ];
 
 export default function ProfilePage() {
+  const router = useRouter();
+
+  function logout() {
+    clearTokens();
+    router.replace("/onboarding/phone");
+  }
+
   return (
     <>
       <AppBar title="Profil" />
@@ -49,6 +58,15 @@ export default function ProfilePage() {
             </div>
           ))}
         </div>
+
+        <button
+          type="button"
+          onClick={logout}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-600"
+        >
+          <LogOut className="h-4 w-4" />
+          Deconectează-te
+        </button>
 
         <p className="mt-6 px-1 text-center text-xs text-slate-400">
           Aerly · Cu un aer înainte.

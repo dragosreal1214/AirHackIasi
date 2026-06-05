@@ -118,3 +118,18 @@ export interface ApiError {
   message: string;
   details?: Record<string, unknown>;
 }
+
+// ----- Auth -----
+
+export type AuthMethod = "sms_otp" | "dev";
+
+export interface PhoneStartResponse {
+  challengeId: string;
+  method: AuthMethod;
+}
+
+export interface TokenResponse {
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+}

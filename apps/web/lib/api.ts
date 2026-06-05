@@ -14,10 +14,13 @@ import type {
   CreatePnrInput,
   Disruption,
   FlightSummary,
+  PhoneStartResponse,
   PnrStatus,
   PnrWithFlight,
+  TokenResponse,
 } from "@aerly/shared";
 
+import { clearTokens, getAccessToken } from "./auth";
 import {
   ALTERNATIVES,
   DISRUPTIONS,
@@ -42,13 +45,18 @@ class ApiClientError extends Error {
 }
 
 async function http<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = getAccessToken();
   const res = await fetch(`${API_URL}/api/v1${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(init?.headers ?? {}),
     },
   });
+  if (res.status === 401) {
+    clearTokens();
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => null);
     throw new ApiClientError(
@@ -168,6 +176,40 @@ export async function selectAlternative(alternativeId: string): Promise<void> {
     return;
   }
   await http(`/alternatives/${alternativeId}/select`, { method: "POST" });
+}
+
+// ---------------------------------------------------------------------------
+// Auth
+// ---------------------------------------------------------------------------
+
+export async function startPhoneVerification(
+  phoneNumber: string,
+): Promise<PhoneStartResponse> {
+  if (USE_MOCKS) {
+    await delay(300);
+    return { challengeId: "mock-challenge", method: "dev" };
+  }
+  return http(`/auth/phone/start`, {
+    method: "POST",
+    body: JSON.stringify({ phoneNumber }),
+  });
+}
+
+export async function verifyOtp(
+  challengeId: string,
+  code: string,
+): Promise<TokenResponse> {
+  if (USE_MOCKS) {
+    await delay(300);
+    if (code !== "000000") {
+      throw new ApiClientError("INVALID_OTP", "Cod greșit. Mai încearcă.");
+    }
+    return { accessToken: "mock-access", refreshToken: "mock-refresh", tokenType: "bearer" };
+  }
+  return http(`/auth/phone/verify`, {
+    method: "POST",
+    body: JSON.stringify({ challengeId, code }),
+  });
 }
 
 export { ApiClientError, USE_MOCKS };
