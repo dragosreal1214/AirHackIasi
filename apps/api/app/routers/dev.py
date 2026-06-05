@@ -4,11 +4,30 @@ from typing import Any
 
 from fastapi import APIRouter
 
+from app.config import settings
 from app.models.schemas import TestNotificationRequest
 from app.services import notification_service
 from app.services.integrations import orange_client
 
 router = APIRouter(prefix="/dev", tags=["dev"])
+
+
+@router.get("/db/status")
+async def db_status() -> dict[str, Any]:
+    """Verify the database connection (does not expose the URL)."""
+    if not settings.db_enabled:
+        return {"enabled": False}
+    try:
+        from sqlalchemy import text
+        from sqlalchemy.ext.asyncio import create_async_engine
+
+        engine = create_async_engine(settings.DATABASE_URL)
+        async with engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+        await engine.dispose()
+        return {"enabled": True, "connected": True}
+    except Exception as exc:  # noqa: BLE001
+        return {"enabled": True, "connected": False, "error": str(exc)}
 
 
 @router.post("/send-notification")
