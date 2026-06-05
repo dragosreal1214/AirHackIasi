@@ -56,12 +56,13 @@ class Settings(BaseSettings):
     # instead of base64-encoding CLIENT_ID:CLIENT_SECRET ourselves.
     ORANGE_AUTH_HEADER: str = ""
     ORANGE_API_BASE: str = "https://api.orange.com"
-    ORANGE_TOKEN_PATH: str = "/oauth/v3/token"
-    # Defaults target the Romania *sandbox* (orange-lab) products, which use
-    # 2-legged OAuth and lab test numbers. For production, swap these to the
-    # live product paths (note: production SIM Swap/KYC use 3-legged OAuth).
-    ORANGE_SIM_SWAP_PATH: str = "/camara/orange-lab/sim-swap/v1/check"
-    ORANGE_KYC_MATCH_PATH: str = "/camara/orange-lab/kyc-match/v0/match"
+    # Defaults target the Orange Network APIs **Playground** (2-legged, with
+    # self-provisioned test numbers via the Admin API). Its CAMARA APIs use a
+    # dedicated token endpoint. For production, switch these to the live product
+    # paths (production SIM Swap/KYC use 3-legged OAuth).
+    ORANGE_TOKEN_PATH: str = "/openidconnect/playground/v1.0/token"
+    ORANGE_SIM_SWAP_PATH: str = "/camara/playground/api/sim-swap/v1/check"
+    ORANGE_KYC_MATCH_PATH: str = "/camara/playground/api/kyc-match/v0.2/match"
     # Return canned sandbox responses without calling Orange. Use while the
     # real app/subscription is awaiting activation on the portal.
     ORANGE_MOCK: bool = False

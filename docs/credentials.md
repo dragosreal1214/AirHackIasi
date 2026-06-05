@@ -69,36 +69,35 @@ How we use them:
 - **SIM Swap** — checked at login (after OTP) as an account-takeover signal.
 - **KYC Match** — verify a passenger's identity matches the SIM owner on file.
 
-### Sandbox (recommended for the hackathon)
-We default to the Romania **sandbox** (`orange-lab`) products — verified from the
-Orange docs. They use the same 2-legged credentials and provide lab test numbers,
-so we can build/demo without approval or real SIMs.
+### Network APIs Playground (LIVE — what we use)
+We use the Orange **Network APIs Playground** (2-legged). It has its own token
+endpoint and paths, and you provision your own test numbers via the Admin API.
 
-| Path | Value |
-| ---- | ----- |
-| SIM Swap | `POST /camara/orange-lab/sim-swap/v1/check` |
-| KYC Match | `POST /camara/orange-lab/kyc-match/v0/match` |
+| Thing | Value |
+| ----- | ----- |
+| Token (CAMARA apps) | `POST /openidconnect/playground/v1.0/token` |
+| Token (Admin API)   | `POST /oauth/v3/token` |
+| SIM Swap | `POST /camara/playground/api/sim-swap/v1/check` |
+| KYC Match | `POST /camara/playground/api/kyc-match/v0.2/match` |
+| Admin  | `POST /camara/playground/admin/v1.0/action` |
 
-**Sandbox test numbers** (`+4078910305x`), all with a recent (–1 day) SIM swap:
-
-| Phone | KYC identity | City |
-| ----- | ------------ | ---- |
-| +40789103050 | Andrei Mihai Popescu | București |
-| +40789103051 | Ioana Elena Marinescu | București |
-| +40789103052 | Catalin Andrei Iordache | Cluj-Napoca |
-| +40789103053 | Madalina Ioana Dobre | **Iași** |
-
-Quick test once `.env` has the creds (API running):
+**Provision a test number** (one-time; up to 10). Uses an `/oauth/v3/token` token:
 ```
-GET /api/v1/dev/orange/status                         # token works?
-GET /api/v1/dev/orange/sim-swap?phone=+40789103051    # -> { "swapped": true }
-GET /api/v1/dev/orange/kyc-match?phone=+40789103053   # -> per-field match result
+POST /camara/playground/admin/v1.0/action
+{ "action": "CREATE", "phoneNumber": "+40770675731" }
+# returns the profile incl. simSwap.latestSimChange, kyc.name, location, …
+# actions: LIST | CREATE | READ | UPDATE | DELETE
 ```
 
-> **Production later:** set `ORANGE_SIM_SWAP_PATH` / `ORANGE_KYC_MATCH_PATH` to
-> the live product paths. Note production SIM Swap/KYC use **3-legged OAuth**
-> (per-user consent), a larger change than the 2-legged sandbox.
-> Empty creds → SIM Swap/KYC return no signal and the app works normally.
+Verify live (API running, `ORANGE_MOCK=false`):
+```
+GET /api/v1/dev/orange/status                         # -> { tokenOk: true }
+GET /api/v1/dev/orange/sim-swap?phone=+40770675731    # -> { "swapped": true }
+```
+
+> **Offline demo:** set `ORANGE_MOCK=true` to return canned responses with no
+> network call. **Production:** point the paths at the live products — those use
+> **3-legged OAuth** (per-user consent), a larger change than the Playground.
 
 ### 4. Mapbox — ops dashboard map (public token)
 ```
