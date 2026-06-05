@@ -1,0 +1,203 @@
+"""In-memory data store used when no database is configured.
+
+Mirrors the frontend mock scenario (apps/web/lib/mock-data.ts) so the API and
+the web app show identical data. When `DATABASE_URL` is set, the DB-backed
+repositories take over (see app/db/) and this module is bypassed.
+"""
+
+from __future__ import annotations
+
+from datetime import datetime, timedelta, timezone
+
+from app.models.schemas import (
+    Alternative,
+    CurrentRisk,
+    Disruption,
+    FlightSummary,
+    FogWindow,
+    PnrWithFlight,
+)
+
+
+def _hours_from_now(h: float) -> str:
+    return (datetime.now(timezone.utc) + timedelta(hours=h)).isoformat()
+
+
+FLIGHT_RO632 = FlightSummary(
+    id="fl_ro632",
+    flight_number="RO 632",
+    airline_code="RO",
+    airline_name="TAROM",
+    origin_iata="IAS",
+    origin_city="Iași",
+    destination_iata="OTP",
+    destination_city="București",
+    scheduled_departure=_hours_from_now(4.5),
+    scheduled_arrival=_hours_from_now(5.5),
+    status="scheduled",
+)
+
+FLIGHT_W6201 = FlightSummary(
+    id="fl_w6201",
+    flight_number="W6 3201",
+    airline_code="W6",
+    airline_name="Wizz Air",
+    origin_iata="IAS",
+    origin_city="Iași",
+    destination_iata="LTN",
+    destination_city="Londra",
+    scheduled_departure=_hours_from_now(28),
+    scheduled_arrival=_hours_from_now(32),
+    status="scheduled",
+)
+
+FLIGHT_RO634 = FlightSummary(
+    id="fl_ro634",
+    flight_number="RO 634",
+    airline_code="RO",
+    airline_name="TAROM",
+    origin_iata="IAS",
+    origin_city="Iași",
+    destination_iata="OTP",
+    destination_city="București",
+    scheduled_departure=_hours_from_now(9),
+    scheduled_arrival=_hours_from_now(10),
+    status="scheduled",
+)
+
+FLIGHT_A9101 = FlightSummary(
+    id="fl_a9101",
+    flight_number="A9 101",
+    airline_code="A9",
+    airline_name="Animawings",
+    origin_iata="IAS",
+    origin_city="Iași",
+    destination_iata="BCN",
+    destination_city="Barcelona",
+    scheduled_departure=_hours_from_now(50),
+    scheduled_arrival=_hours_from_now(54),
+    status="scheduled",
+)
+
+FLIGHT_CATALOG: list[FlightSummary] = [
+    FLIGHT_RO632,
+    FLIGHT_W6201,
+    FLIGHT_RO634,
+    FLIGHT_A9101,
+]
+
+_RISK_HIGH = CurrentRisk(
+    level="high",
+    probability=0.78,
+    prediction_for=FLIGHT_RO632.scheduled_departure,
+    fog_window=FogWindow(start=_hours_from_now(3), end=_hours_from_now(6)),
+)
+
+DISRUPTIONS: dict[str, Disruption] = {
+    "d_001": Disruption(
+        id="d_001",
+        flight=FLIGHT_RO632,
+        severity="high",
+        risk=_RISK_HIGH,
+        detected_at=_hours_from_now(-0.5),
+        alternatives_count=4,
+    )
+}
+
+ALTERNATIVES: dict[str, list[Alternative]] = {
+    "d_001": [
+        Alternative(
+            id="alt_train_ir",
+            rank=1,
+            type="train",
+            title="Tren IR 1654 · Iași → București Nord",
+            subtitle="Direct, fără transfer aeroport",
+            departure=_hours_from_now(2),
+            arrival=_hours_from_now(8),
+            duration_minutes=360,
+            cost_eur=28,
+            reliability=0.92,
+            score=88,
+            action_url="https://bilete.cfrcalatori.ro/",
+            action_label="Rezervă pe CFR",
+        ),
+        Alternative(
+            id="alt_flight_ro634",
+            rank=2,
+            type="alternate_flight",
+            title="TAROM RO 634 · IAS → OTP",
+            subtitle="Mai târziu azi, risc de ceață mai mic",
+            departure=_hours_from_now(9),
+            arrival=_hours_from_now(10),
+            duration_minutes=60,
+            cost_eur=95,
+            reliability=0.85,
+            score=79,
+            action_url="https://www.tarom.ro/",
+            action_label="Rezervă pe TAROM",
+        ),
+        Alternative(
+            id="alt_reroute_bcm",
+            rank=3,
+            type="reroute_airport",
+            title="Reroute via Bacău (BCM)",
+            subtitle="Transfer auto ~1h 40min + zbor către OTP",
+            departure=_hours_from_now(6),
+            arrival=_hours_from_now(8),
+            duration_minutes=220,
+            cost_eur=140,
+            reliability=0.74,
+            score=61,
+            action_url="https://www.aerodatabox.com/",
+            action_label="Vezi detalii",
+        ),
+        Alternative(
+            id="alt_bus_flix",
+            rank=4,
+            type="bus",
+            title="FlixBus · Iași → București",
+            subtitle="Plecare din centru, fără transfer aeroport",
+            departure=_hours_from_now(3),
+            arrival=_hours_from_now(11),
+            duration_minutes=480,
+            cost_eur=22,
+            reliability=0.78,
+            score=58,
+            action_url="https://www.flixbus.ro/",
+            action_label="Rezervă pe FlixBus",
+        ),
+    ]
+}
+
+PNR_STORE: list[PnrWithFlight] = [
+    PnrWithFlight(
+        id="pnr_001",
+        status="active",
+        passenger_name="Andrei Pop",
+        pnr_code="XR7K2A",
+        flight=FLIGHT_RO632,
+        current_risk=_RISK_HIGH,
+        disruption_id="d_001",
+    ),
+    PnrWithFlight(
+        id="pnr_002",
+        status="active",
+        passenger_name="Andrei Pop",
+        pnr_code="QW91ZB",
+        flight=FLIGHT_W6201,
+        current_risk=CurrentRisk(
+            level="low",
+            probability=0.08,
+            prediction_for=FLIGHT_W6201.scheduled_departure,
+        ),
+        disruption_id=None,
+    ),
+]
+
+_pnr_seq = len(PNR_STORE)
+
+
+def next_pnr_id() -> str:
+    global _pnr_seq
+    _pnr_seq += 1
+    return f"pnr_{_pnr_seq:03d}"

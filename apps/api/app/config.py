@@ -2,6 +2,10 @@
 
 All environment variables are declared here. When adding a new env var,
 update this file AND `.env.example` (see CLAUDE.md conventions).
+
+The API boots and serves a full demo with NO credentials: missing integrations
+degrade gracefully (see the `*_enabled` feature flags below). Fill the env vars
+to switch each piece from mock/dev mode to the real service.
 """
 
 from functools import lru_cache
@@ -23,30 +27,50 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = "/api/v1"
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
 
-    # --- Database ---
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/aerly"
+    # --- Database (Supabase Postgres). Empty -> in-memory store. ---
+    DATABASE_URL: str = ""
+    SUPABASE_URL: str = ""
+    SUPABASE_ANON_KEY: str = ""
+    SUPABASE_SERVICE_ROLE_KEY: str = ""
 
     # --- Redis / Celery ---
-    REDIS_URL: str = "redis://localhost:6379/0"
+    REDIS_URL: str = ""
 
     # --- Auth / JWT ---
-    JWT_SECRET: str = "change-me-in-production"
+    JWT_SECRET: str = "dev-secret-change-me"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-    # --- Twilio ---
+    # --- Twilio (WhatsApp + SMS + Verify) ---
     TWILIO_ACCOUNT_SID: str = ""
     TWILIO_AUTH_TOKEN: str = ""
     TWILIO_VERIFY_SERVICE_SID: str = ""
+    TWILIO_WHATSAPP_FROM: str = ""  # e.g. "whatsapp:+14155238886" (sandbox)
+    TWILIO_SMS_FROM: str = ""
 
-    # --- Orange CAMARA ---
+    # --- Orange CAMARA (Romania). Confirm which APIs are enabled. ---
     ORANGE_CLIENT_ID: str = ""
     ORANGE_CLIENT_SECRET: str = ""
-    ORANGE_API_URL: str = "https://api.orange.com/camara"
+    ORANGE_API_BASE: str = "https://api.orange.com"
+    ORANGE_TOKEN_PATH: str = "/oauth/v3/token"
 
     # --- External data ---
     MAPBOX_TOKEN: str = ""
     RAPIDAPI_KEY: str = ""
+
+    # ----- Feature flags (derived) -----
+
+    @property
+    def db_enabled(self) -> bool:
+        return bool(self.DATABASE_URL)
+
+    @property
+    def twilio_enabled(self) -> bool:
+        return bool(self.TWILIO_ACCOUNT_SID and self.TWILIO_AUTH_TOKEN)
+
+    @property
+    def orange_enabled(self) -> bool:
+        return bool(self.ORANGE_CLIENT_ID and self.ORANGE_CLIENT_SECRET)
 
 
 @lru_cache
