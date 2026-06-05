@@ -26,10 +26,20 @@ async def test_list_pnrs() -> None:
 
 
 @pytest.mark.asyncio
-async def test_flight_search_and_add_then_duplicate() -> None:
+async def test_flight_search_real_schedule() -> None:
     async with _client() as c:
-        found = await c.get(f"{V1}/flights/search?q=A9")
-        assert found.status_code == 200
+        found = await c.get(f"{V1}/flights/search?q=LTN")
+    assert found.status_code == 200
+    body = found.json()
+    assert len(body) >= 1
+    # Real London-Luton route on the LRIA schedule.
+    assert any(f["destinationIata"] == "LTN" or f["originIata"] == "LTN" for f in body)
+
+
+@pytest.mark.asyncio
+async def test_add_then_duplicate() -> None:
+    async with _client() as c:
+        found = await c.get(f"{V1}/flights/search?q=LTN")
         flight_id = found.json()[0]["id"]
 
         created = await c.post(f"{V1}/pnrs", json={"flightId": flight_id})

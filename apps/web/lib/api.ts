@@ -16,6 +16,7 @@ import type {
   FlightSummary,
   FogTimeline,
   LoginInput,
+  OpsAirport,
   PhoneStartResponse,
   PnrStatus,
   PnrWithFlight,
@@ -243,12 +244,20 @@ export async function verifyOtp(
 // Fog forecast / ops timeline
 // ---------------------------------------------------------------------------
 
-export async function getForecast(): Promise<FogTimeline> {
+export async function getAirports(): Promise<OpsAirport[]> {
+  if (USE_MOCKS) {
+    await delay();
+    return [{ iata: "IAS", name: "Iași", city: "Iași", country: "RO" }];
+  }
+  return http(`/ml/airports`);
+}
+
+export async function getForecast(airport = "IAS"): Promise<FogTimeline> {
   if (USE_MOCKS) {
     await delay();
     return { source: "open-meteo", available: true, hourly: [], windows: [], peak: null };
   }
-  return http(`/ml/forecast`);
+  return http(`/ml/forecast?airport=${airport}`);
 }
 
 export async function getTimeline(date: string): Promise<FogTimeline> {

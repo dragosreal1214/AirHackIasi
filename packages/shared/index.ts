@@ -132,6 +132,13 @@ export interface FogPeak {
   explanation?: string;
 }
 
+export interface OpsAirport {
+  iata: string;
+  name: string;
+  city: string;
+  country: string;
+}
+
 export interface FogTimeline {
   source: "open-meteo" | "replay";
   available: boolean;

@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import { FogChart } from "@/components/ops/fog-chart";
 import { RiskBadge } from "@/components/shared/risk-badge";
-import { getForecast, getTimeline } from "@/lib/api";
+import { getAirports, getForecast, getTimeline } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 const REPLAY_EVENTS = [
@@ -20,13 +20,17 @@ function fmt(iso: string): string {
 }
 
 export default function OpsDashboard() {
-  const [mode, setMode] = useState<{ kind: "live" } | { kind: "replay"; date: string }>(
-    { kind: "live" },
-  );
+  const [mode, setMode] = useState<
+    { kind: "live"; airport: string } | { kind: "replay"; date: string }
+  >({ kind: "live", airport: "IAS" });
+
+  const airports = useQuery({ queryKey: ["airports"], queryFn: getAirports });
 
   const query = useQuery({
-    queryKey: mode.kind === "live" ? ["forecast"] : ["timeline", mode.date],
-    queryFn: () => (mode.kind === "live" ? getForecast() : getTimeline(mode.date)),
+    queryKey:
+      mode.kind === "live" ? ["forecast", mode.airport] : ["timeline", mode.date],
+    queryFn: () =>
+      mode.kind === "live" ? getForecast(mode.airport) : getTimeline(mode.date),
   });
 
   const data = query.data;
@@ -50,7 +54,7 @@ export default function OpsDashboard() {
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <button
           type="button"
-          onClick={() => setMode({ kind: "live" })}
+          onClick={() => setMode({ kind: "live", airport: mode.kind === "live" ? mode.airport : "IAS" })}
           className={cn(
             "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold",
             mode.kind === "live" ? "bg-primary text-white" : "bg-white text-slate-600 border border-slate-200",
@@ -58,6 +62,19 @@ export default function OpsDashboard() {
         >
           <Radio className="h-4 w-4" /> Live (Open-Meteo)
         </button>
+        {mode.kind === "live" && (
+          <select
+            value={mode.airport}
+            onChange={(e) => setMode({ kind: "live", airport: e.target.value })}
+            className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700"
+          >
+            {(airports.data ?? []).map((a) => (
+              <option key={a.iata} value={a.iata}>
+                {a.iata} · {a.city}
+              </option>
+            ))}
+          </select>
+        )}
         <span className="mx-1 text-xs text-slate-400">|</span>
         <RotateCcw className="h-4 w-4 text-slate-400" />
         {REPLAY_EVENTS.map((e) => (
@@ -91,7 +108,9 @@ export default function OpsDashboard() {
             Probabilitate de ceață pe ore
           </h2>
           <span className="text-xs text-slate-400">
-            {mode.kind === "live" ? "Prognoză live" : `Replay · ${mode.date}`}
+            {mode.kind === "live"
+              ? `Prognoză live · ${mode.airport}`
+              : `Replay · IAS · ${mode.date}`}
           </span>
         </div>
         {query.isLoading && <div className="h-72 animate-pulse rounded-xl bg-slate-100" />}

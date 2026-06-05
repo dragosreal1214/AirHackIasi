@@ -19,20 +19,22 @@ from app.ml.fog_model import fog_model
 
 logger = structlog.get_logger(__name__)
 
-LAT, LON = 47.1785, 27.6206  # LRIA / Iași
 _URL = "https://api.open-meteo.com/v1/forecast"
 _TTL_SECONDS = 900
 
-_cache: dict[str, Any] = {"ts": 0.0, "hourly": None}
+# Cache hourly timelines per "lat,lon" key.
+_cache: dict[str, dict[str, Any]] = {}
 
 
-async def _fetch_hourly() -> list[dict[str, Any]]:
-    if _cache["hourly"] is not None and (time.monotonic() - _cache["ts"]) < _TTL_SECONDS:
-        return _cache["hourly"]
+async def _fetch_hourly(lat: float, lon: float) -> list[dict[str, Any]]:
+    key = f"{lat:.3f},{lon:.3f}"
+    entry = _cache.get(key)
+    if entry is not None and (time.monotonic() - entry["ts"]) < _TTL_SECONDS:
+        return entry["hourly"]
 
     params = {
-        "latitude": LAT,
-        "longitude": LON,
+        "latitude": lat,
+        "longitude": lon,
         "hourly": "temperature_2m,dew_point_2m,relative_humidity_2m,wind_speed_10m",
         "wind_speed_unit": "kn",
         "forecast_days": 2,
@@ -72,7 +74,7 @@ async def _fetch_hourly() -> list[dict[str, Any]]:
             }
         )
 
-    _cache.update(ts=time.monotonic(), hourly=out)
+    _cache[key] = {"ts": time.monotonic(), "hourly": out}
     return out
 
 
@@ -111,15 +113,23 @@ def _peak(hourly: list[dict[str, Any]]) -> dict[str, Any] | None:
     }
 
 
-async def forecast() -> dict[str, Any]:
+async def forecast(lat: float, lon: float, airport: str | None = None) -> dict[str, Any]:
     try:
-        hourly = await _fetch_hourly()
+        hourly = await _fetch_hourly(lat, lon)
     except Exception as exc:  # noqa: BLE001
-        logger.warning("open_meteo_failed", error=str(exc))
-        return {"source": "open-meteo", "available": False, "hourly": [], "windows": [], "peak": None}
+        logger.warning("open_meteo_failed", airport=airport, error=str(exc))
+        return {
+            "source": "open-meteo",
+            "available": False,
+            "airport": airport,
+            "hourly": [],
+            "windows": [],
+            "peak": None,
+        }
     return {
         "source": "open-meteo",
         "available": True,
+        "airport": airport,
         "hourly": hourly,
         "windows": _windows(hourly),
         "peak": _peak(hourly),

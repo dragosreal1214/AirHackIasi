@@ -9,6 +9,7 @@ import os
 os.environ["DATABASE_URL"] = ""
 os.environ["ENV"] = "development"
 os.environ["DEBUG"] = "true"
+os.environ["LIVE_FORECAST"] = "false"  # no network in tests
 for _k in (
     "TWILIO_ACCOUNT_SID",
     "TWILIO_AUTH_TOKEN",

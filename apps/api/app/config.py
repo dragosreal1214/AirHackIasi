@@ -71,6 +71,9 @@ class Settings(BaseSettings):
     MAPBOX_TOKEN: str = ""
     RAPIDAPI_KEY: str = ""
 
+    # Compute per-flight risk from the live Open-Meteo forecast. Off in tests.
+    LIVE_FORECAST: bool = True
+
     # ----- Feature flags (derived) -----
 
     @property
