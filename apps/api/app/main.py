@@ -6,11 +6,16 @@ from contextlib import asynccontextmanager
 import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from app.config import settings
+from app.rate_limit import limiter
 from app.routers import auth, dev, disruptions, flights, health, pnrs
 
 logger = structlog.get_logger(__name__)
+
+_INSECURE_SECRETS = {"dev-secret-change-me", "change-me-in-production", ""}
 
 
 @asynccontextmanager
@@ -19,6 +24,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     ML models are loaded here (not per-request) once available — see CLAUDE.md.
     """
+    # Fail fast: never run production with a default/weak JWT secret.
+    if settings.ENV == "production" and settings.JWT_SECRET in _INSECURE_SECRETS:
+        raise RuntimeError("JWT_SECRET must be set to a strong value in production")
+
     logger.info(
         "api_starting",
         env=settings.ENV,
@@ -36,6 +45,9 @@ app = FastAPI(
     description="Fog disruption copilot backend.",
     lifespan=lifespan,
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,

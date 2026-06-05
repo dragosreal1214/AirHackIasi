@@ -1,0 +1,56 @@
+"""User persistence + auth audit (DB-backed)."""
+
+from __future__ import annotations
+
+import uuid
+from datetime import datetime, timezone
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.models import AuthAuditLog, User
+
+DEMO_PHONE = "+40700000000"
+
+
+async def get_by_id(db: AsyncSession, user_id: str) -> User | None:
+    try:
+        uid = uuid.UUID(user_id)
+    except (ValueError, TypeError):
+        return None
+    return (await db.execute(select(User).where(User.id == uid))).scalar_one_or_none()
+
+
+async def get_or_create_by_phone(db: AsyncSession, phone_number: str) -> User:
+    user = (
+        await db.execute(select(User).where(User.phone_number == phone_number))
+    ).scalar_one_or_none()
+    if user is None:
+        user = User(phone_number=phone_number)
+        db.add(user)
+        await db.flush()
+    user.phone_verified_at = datetime.now(timezone.utc)
+    user.last_active_at = datetime.now(timezone.utc)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+async def get_or_create_demo(db: AsyncSession) -> User:
+    return await get_or_create_by_phone(db, DEMO_PHONE)
+
+
+async def write_audit(
+    db: AsyncSession,
+    *,
+    phone_number: str | None,
+    event: str,
+    success: bool = True,
+    meta: dict | None = None,
+) -> None:
+    db.add(
+        AuthAuditLog(
+            phone_number=phone_number, event=event, success=success, meta=meta
+        )
+    )
+    await db.commit()
