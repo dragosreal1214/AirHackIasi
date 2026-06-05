@@ -12,7 +12,7 @@ export function AuthGuard({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      router.replace("/onboarding/phone");
+      router.replace("/onboarding/login");
     } else {
       setReady(true);
     }

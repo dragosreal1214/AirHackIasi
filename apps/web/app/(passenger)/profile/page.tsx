@@ -17,7 +17,7 @@ export default function ProfilePage() {
 
   function logout() {
     clearTokens();
-    router.replace("/onboarding/phone");
+    router.replace("/onboarding/login");
   }
 
   return (

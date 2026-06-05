@@ -133,3 +133,15 @@ export interface TokenResponse {
   refreshToken: string;
   tokenType: string;
 }
+
+export interface RegisterInput {
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+}
+
+export interface LoginInput {
+  email: string;
+  password: string;
+}

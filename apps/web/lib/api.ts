@@ -14,9 +14,11 @@ import type {
   CreatePnrInput,
   Disruption,
   FlightSummary,
+  LoginInput,
   PhoneStartResponse,
   PnrStatus,
   PnrWithFlight,
+  RegisterInput,
   TokenResponse,
 } from "@aerly/shared";
 
@@ -181,6 +183,30 @@ export async function selectAlternative(alternativeId: string): Promise<void> {
 // ---------------------------------------------------------------------------
 // Auth
 // ---------------------------------------------------------------------------
+
+export async function register(
+  input: RegisterInput,
+): Promise<PhoneStartResponse> {
+  if (USE_MOCKS) {
+    await delay(300);
+    return { challengeId: "mock-challenge", method: "dev" };
+  }
+  return http(`/auth/register`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export async function loginEmail(input: LoginInput): Promise<TokenResponse> {
+  if (USE_MOCKS) {
+    await delay(300);
+    return { accessToken: "mock-access", refreshToken: "mock-refresh", tokenType: "bearer" };
+  }
+  return http(`/auth/login`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
 
 export async function startPhoneVerification(
   phoneNumber: string,
