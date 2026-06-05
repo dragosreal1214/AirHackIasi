@@ -21,6 +21,40 @@ async def get_by_id(db: AsyncSession, user_id: str) -> User | None:
     return (await db.execute(select(User).where(User.id == uid))).scalar_one_or_none()
 
 
+async def get_by_email(db: AsyncSession, email: str) -> User | None:
+    return (
+        await db.execute(
+            select(User).where(User.email == email, User.deleted_at.is_(None))
+        )
+    ).scalar_one_or_none()
+
+
+async def get_by_phone(db: AsyncSession, phone_number: str) -> User | None:
+    return (
+        await db.execute(select(User).where(User.phone_number == phone_number))
+    ).scalar_one_or_none()
+
+
+async def create_registered_user(
+    db: AsyncSession,
+    *,
+    full_name: str,
+    email: str,
+    phone_number: str,
+    password_hash: str,
+) -> User:
+    user = User(
+        full_name=full_name,
+        email=email,
+        phone_number=phone_number,
+        password_hash=password_hash,
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
 async def get_or_create_by_phone(db: AsyncSession, phone_number: str) -> User:
     user = (
         await db.execute(select(User).where(User.phone_number == phone_number))

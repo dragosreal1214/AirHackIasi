@@ -97,6 +97,18 @@ class CreatePnrInput(CamelModel):
 # ----- Auth -----
 
 
+class RegisterRequest(CamelModel):
+    full_name: str
+    email: str
+    phone_number: str
+    password: str
+
+
+class LoginRequest(CamelModel):
+    email: str
+    password: str
+
+
 class PhoneStartRequest(CamelModel):
     phone_number: str
 

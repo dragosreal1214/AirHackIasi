@@ -31,8 +31,9 @@ class User(Base):
     id: Mapped[uuid.UUID] = _uuid_pk()
     phone_number: Mapped[str] = mapped_column(String, unique=True, index=True)
     phone_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    email: Mapped[str | None] = mapped_column(String)
+    email: Mapped[str | None] = mapped_column(String, index=True)
     full_name: Mapped[str | None] = mapped_column(String)
+    password_hash: Mapped[str | None] = mapped_column(String)
     preferred_language: Mapped[str] = mapped_column(String, default="ro")
     notification_channels: Mapped[list[str]] = mapped_column(
         JSONB, default=lambda: ["whatsapp", "sms"]
