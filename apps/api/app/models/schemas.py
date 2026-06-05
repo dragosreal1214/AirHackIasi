@@ -123,3 +123,4 @@ class TokenResponse(CamelModel):
 class TestNotificationRequest(CamelModel):
     phone_number: str
     disruption_id: str = "d_001"
+    channels: list[NotificationChannel] | None = None

@@ -70,7 +70,13 @@ async def send_sms(to: str, body: str) -> str | None:
     if not settings.twilio_enabled:
         logger.info("twilio_dev_sms", to=to, body=body)
         return None
-    msg = _client().messages.create(to=to, from_=settings.TWILIO_SMS_FROM, body=body)
+    import asyncio  # noqa: PLC0415
+
+    msg = await asyncio.to_thread(
+        lambda: _client().messages.create(
+            to=to, from_=settings.TWILIO_SMS_FROM, body=body
+        )
+    )
     return msg.sid
 
 
@@ -78,9 +84,13 @@ async def send_whatsapp(to: str, body: str) -> str | None:
     if not settings.twilio_enabled:
         logger.info("twilio_dev_whatsapp", to=to, body=body)
         return None
-    msg = _client().messages.create(
-        to=f"whatsapp:{to}",
-        from_=settings.TWILIO_WHATSAPP_FROM,
-        body=body,
+    import asyncio  # noqa: PLC0415
+
+    msg = await asyncio.to_thread(
+        lambda: _client().messages.create(
+            to=f"whatsapp:{to}",
+            from_=settings.TWILIO_WHATSAPP_FROM,
+            body=body,
+        )
     )
     return msg.sid

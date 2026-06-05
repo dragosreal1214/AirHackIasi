@@ -1,12 +1,10 @@
 """Notification dispatcher.
 
-Renders the fog-warning message (Romanian) and sends it over the user's
+Renders the fog-warning message (Romanian) and sends it over the requested
 channels via Twilio. With no Twilio credentials it logs the message in dev mode
-so the flow is demonstrable offline.
-
-(Orange Device Location is not among the available RO CAMARA products, so the
-urgency line is generic. If a location product becomes available we can tailor
-it per distance-to-airport.)
+so the flow is demonstrable offline. Each channel is attempted independently;
+a failure on one (e.g. WhatsApp recipient hasn't joined the sandbox) doesn't
+block the others.
 """
 
 from __future__ import annotations
@@ -20,8 +18,10 @@ from app.services.integrations import twilio_client
 
 logger = structlog.get_logger(__name__)
 
+DEFAULT_CHANNELS = ["whatsapp", "sms"]
 
-def render_whatsapp(disruption: Disruption) -> str:
+
+def render_message(disruption: Disruption) -> str:
     f = disruption.flight
     pct = round(disruption.risk.probability * 100)
     return (
@@ -32,18 +32,52 @@ def render_whatsapp(disruption: Disruption) -> str:
     )
 
 
-async def dispatch(phone_number: str, disruption_id: str) -> dict[str, str]:
+async def dispatch(
+    phone_number: str,
+    disruption_id: str,
+    channels: list[str] | None = None,
+) -> dict:
     disruption = store.DISRUPTIONS.get(disruption_id)
     if disruption is None:
         return {"status": "skipped", "reason": "unknown_disruption"}
 
-    body = render_whatsapp(disruption)
+    channels = channels or DEFAULT_CHANNELS
+    body = render_message(disruption)
+    results: dict[str, dict] = {}
 
-    # WhatsApp first, SMS fallback.
-    await twilio_client.send_whatsapp(phone_number, body)
-    if not settings.twilio_enabled:
-        # dev mode: also exercise the SMS path so both channels are visible
-        await twilio_client.send_sms(phone_number, body)
+    senders = {
+        "whatsapp": twilio_client.send_whatsapp,
+        "sms": twilio_client.send_sms,
+    }
+    # In live mode, only attempt a channel whose sender address is configured.
+    from_configured = {
+        "whatsapp": bool(settings.TWILIO_WHATSAPP_FROM),
+        "sms": bool(settings.TWILIO_SMS_FROM),
+    }
 
-    logger.info("notification_dispatched", phone=phone_number, disruption=disruption_id)
-    return {"status": "sent", "channel": "whatsapp", "preview": body}
+    for channel in channels:
+        sender = senders.get(channel)
+        if sender is None:
+            continue
+        if settings.twilio_enabled and not from_configured.get(channel, False):
+            results[channel] = {"ok": False, "reason": "no_sender_configured"}
+            continue
+        try:
+            sid = await sender(phone_number, body)
+            results[channel] = {"ok": True, "sid": sid}
+        except Exception as exc:  # noqa: BLE001 - per-channel best effort
+            logger.warning("notify_channel_failed", channel=channel, error=str(exc))
+            results[channel] = {"ok": False, "error": str(exc)[:160]}
+
+    sent_any = any(r.get("ok") for r in results.values())
+    logger.info(
+        "notification_dispatched",
+        phone=phone_number,
+        disruption=disruption_id,
+        sent=sent_any,
+    )
+    return {
+        "status": "sent" if sent_any else "failed",
+        "channels": results,
+        "preview": body,
+    }

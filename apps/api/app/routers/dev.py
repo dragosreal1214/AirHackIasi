@@ -34,10 +34,14 @@ async def db_status() -> dict[str, Any]:
 
 
 @router.post("/send-notification")
-async def send_test_notification(payload: TestNotificationRequest) -> dict[str, str]:
-    """Render + 'send' a fog alert. In dev mode the message is logged, not sent."""
+async def send_test_notification(payload: TestNotificationRequest) -> dict[str, Any]:
+    """Render + send a fog alert now. In dev mode the message is logged, not sent.
+
+    On a Twilio trial, WhatsApp only reaches numbers that joined the sandbox;
+    SMS needs a purchased `from` number.
+    """
     return await notification_service.dispatch(
-        payload.phone_number, payload.disruption_id
+        payload.phone_number, payload.disruption_id, payload.channels
     )
 
 
