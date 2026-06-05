@@ -111,6 +111,8 @@ class OrangeClient:
 
     async def healthcheck(self) -> dict[str, Any]:
         """Verify creds + connectivity without exposing the token (dev only)."""
+        if settings.ORANGE_MOCK:
+            return {"enabled": True, "mock": True, "tokenOk": True}
         if not settings.orange_enabled:
             return {"enabled": False}
         try:
@@ -126,6 +128,9 @@ class OrangeClient:
 
         None when Orange is disabled/unavailable (caller treats as "no signal").
         """
+        if settings.ORANGE_MOCK:
+            # Lab numbers are documented as swapped ~1 day ago.
+            return phone_number in SANDBOX_IDENTITIES
         body = await self._post(
             settings.ORANGE_SIM_SWAP_PATH,
             {"phoneNumber": phone_number, "maxAge": max_age_hours},
@@ -143,6 +148,16 @@ class OrangeClient:
         the per-field match result (values like "true"/"false"/"not_available"),
         or None when Orange is disabled/unavailable.
         """
+        if settings.ORANGE_MOCK:
+            identity = SANDBOX_IDENTITIES.get(phone_number)
+            if not applicant:
+                return {"overallMatch": "not_available"}
+            return {
+                f"{field}Match": (
+                    "true" if identity and identity.get(field) == value else "false"
+                )
+                for field, value in applicant.items()
+            }
         return await self._post(
             settings.ORANGE_KYC_MATCH_PATH,
             {"phoneNumber": phone_number, **applicant},

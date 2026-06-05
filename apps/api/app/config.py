@@ -62,6 +62,9 @@ class Settings(BaseSettings):
     # live product paths (note: production SIM Swap/KYC use 3-legged OAuth).
     ORANGE_SIM_SWAP_PATH: str = "/camara/orange-lab/sim-swap/v1/check"
     ORANGE_KYC_MATCH_PATH: str = "/camara/orange-lab/kyc-match/v0/match"
+    # Return canned sandbox responses without calling Orange. Use while the
+    # real app/subscription is awaiting activation on the portal.
+    ORANGE_MOCK: bool = False
 
     # --- External data ---
     MAPBOX_TOKEN: str = ""
