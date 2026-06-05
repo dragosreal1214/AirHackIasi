@@ -4,7 +4,7 @@ from typing import Any
 
 from fastapi import APIRouter, Query
 
-from app.ml import fog_history
+from app.ml import fog_forecast, fog_history
 from app.ml.fog_model import fog_model
 
 router = APIRouter(prefix="/ml", tags=["ml"])
@@ -47,6 +47,25 @@ async def fog_windows(date: str = Query(..., description="YYYY-MM-DD")) -> dict[
     """High-risk fog windows predicted by the model for a historical day."""
     return {
         "date": date,
+        "windows": fog_history.fog_windows(date),
+        "peak": fog_history.peak(date),
+    }
+
+
+@router.get("/forecast")
+async def forecast() -> dict[str, Any]:
+    """LIVE hourly fog-risk timeline for LRIA via Open-Meteo."""
+    return await fog_forecast.forecast()
+
+
+@router.get("/timeline")
+async def timeline(date: str = Query(..., description="YYYY-MM-DD")) -> dict[str, Any]:
+    """REPLAY: hourly fog-risk timeline for a historical day from the dataset."""
+    return {
+        "source": "replay",
+        "available": True,
+        "date": date,
+        "hourly": fog_history.timeline(date),
         "windows": fog_history.fog_windows(date),
         "peak": fog_history.peak(date),
     }

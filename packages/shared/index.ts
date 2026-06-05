@@ -113,6 +113,34 @@ export interface CreatePnrInput {
   pnrCode?: string;
 }
 
+// ----- Fog forecast / ops timeline -----
+
+export interface FogHourly {
+  time: string; // ISO 8601
+  probability: number; // 0..1
+  level: RiskLevel;
+  temperature?: number;
+  dewpointDepression?: number;
+  windSpeed?: number;
+  humidity?: number;
+}
+
+export interface FogPeak {
+  time: string;
+  probability: number;
+  level: RiskLevel;
+  explanation?: string;
+}
+
+export interface FogTimeline {
+  source: "open-meteo" | "replay";
+  available: boolean;
+  date?: string;
+  hourly: FogHourly[];
+  windows: { start: string; end: string }[];
+  peak: FogPeak | null;
+}
+
 /** Standard API error envelope (see docs/api-spec.md). */
 export interface ApiError {
   code: string;

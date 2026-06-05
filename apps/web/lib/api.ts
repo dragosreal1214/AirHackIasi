@@ -14,6 +14,7 @@ import type {
   CreatePnrInput,
   Disruption,
   FlightSummary,
+  FogTimeline,
   LoginInput,
   PhoneStartResponse,
   PnrStatus,
@@ -236,6 +237,26 @@ export async function verifyOtp(
     method: "POST",
     body: JSON.stringify({ challengeId, code }),
   });
+}
+
+// ---------------------------------------------------------------------------
+// Fog forecast / ops timeline
+// ---------------------------------------------------------------------------
+
+export async function getForecast(): Promise<FogTimeline> {
+  if (USE_MOCKS) {
+    await delay();
+    return { source: "open-meteo", available: true, hourly: [], windows: [], peak: null };
+  }
+  return http(`/ml/forecast`);
+}
+
+export async function getTimeline(date: string): Promise<FogTimeline> {
+  if (USE_MOCKS) {
+    await delay();
+    return { source: "replay", available: true, date, hourly: [], windows: [], peak: null };
+  }
+  return http(`/ml/timeline?date=${date}`);
 }
 
 export { ApiClientError, USE_MOCKS };

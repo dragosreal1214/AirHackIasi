@@ -65,6 +65,28 @@ def fog_windows(date_str: str, threshold: float = HIGH_RISK_THRESHOLD) -> list[d
     return windows
 
 
+def timeline(date_str: str) -> list[dict[str, Any]]:
+    """Hourly risk series for a historical day (for ops replay)."""
+    day = _day(date_str)
+    if day.empty:
+        return []
+    series: list[dict[str, Any]] = []
+    for _, row in day.iterrows():
+        prob = float(row["prob"])
+        series.append(
+            {
+                "time": row["timestamp"].isoformat(),
+                "probability": round(prob, 4),
+                "level": fog_model.risk_level(prob),
+                "temperature": float(row["temperature"]),
+                "dewpointDepression": float(row["dewpoint_depression"]),
+                "windSpeed": float(row["wind_speed"]),
+                "humidity": float(row["humidity"]),
+            }
+        )
+    return series
+
+
 def peak(date_str: str) -> dict[str, Any] | None:
     day = _day(date_str)
     if day.empty:
