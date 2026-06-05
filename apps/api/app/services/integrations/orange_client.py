@@ -71,6 +71,16 @@ class OrangeClient:
             logger.warning("orange_call_failed", path=path, error=str(exc))
             return None
 
+    async def healthcheck(self) -> dict[str, Any]:
+        """Verify creds + connectivity without exposing the token (dev only)."""
+        if not settings.orange_enabled:
+            return {"enabled": False}
+        try:
+            await self._get_token()
+            return {"enabled": True, "tokenOk": True}
+        except Exception as exc:  # noqa: BLE001
+            return {"enabled": True, "tokenOk": False, "error": str(exc)}
+
     async def check_sim_swap(
         self, phone_number: str, max_age_hours: int = 240
     ) -> bool | None:
