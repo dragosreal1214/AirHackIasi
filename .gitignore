@@ -49,3 +49,6 @@ Thumbs.db
 *.log
 npm-debug.log*
 pnpm-debug.log*
+
+# Playwright MCP scratch
+.playwright-mcp/
