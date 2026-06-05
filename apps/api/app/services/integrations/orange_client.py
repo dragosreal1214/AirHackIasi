@@ -5,12 +5,13 @@ Available CAMARA products on the Orange Romania account:
   • KYC Match  — does user-provided identity data match the operator's records?
 (Number Verification is NOT available in RO, so login uses SMS OTP via Twilio.)
 
-OAuth2 client_credentials is used for all calls. Feature-flagged: with no
-credentials every method returns None and callers degrade gracefully.
+Paths default to the Romania **sandbox** (orange-lab) products — verified from
+the Orange Developer docs — which use 2-legged OAuth and lab test numbers
+(+4078910305x). Override ORANGE_SIM_SWAP_PATH / ORANGE_KYC_MATCH_PATH for
+production (which uses 3-legged OAuth).
 
-⚠️ ENDPOINT PATHS / FIELD NAMES BELOW ARE BEST-EFFORT CAMARA DEFAULTS. Confirm
-the exact product paths + versions shown on the Orange Developer portal for
-Romania and adjust the constants if they differ.
+Feature-flagged: with no credentials every method returns None and callers
+degrade gracefully.
 """
 
 from __future__ import annotations
@@ -25,9 +26,46 @@ from app.config import settings
 
 logger = structlog.get_logger(__name__)
 
-# TODO(orange): confirm exact product paths/versions on Orange Developer (RO).
-SIM_SWAP_CHECK_PATH = "/camara/sim-swap/v040/check"
-KYC_MATCH_PATH = "/camara/kyc-match/v020/match"
+# Romania sandbox lab numbers + their fake identities (from Orange docs).
+# Handy for demoing KYC Match (matching identity) without real data.
+SANDBOX_IDENTITIES: dict[str, dict[str, str]] = {
+    "+40789103050": {
+        "name": "Andrei Mihai Popescu",
+        "givenName": "Andrei",
+        "familyName": "Popescu",
+        "email": "andrei.popescu@example.com",
+        "postalCode": "10607",
+        "locality": "Bucuresti",
+        "birthdate": "1985-03-14",
+    },
+    "+40789103051": {
+        "name": "Ioana Elena Marinescu",
+        "givenName": "Ioana",
+        "familyName": "Marinescu",
+        "email": "ioana.marinescu@example.com",
+        "postalCode": "20145",
+        "locality": "Bucuresti",
+        "birthdate": "1990-11-02",
+    },
+    "+40789103052": {
+        "name": "Catalin Andrei Iordache",
+        "givenName": "Catalin",
+        "familyName": "Iordache",
+        "email": "catalin.iordache@example.com",
+        "postalCode": "400114",
+        "locality": "Cluj-Napoca",
+        "birthdate": "1982-06-28",
+    },
+    "+40789103053": {
+        "name": "Madalina Ioana Dobre",
+        "givenName": "Madalina",
+        "familyName": "Dobre",
+        "email": "madalina.dobre@example.com",
+        "postalCode": "700064",
+        "locality": "Iasi",
+        "birthdate": "1993-05-17",
+    },
+}
 
 
 class OrangeClient:
@@ -89,7 +127,7 @@ class OrangeClient:
         None when Orange is disabled/unavailable (caller treats as "no signal").
         """
         body = await self._post(
-            SIM_SWAP_CHECK_PATH,
+            settings.ORANGE_SIM_SWAP_PATH,
             {"phoneNumber": phone_number, "maxAge": max_age_hours},
         )
         if body is None:
@@ -106,7 +144,7 @@ class OrangeClient:
         or None when Orange is disabled/unavailable.
         """
         return await self._post(
-            KYC_MATCH_PATH,
+            settings.ORANGE_KYC_MATCH_PATH,
             {"phoneNumber": phone_number, **applicant},
         )
 

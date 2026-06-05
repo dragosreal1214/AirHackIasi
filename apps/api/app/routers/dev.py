@@ -27,5 +27,20 @@ async def orange_status() -> dict[str, Any]:
 
 @router.get("/orange/sim-swap")
 async def orange_sim_swap(phone: str) -> dict[str, Any]:
-    """Try a SIM Swap check. `swapped` is null until the subscription is approved."""
+    """Try a SIM Swap check. `swapped` is null until the subscription is approved.
+
+    Sandbox test numbers: +40789103050..+40789103053.
+    """
     return {"swapped": await orange_client.orange_client.check_sim_swap(phone)}
+
+
+@router.get("/orange/kyc-match")
+async def orange_kyc_match(phone: str) -> dict[str, Any]:
+    """Run KYC Match for a sandbox number using its known lab identity.
+
+    For +4078910305x the matching identity is used, so you should see all
+    fields match. `result` is null until Orange is configured/approved.
+    """
+    applicant = orange_client.SANDBOX_IDENTITIES.get(phone, {})
+    result = await orange_client.orange_client.kyc_match(phone, applicant)
+    return {"applicant": applicant, "result": result}

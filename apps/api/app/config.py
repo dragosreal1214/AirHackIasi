@@ -57,6 +57,11 @@ class Settings(BaseSettings):
     ORANGE_AUTH_HEADER: str = ""
     ORANGE_API_BASE: str = "https://api.orange.com"
     ORANGE_TOKEN_PATH: str = "/oauth/v3/token"
+    # Defaults target the Romania *sandbox* (orange-lab) products, which use
+    # 2-legged OAuth and lab test numbers. For production, swap these to the
+    # live product paths (note: production SIM Swap/KYC use 3-legged OAuth).
+    ORANGE_SIM_SWAP_PATH: str = "/camara/orange-lab/sim-swap/v1/check"
+    ORANGE_KYC_MATCH_PATH: str = "/camara/orange-lab/kyc-match/v0/match"
 
     # --- External data ---
     MAPBOX_TOKEN: str = ""

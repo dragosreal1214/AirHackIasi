@@ -69,11 +69,35 @@ How we use them:
 - **SIM Swap** — checked at login (after OTP) as an account-takeover signal.
 - **KYC Match** — verify a passenger's identity matches the SIM owner on file.
 
-> **Still need from you:** the exact **product paths + versions** shown on the
-> Orange Developer portal for SIM Swap and KYC Match. The constants
-> `SIM_SWAP_CHECK_PATH` / `KYC_MATCH_PATH` in
-> `apps/api/app/services/integrations/orange_client.py` are best-effort CAMARA
-> defaults — paste the portal's "try it" URLs and I'll lock them in.
+### Sandbox (recommended for the hackathon)
+We default to the Romania **sandbox** (`orange-lab`) products — verified from the
+Orange docs. They use the same 2-legged credentials and provide lab test numbers,
+so we can build/demo without approval or real SIMs.
+
+| Path | Value |
+| ---- | ----- |
+| SIM Swap | `POST /camara/orange-lab/sim-swap/v1/check` |
+| KYC Match | `POST /camara/orange-lab/kyc-match/v0/match` |
+
+**Sandbox test numbers** (`+4078910305x`), all with a recent (–1 day) SIM swap:
+
+| Phone | KYC identity | City |
+| ----- | ------------ | ---- |
+| +40789103050 | Andrei Mihai Popescu | București |
+| +40789103051 | Ioana Elena Marinescu | București |
+| +40789103052 | Catalin Andrei Iordache | Cluj-Napoca |
+| +40789103053 | Madalina Ioana Dobre | **Iași** |
+
+Quick test once `.env` has the creds (API running):
+```
+GET /api/v1/dev/orange/status                         # token works?
+GET /api/v1/dev/orange/sim-swap?phone=+40789103051    # -> { "swapped": true }
+GET /api/v1/dev/orange/kyc-match?phone=+40789103053   # -> per-field match result
+```
+
+> **Production later:** set `ORANGE_SIM_SWAP_PATH` / `ORANGE_KYC_MATCH_PATH` to
+> the live product paths. Note production SIM Swap/KYC use **3-legged OAuth**
+> (per-user consent), a larger change than the 2-legged sandbox.
 > Empty creds → SIM Swap/KYC return no signal and the app works normally.
 
 ### 4. Mapbox — ops dashboard map (public token)
