@@ -16,7 +16,7 @@ import { FilterChips } from "@/components/ui/filter-chips";
 import { usePnrs } from "@/hooks/use-pnrs";
 
 const FILTERS: { value: PnrStatus; label: string }[] = [
-  { value: "active", label: "Active" },
+  { value: "active", label: "Viitoare" },
   { value: "completed", label: "Trecute" },
   { value: "cancelled", label: "Anulate" },
 ];
@@ -90,7 +90,7 @@ export default function TripsPage() {
             <EmptyState
               icon={<PlaneTakeoff className="h-7 w-7" />}
               title="Niciun zbor adăugat"
-              description="Adaugă un zbor și te anunțăm din timp dacă apare risc de ceață la Iași."
+              description="Adaugă un zbor și te anunțăm din timp dacă apare risc de ceață la plecare."
               action={
                 <Link href="/flights/add">
                   <CButton variant="gold" rightIcon={<Plus className="h-4 w-4" />}>

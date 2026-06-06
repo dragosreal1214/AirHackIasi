@@ -68,6 +68,7 @@ export function TimePicker({
                     <button
                       key={hh}
                       type="button"
+                      aria-label={`Ora ${pad(hh)}`}
                       onClick={() => update({ h: hh, m: sel.m })}
                       className={cn(
                         "rounded-icon py-2 text-sm font-semibold tabular-nums transition-colors",
@@ -88,6 +89,7 @@ export function TimePicker({
                     <button
                       key={mm}
                       type="button"
+                      aria-label={`Minutul ${pad(mm)}`}
                       onClick={() => update({ h: sel.h, m: mm })}
                       className={cn(
                         "rounded-icon py-2 text-sm font-semibold tabular-nums transition-colors",

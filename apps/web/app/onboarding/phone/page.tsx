@@ -49,7 +49,7 @@ export default function PhonePage() {
           className="mt-10 font-display text-[2.75rem] leading-[1.05] tracking-tight text-espresso animate-c-fade-up"
           style={{ animationDelay: "120ms" }}
         >
-          Cu un <span className="italic text-accent-deep">aer</span> înainte.
+          Copilotul tău <span className="italic text-accent-deep">calm.</span>
         </h1>
         <p
           className="mt-3 text-base leading-relaxed text-warm-muted animate-c-fade-up"

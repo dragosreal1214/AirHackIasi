@@ -59,7 +59,8 @@ export function AirlineBadge({
 
   return (
     <span
-      aria-hidden
+      aria-label={code}
+      role="img"
       className={cn(
         "inline-flex flex-shrink-0 items-center justify-center rounded-full font-bold tracking-tight ring-1 ring-black/[0.06]",
         className,

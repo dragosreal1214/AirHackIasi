@@ -23,6 +23,7 @@ export default function VerifyPage() {
   const [challengeId, setChallengeId] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
   const [isDev, setIsDev] = useState(false);
+  const [backHref, setBackHref] = useState("/onboarding/phone");
 
   useEffect(() => {
     const ch = sessionStorage.getItem("aerly_challenge");
@@ -33,6 +34,11 @@ export default function VerifyPage() {
     setChallengeId(ch);
     setPhone(sessionStorage.getItem("aerly_phone") ?? "");
     setIsDev(sessionStorage.getItem("aerly_method") === "dev");
+    setBackHref(
+      sessionStorage.getItem("aerly_flow") === "register"
+        ? "/onboarding/register"
+        : "/onboarding/phone",
+    );
     inputRef.current?.focus();
   }, [router]);
 
@@ -64,7 +70,7 @@ export default function VerifyPage() {
     <div className="cine-surface flex min-h-screen flex-1 flex-col px-6 pt-safe-top">
       <div className="pt-6 animate-c-fade-up">
         <Link
-          href="/onboarding/phone"
+          href={backHref}
           aria-label="Înapoi"
           className="-ml-1 flex h-[42px] w-[42px] items-center justify-center rounded-full border border-[rgba(200,167,97,0.65)] bg-white/60 text-warm-ink shadow-[0_0_12px_rgba(200,167,97,0.16)] backdrop-blur-lg transition-all duration-120 ease-cinematic active:scale-95"
         >
@@ -116,7 +122,7 @@ export default function VerifyPage() {
         <Clock className="h-4 w-4 text-warm-faint" />
         N-ai primit codul?{" "}
         <Link
-          href="/onboarding/phone"
+          href={backHref}
           className="font-semibold text-accent-deep underline-offset-2 hover:underline"
         >
           Trimite din nou

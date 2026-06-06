@@ -167,7 +167,7 @@ export default function DisruptionPage() {
             className="inline-flex items-center gap-1.5 rounded-button border border-[color:var(--gold-border-strong)] bg-white/60 px-3 py-2 text-sm font-semibold text-accent-deep backdrop-blur-lg transition-transform duration-120 ease-cinematic active:scale-[0.98]"
           >
             <Phone className="h-4 w-4" strokeWidth={2} />
-            Sună TAROM
+            Sună la suport
           </a>
         </GoldCard>
 

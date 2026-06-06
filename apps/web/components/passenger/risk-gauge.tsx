@@ -50,13 +50,18 @@ export function RiskGauge({
   const dash = (pct / 100) * c;
 
   return (
-    <div className="flex flex-col items-center gap-2 text-center">
+    <div
+      className="flex flex-col items-center gap-2 text-center"
+      role="img"
+      aria-label={`${label}: ${pct}% — ${LEVEL_WORD[level]}`}
+    >
       <div className="relative" style={{ width: size, height: size }}>
         <svg
           width={size}
           height={size}
           viewBox={`0 0 ${size} ${size}`}
           className="-rotate-90"
+          aria-hidden
         >
           <circle
             cx={size / 2}
