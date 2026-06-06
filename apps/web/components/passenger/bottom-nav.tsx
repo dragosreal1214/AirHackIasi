@@ -19,7 +19,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="sticky bottom-0 z-20 border-t border-[color:var(--gold-border)] pb-safe-bottom backdrop-blur-glass"
+      className="sticky bottom-0 z-20 border-t border-[color:var(--gold-border)] pb-safe-bottom backdrop-blur-glass lg:hidden"
       style={{ background: "var(--bottomnav-bg)" }}
     >
       <ul className="mx-auto flex max-w-md items-stretch justify-around px-1.5 pt-1.5">

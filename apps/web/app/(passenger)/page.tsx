@@ -3,6 +3,7 @@
 import {
   ArrowUpRight,
   Bell,
+  Code2,
   FileText,
   type LucideIcon,
   LifeBuoy,
@@ -56,6 +57,13 @@ const MENU: MenuItem[] = [
     title: "Profil",
     sub: "Cont & alerte",
     tone: "sky",
+  },
+  {
+    href: "/developers",
+    icon: Code2,
+    title: "API & date",
+    sub: "Pentru dezvoltatori",
+    tone: "sand",
   },
 ];
 
@@ -187,7 +195,7 @@ export default function HomePage() {
         )}
 
         {/* menu grid */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
           {MENU.map((item, i) => (
             <MenuCard key={item.href} item={item} delay={0.12 + i * 0.06} />
           ))}
