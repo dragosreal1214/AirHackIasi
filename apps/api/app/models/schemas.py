@@ -73,6 +73,38 @@ class Disruption(CamelModel):
     alternatives_count: int
 
 
+class Gauge(CamelModel):
+    key: str
+    label: str
+    value: float  # 0..1
+    level: RiskLevel
+
+
+class FlightInfo(CamelModel):
+    terminal: str | None = None
+    gate: str | None = None
+    baggage_belt: str | None = None
+    duration_minutes: int
+
+
+class TimelineStep(CamelModel):
+    label: str
+    time: str
+    done: bool
+
+
+class FlightDetail(CamelModel):
+    flight: FlightSummary
+    risk: CurrentRisk
+    destination_risk: CurrentRisk | None = None
+    cancel_probability: float
+    weather: list[Gauge]
+    info: FlightInfo
+    timeline: list[TimelineStep]
+    disruption_id: str | None = None
+    alternatives_count: int = 0
+
+
 class Me(CamelModel):
     id: str
     full_name: str | None = None
