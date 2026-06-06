@@ -1,7 +1,6 @@
 "use client";
 
-import { use } from "react";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { Check, MapPin, Phone, Star } from "lucide-react";
 
 import { AppBar } from "@/components/passenger/app-bar";
@@ -11,12 +10,8 @@ import { GoldDivider } from "@/components/ui/divider";
 import { cn } from "@/lib/utils";
 import { getHotel } from "../hotels-data";
 
-export default function HotelDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = use(params);
+export default function HotelDetailPage() {
+  const { id } = useParams<{ id: string }>();
   const hotel = getHotel(id);
 
   if (!hotel) {
