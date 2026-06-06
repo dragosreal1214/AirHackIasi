@@ -50,6 +50,10 @@ async def dispatch(
     if disruption is None:
         return {"status": "skipped", "reason": "unknown_disruption"}
 
+    # Never alert on low risk — only high/critical fog risk warrants a notification.
+    if disruption.risk.level not in ("high", "critical"):
+        return {"status": "skipped", "reason": "risk_not_high", "level": disruption.risk.level}
+
     channels = channels or DEFAULT_CHANNELS
 
     # Orange Device Reachability — pick the channel that can actually be reached.
