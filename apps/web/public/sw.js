@@ -37,10 +37,10 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
+  // Cache images/fonts only — never JS/CSS (would serve stale chunks + break HMR).
   const isStatic =
     url.pathname.startsWith("/cine/") ||
-    url.pathname.startsWith("/_next/static/") ||
-    /\.(?:png|jpg|jpeg|svg|gif|webp|ico|woff2?|css|js)$/.test(url.pathname);
+    /\.(?:png|jpg|jpeg|svg|gif|webp|ico|woff2?)$/.test(url.pathname);
 
   if (isStatic) {
     // Cache-first for static assets.
