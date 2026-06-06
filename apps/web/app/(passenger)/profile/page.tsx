@@ -295,13 +295,17 @@ export default function ProfilePage() {
       const res = await subscribeToPush();
       if (res !== "ok") {
         setOverride(prev); // deactivate on error
-        setPushNote(
-          res === "denied"
-            ? "Permite notificările din setările browserului/telefonului."
-            : res === "unsupported"
-              ? "Notificările push nu sunt suportate aici (adaugă pe ecranul principal pe iOS)."
-              : "Nu am putut activa notificările push acum.",
-        );
+        const NOTE: Record<string, string> = {
+          denied: "Permite notificările din setările browserului/telefonului.",
+          unsupported:
+            "Notificările push nu sunt suportate aici (pe iOS adaugă întâi pe ecranul principal).",
+          disabled: "Notificările push nu sunt configurate pe server.",
+          "no-backend": "Nu pot contacta serverul (verifică conexiunea / că ești autentificat).",
+          "subscribe-failed":
+            "Browserul nu a putut crea abonamentul (pe iOS deschide din ecranul principal).",
+          "save-failed": "Nu am putut salva abonamentul (reautentifică-te și reîncearcă).",
+        };
+        setPushNote(NOTE[res] ?? "Nu am putut activa notificările push acum.");
         return;
       }
       setPushNote("Notificările push sunt active pe acest dispozitiv.");

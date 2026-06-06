@@ -2,7 +2,14 @@
 
 import { getPushPublicKey, savePushSubscription } from "@/lib/api";
 
-export type PushResult = "ok" | "denied" | "unsupported" | "disabled" | "error";
+export type PushResult =
+  | "ok"
+  | "denied"
+  | "unsupported"
+  | "disabled"
+  | "no-backend"
+  | "subscribe-failed"
+  | "save-failed";
 
 function urlBase64ToUint8Array(base64: string): Uint8Array {
   const padding = "=".repeat((4 - (base64.length % 4)) % 4);
@@ -24,26 +31,47 @@ export async function subscribeToPush(): Promise<PushResult> {
     return "unsupported";
   }
 
-  const { publicKey, enabled } = await getPushPublicKey();
+  // 1. Get the VAPID public key from the backend.
+  let publicKey = "";
+  let enabled = false;
+  try {
+    const r = await getPushPublicKey();
+    publicKey = r.publicKey;
+    enabled = r.enabled;
+  } catch (e) {
+    console.error("[push] could not reach backend for public key:", e);
+    return "no-backend";
+  }
   if (!enabled || !publicKey) return "disabled";
 
+  // 2. Permission.
   const permission = await Notification.requestPermission();
   if (permission !== "granted") return "denied";
 
+  // 3. Subscribe via the service worker.
+  let sub: PushSubscription | null;
   try {
     const reg = await navigator.serviceWorker.ready;
-    let sub = await reg.pushManager.getSubscription();
+    sub = await reg.pushManager.getSubscription();
     if (!sub) {
       sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey) as BufferSource,
       });
     }
-    await savePushSubscription(sub.toJSON());
-    return "ok";
-  } catch {
-    return "error";
+  } catch (e) {
+    console.error("[push] pushManager.subscribe failed:", e);
+    return "subscribe-failed";
   }
+
+  // 4. Save the subscription to the backend (needs auth + reachable API).
+  try {
+    await savePushSubscription(sub.toJSON());
+  } catch (e) {
+    console.error("[push] saving subscription failed:", e);
+    return "save-failed";
+  }
+  return "ok";
 }
 
 export function pushPermission(): NotificationPermission | "unsupported" {
