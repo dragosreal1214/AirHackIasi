@@ -1,12 +1,14 @@
 {
   "$schema": "https://railway.com/railway.schema.json",
-  "_comment": "WEB service config. Set this Railway service's Root Directory to the repo root. The API service uses apps/api (apps/api/railway.json). See docs/deploy-railway.md.",
+  "_comment": "BACKEND (FastAPI). A Railway service with Root Directory '/' builds the repo-root Dockerfile (the API). The web app deploys on Vercel. See docs/deploy-railway.md.",
   "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "pnpm install --frozen-lockfile && pnpm --filter web build"
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-    "startCommand": "pnpm --filter web exec next start -H 0.0.0.0 -p $PORT",
+    "startCommand": "sh -c 'alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT'",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 120,
     "restartPolicyType": "ON_FAILURE",
     "numReplicas": 1
   }

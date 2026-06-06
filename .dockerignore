@@ -1,0 +1,18 @@
+# Repo-root build context (Dockerfile builds the API). Keep the image small.
+**/.venv/
+**/node_modules/
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.next/
+**/.turbo/
+.git/
+apps/web/
+packages/
+docs/
+**/.env
+**/*.log
+apps/api/tests/
+apps/api/data/raw/
