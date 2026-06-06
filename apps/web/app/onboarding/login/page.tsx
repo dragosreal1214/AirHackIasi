@@ -160,10 +160,25 @@ export default function LoginPage() {
             }}
           />
 
-          {/* SECONDARY: email/password login */}
+          {/* Login — phone number is the primary method */}
           <p className="mb-3 text-center text-[11px] font-bold uppercase tracking-[0.16em] text-warm-faint">
             Ai deja cont?
           </p>
+
+          <Link
+            href="/onboarding/phone"
+            className="inline-flex h-14 w-full items-center justify-center gap-2 whitespace-nowrap rounded-button border border-[rgba(200,167,97,0.65)] bg-ivory/95 px-7 text-base font-semibold tracking-tight text-espresso shadow-ivory-button transition-all duration-150 ease-cinematic active:scale-[0.98]"
+          >
+            <Smartphone className="h-5 w-5" />
+            Intră cu numărul de telefon
+          </Link>
+
+          {/* alternative: email + password */}
+          <div className="my-4 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-warm-faint">
+            <span className="h-px flex-1 bg-[rgba(200,162,78,0.22)]" />
+            sau cu email
+            <span className="h-px flex-1 bg-[rgba(200,162,78,0.22)]" />
+          </div>
 
           <div className="space-y-3">
             <TextField
@@ -186,15 +201,15 @@ export default function LoginPage() {
           {error && <p className="mt-3 text-sm font-medium text-risk-high">{error}</p>}
 
           <CButton
-            variant="ivory"
+            variant="ghost"
             size="md"
             full
             onClick={submit}
             disabled={pending}
             rightIcon={!pending && <ArrowRight className="h-5 w-5" />}
-            className="mt-4"
+            className="mt-3 border border-[color:var(--gold-border-strong)] text-accent-deep"
           >
-            {pending ? "Se autentifică…" : "Autentifică-te"}
+            {pending ? "Se autentifică…" : "Autentifică-te cu email"}
           </CButton>
 
           <Link
@@ -203,14 +218,6 @@ export default function LoginPage() {
           >
             Creează cont
             <ArrowRight className="h-4 w-4" />
-          </Link>
-
-          <Link
-            href="/onboarding/phone"
-            className="mt-3 flex items-center justify-center gap-1.5 text-sm font-semibold text-accent-deep"
-          >
-            <Smartphone className="h-4 w-4" />
-            Intră cu numărul de telefon
           </Link>
         </div>
       </div>

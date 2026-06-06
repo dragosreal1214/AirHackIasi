@@ -3,6 +3,7 @@
 import {
   ArrowUpRight,
   Bell,
+  CloudFog,
   Code2,
   FileText,
   type LucideIcon,
@@ -12,11 +13,11 @@ import {
   Sparkles,
   User,
 } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { getMe, getPnrs } from "@/lib/api";
+import { getForecast, getMe, getPnrs } from "@/lib/api";
 import { pnrKeys } from "@/hooks/use-pnrs";
 import { getAccessToken } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -82,6 +83,16 @@ export default function HomePage() {
     qc.prefetchQuery({ queryKey: ["me"], queryFn: getMe });
   }, [qc]);
 
+  // Live weather greeting for Iași — reflects today's actual fog outlook.
+  const forecast = useQuery({ queryKey: ["forecast", "IAS"], queryFn: () => getForecast("IAS") });
+  const peakLevel = forecast.data?.peak?.level;
+  const greeting =
+    peakLevel === "high" || peakLevel === "critical"
+      ? { Icon: CloudFog, text: "Risc de ceață azi", tone: "text-risk-high" }
+      : peakLevel === "moderate"
+        ? { Icon: CloudFog, text: "Vizibilitate variabilă azi", tone: "text-risk-moderate" }
+        : { Icon: Sparkles, text: "Cer senin azi", tone: "text-sky-ink" };
+
   return (
     <div
       className="no-sb relative min-h-full overflow-y-auto"
@@ -116,9 +127,14 @@ export default function HomePage() {
         {/* header */}
         <div className="animate-c-fade-up flex items-center justify-between [animation-delay:40ms]">
           <div>
-            <span className="mb-2 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase leading-none tracking-[0.14em] text-sky-ink">
-              <Sparkles className="h-3.5 w-3.5" strokeWidth={1.8} />
-              Cer senin azi
+            <span
+              className={cn(
+                "mb-2 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase leading-none tracking-[0.14em]",
+                greeting.tone,
+              )}
+            >
+              <greeting.Icon className="h-3.5 w-3.5" strokeWidth={1.8} />
+              {greeting.text}
             </span>
             <h1 className="font-display text-[28px] leading-[1.08] text-espresso">
               Bun venit
