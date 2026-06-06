@@ -51,8 +51,17 @@ function RiskGauge({ icon, label, value, caption, placeholder }: GaugeProps) {
   );
 }
 
-export function WeatherRiskPanel({ risk }: { risk: CurrentRisk }) {
+export function WeatherRiskPanel({
+  risk,
+  destinationRisk,
+  destinationIata,
+}: {
+  risk: CurrentRisk;
+  destinationRisk?: CurrentRisk | null;
+  destinationIata?: string;
+}) {
   const fogPct = riskPercent(risk.probability);
+  const destFogPct = destinationRisk ? riskPercent(destinationRisk.probability) : 0;
 
   return (
     <div
@@ -77,6 +86,16 @@ export function WeatherRiskPanel({ risk }: { risk: CurrentRisk }) {
           value={fogPct}
           caption={`${fogPct}% probabilitate`}
         />
+
+        {/* Real, bound to destinationRisk.probability — hidden when null */}
+        {destinationRisk && (
+          <RiskGauge
+            icon={<CloudFog className="h-4 w-4" strokeWidth={2} />}
+            label={`Ceață la destinație (${destinationIata})`}
+            value={destFogPct}
+            caption={`${destFogPct}% probabilitate`}
+          />
+        )}
 
         {/* Placeholders — our types carry only one probability */}
         <RiskGauge

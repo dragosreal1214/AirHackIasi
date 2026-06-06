@@ -106,7 +106,11 @@ export default function DisruptionPage() {
         {/* Weather / risk panel */}
         {disruption.data && (
           <div className="animate-c-fade-up" style={{ animationDelay: "70ms" }}>
-            <WeatherRiskPanel risk={disruption.data.risk} />
+            <WeatherRiskPanel
+              risk={disruption.data.risk}
+              destinationRisk={disruption.data.destinationRisk}
+              destinationIata={flight?.destinationIata}
+            />
           </div>
         )}
 

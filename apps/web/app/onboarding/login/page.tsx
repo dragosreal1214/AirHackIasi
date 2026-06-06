@@ -1,13 +1,12 @@
 "use client";
 
-import { ArrowRight, ChevronDown, Lock, Mail, Smartphone, Sparkles } from "lucide-react";
+import { ArrowRight, ChevronDown, Lock, Mail, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { CButton } from "@/components/ui/button";
 import { TextField } from "@/components/ui/text-field";
-import { CWord } from "@/components/ui/wordmark";
 import { ApiClientError, loginEmail } from "@/lib/api";
 import { setTokens } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -79,23 +78,23 @@ export default function LoginPage() {
         />
         <div className="absolute inset-0" style={{ background: `rgba(18,12,7,${dim - 0.16})` }} />
 
-        {/* wordmark */}
+        {/* Fogora logo — prominent */}
         <div
           className="absolute left-0 right-0 flex justify-center pt-safe-top"
           style={{ opacity: 1 - p * 0.85, transform: `translateY(${p * -10}px)` }}
         >
-          <CWord size={18} light className="mt-3.5" />
+          <img
+            src="/cine/fogora-mark.png"
+            alt="Fogora"
+            className="mt-2 h-[84px] w-[84px] object-contain drop-shadow-[0_6px_26px_rgba(0,0,0,0.55)]"
+          />
         </div>
 
         {/* tagline */}
         <div
           className="absolute left-0 right-0 px-8 text-center"
-          style={{ top: "12.5%", transform: `translateY(${p * -26}px) scale(${1 - p * 0.04})`, opacity: 1 - p * 1.15 }}
+          style={{ top: "15%", transform: `translateY(${p * -26}px) scale(${1 - p * 0.04})`, opacity: 1 - p * 1.15 }}
         >
-          <span className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-accent/35 bg-white/[0.12] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/90 backdrop-blur-glass">
-            <Sparkles className="h-3.5 w-3.5" />
-            Copilotul tău calm
-          </span>
           <h1 className="font-display text-[2.2rem] leading-[1.06] tracking-[0.01em] text-white [text-shadow:0_2px_30px_rgba(0,0,0,0.6)]">
             Claritate când
             <br />

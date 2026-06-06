@@ -5,6 +5,7 @@ import { Cloud, Radio, RotateCcw } from "lucide-react";
 import { useState } from "react";
 
 import { FogChart } from "@/components/ops/fog-chart";
+import { WeatherMap } from "@/components/ops/weather-map";
 import { RiskBadge } from "@/components/shared/risk-badge";
 import { getAirports, getForecast, getTimeline } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -101,27 +102,30 @@ export default function OpsDashboard() {
         <Stat label="Ferestre de ceață" value={String(data?.windows.length ?? 0)} />
       </div>
 
-      {/* Chart */}
-      <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
-        <div className="mb-2 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-700">
-            Probabilitate de ceață pe ore
-          </h2>
-          <span className="text-xs text-slate-400">
-            {mode.kind === "live"
-              ? `Prognoză live · ${mode.airport}`
-              : `Replay · IAS · ${mode.date}`}
-          </span>
-        </div>
-        {query.isLoading && <div className="h-72 animate-pulse rounded-xl bg-slate-100" />}
-        {data && data.available && data.hourly.length > 0 && <FogChart hourly={data.hourly} />}
-        {data && (!data.available || data.hourly.length === 0) && (
-          <div className="flex h-72 items-center justify-center text-sm text-slate-400">
-            {mode.kind === "live"
-              ? "Prognoza live nu e disponibilă momentan."
-              : "Nu există date pentru această zi."}
+      {/* Chart + weather map */}
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+        <div className="rounded-2xl border border-slate-200 bg-white p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-slate-700">
+              Probabilitate de ceață pe ore
+            </h2>
+            <span className="text-xs text-slate-400">
+              {mode.kind === "live"
+                ? `Prognoză live · ${mode.airport}`
+                : `Replay · IAS · ${mode.date}`}
+            </span>
           </div>
-        )}
+          {query.isLoading && <div className="h-72 animate-pulse rounded-xl bg-slate-100" />}
+          {data && data.available && data.hourly.length > 0 && <FogChart hourly={data.hourly} />}
+          {data && (!data.available || data.hourly.length === 0) && (
+            <div className="flex h-72 items-center justify-center text-sm text-slate-400">
+              {mode.kind === "live"
+                ? "Prognoza live nu e disponibilă momentan."
+                : "Nu există date pentru această zi."}
+            </div>
+          )}
+        </div>
+        <WeatherMap probability={data?.peak?.probability} />
       </div>
 
       {/* Windows + explanation */}

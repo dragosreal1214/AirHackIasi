@@ -13,23 +13,13 @@ export function CWord({ light, size = 32, className, ...props }: CWordProps) {
       className={cn("inline-flex items-center gap-2.5", className)}
       {...props}
     >
-      <span
+      <img
+        src="/cine/fogora-mark.png"
+        alt=""
+        aria-hidden
         style={{ width: size, height: size }}
-        className={cn(
-          "grid shrink-0 place-items-center rounded-full",
-          light
-            ? "border border-white/40 bg-white/[0.16] backdrop-blur-glass"
-            : "bg-gradient-to-br from-accent-soft to-accent-deep shadow-[0_6px_20px_rgba(168,132,47,0.35)]",
-        )}
-      >
-        <span
-          aria-hidden
-          className={cn(
-            "h-1/3 w-1/3 rounded-full",
-            light ? "bg-white" : "bg-ivory",
-          )}
-        />
-      </span>
+        className="shrink-0 rounded-icon object-contain"
+      />
       <span
         className={cn(
           "font-display leading-tight tracking-tight",

@@ -16,7 +16,9 @@ import type {
   FlightSummary,
   FogTimeline,
   LoginInput,
+  Me,
   OpsAirport,
+  UpdateMeInput,
   PhoneStartResponse,
   PnrStatus,
   PnrWithFlight,
@@ -312,6 +314,34 @@ export async function getTimeline(date: string): Promise<FogTimeline> {
     return { source: "replay", available: true, date, hourly: [], windows: [], peak: null };
   }
   return http(`/ml/timeline?date=${date}`);
+}
+
+// ---------------------------------------------------------------------------
+// Current user (profile + notification channels)
+// ---------------------------------------------------------------------------
+
+const MOCK_ME: Me = {
+  id: "demo-user",
+  fullName: "Andrei Pop",
+  phoneNumber: "+40700000000",
+  preferredLanguage: "ro",
+  notificationChannels: ["whatsapp", "sms"],
+};
+
+export async function getMe(): Promise<Me> {
+  if (USE_MOCKS) {
+    await delay(200);
+    return MOCK_ME;
+  }
+  return http(`/me`);
+}
+
+export async function updateMe(input: UpdateMeInput): Promise<Me> {
+  if (USE_MOCKS) {
+    await delay(200);
+    return { ...MOCK_ME, ...input } as Me;
+  }
+  return http(`/me`, { method: "PATCH", body: JSON.stringify(input) });
 }
 
 export { ApiClientError, USE_MOCKS };

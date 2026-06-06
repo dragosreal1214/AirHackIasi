@@ -85,6 +85,8 @@ export interface Disruption {
   flight: FlightSummary;
   severity: RiskLevel;
   risk: CurrentRisk;
+  /** Fog risk at the arrival airport, when available. */
+  destinationRisk?: CurrentRisk | null;
   detectedAt: string; // ISO 8601
   alternativesCount: number;
 }
@@ -168,6 +170,20 @@ export interface TokenResponse {
   accessToken: string;
   refreshToken: string;
   tokenType: string;
+}
+
+export interface Me {
+  id: string;
+  fullName?: string;
+  email?: string;
+  phoneNumber: string;
+  preferredLanguage: string;
+  notificationChannels: NotificationChannel[];
+}
+
+export interface UpdateMeInput {
+  fullName?: string;
+  notificationChannels?: NotificationChannel[];
 }
 
 export interface RegisterInput {

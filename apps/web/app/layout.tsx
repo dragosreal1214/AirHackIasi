@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Hanken_Grotesk, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { PwaRegister } from "@/components/pwa-register";
 
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
@@ -20,6 +21,11 @@ export const metadata: Metadata = {
   title: "Fogora — Copilotul tău calm.",
   description:
     "Fogora îți spune din timp când zborul tău e la risc de ceață și îți dă alternative.",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/cine/fogora-mark.png",
+    apple: "/cine/fogora-mark.png",
+  },
 };
 
 export const viewport: Viewport = {
@@ -37,6 +43,7 @@ export default function RootLayout({
     <html lang="ro" className={`${hanken.variable} ${instrument.variable}`}>
       <body className="font-sans">
         <Providers>{children}</Providers>
+        <PwaRegister />
       </body>
     </html>
   );
