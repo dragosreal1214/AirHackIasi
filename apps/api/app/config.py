@@ -88,7 +88,16 @@ class Settings(BaseSettings):
     # (e.g. "IAS") so the whole disruption flow is showable on a clear day.
     FORCE_FOG_IATA: str = ""
 
+    # --- Web Push (VAPID) ---
+    VAPID_PUBLIC_KEY: str = ""
+    VAPID_PRIVATE_KEY: str = ""
+    VAPID_SUBJECT: str = "mailto:alerts@fogora.app"
+
     # ----- Feature flags (derived) -----
+
+    @property
+    def push_enabled(self) -> bool:
+        return bool(self.VAPID_PUBLIC_KEY and self.VAPID_PRIVATE_KEY)
 
     @property
     def db_enabled(self) -> bool:

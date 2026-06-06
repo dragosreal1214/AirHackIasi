@@ -85,6 +85,22 @@ async def dispatch(
             logger.warning("notify_channel_failed", channel=channel, error=str(exc))
             results[channel] = {"ok": False, "error": str(exc)[:160]}
 
+    # Web Push (PWA pop-up) — always attempt alongside the chosen channels.
+    try:
+        from app.services import push_service  # noqa: PLC0415
+
+        pushed = await push_service.send_to_phone(
+            phone_number,
+            title=f"⚠️ Risc de ceață — {disruption.flight.flight_number}",
+            body=f"{disruption.flight.origin_iata}→{disruption.flight.destination_iata}: "
+            f"{round(disruption.risk.probability * 100)}% risc. Vezi alternativele.",
+            url=f"/trips/{disruption.flight.id}",
+        )
+        if pushed:
+            results["push"] = {"ok": True, "count": pushed}
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("push_dispatch_failed", error=str(exc)[:160])
+
     sent_any = any(r.get("ok") for r in results.values())
     logger.info(
         "notification_dispatched",

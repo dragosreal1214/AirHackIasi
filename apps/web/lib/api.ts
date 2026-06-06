@@ -371,4 +371,24 @@ export async function updateMe(input: UpdateMeInput): Promise<Me> {
   return http(`/me`, { method: "PATCH", body: JSON.stringify(input) });
 }
 
+// ---------------------------------------------------------------------------
+// Web Push
+// ---------------------------------------------------------------------------
+
+export async function getPushPublicKey(): Promise<{ publicKey: string; enabled: boolean }> {
+  if (USE_MOCKS) {
+    await delay(120);
+    return { publicKey: "", enabled: false };
+  }
+  return http(`/push/public-key`);
+}
+
+export async function savePushSubscription(subscription: unknown): Promise<void> {
+  if (USE_MOCKS) {
+    await delay(120);
+    return;
+  }
+  await http(`/push/subscribe`, { method: "POST", body: JSON.stringify(subscription) });
+}
+
 export { ApiClientError, USE_MOCKS };

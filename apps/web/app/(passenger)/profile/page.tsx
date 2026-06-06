@@ -24,6 +24,7 @@ import { GoldCard } from "@/components/ui/card";
 import { TextField } from "@/components/ui/text-field";
 import { useMe, useUpdateMe } from "@/hooks/use-me";
 import { clearTokens } from "@/lib/auth";
+import { subscribeToPush } from "@/lib/push";
 import { cn } from "@/lib/utils";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -275,10 +276,30 @@ export default function ProfilePage() {
   const updateMe = useUpdateMe();
 
   const channels = me?.notificationChannels ?? [];
+  const [pushNote, setPushNote] = useState<string | null>(null);
 
-  function toggleChannel(channel: NotificationChannel) {
+  async function toggleChannel(channel: NotificationChannel) {
     if (!me) return;
-    const next = channels.includes(channel)
+    const isOn = channels.includes(channel);
+
+    // Enabling push needs the browser's permission + a SW subscription.
+    if (channel === "push" && !isOn) {
+      setPushNote(null);
+      const res = await subscribeToPush();
+      if (res !== "ok") {
+        setPushNote(
+          res === "denied"
+            ? "Permite notificările din setările browserului/telefonului."
+            : res === "unsupported"
+              ? "Notificările push nu sunt suportate aici (adaugă pe ecranul principal pe iOS)."
+              : "Nu am putut activa notificările push acum.",
+        );
+        return;
+      }
+      setPushNote("Notificările push sunt active pe acest dispozitiv.");
+    }
+
+    const next = isOn
       ? channels.filter((c) => c !== channel)
       : [...channels, channel];
     updateMe.mutate({ notificationChannels: next });
@@ -390,6 +411,9 @@ export default function ProfilePage() {
             );
           })}
           </GoldCard>
+          {pushNote && (
+            <p className="mt-2 px-1 text-xs font-medium text-warm-muted">{pushNote}</p>
+          )}
         </div>
 
         {/* Mai multe */}

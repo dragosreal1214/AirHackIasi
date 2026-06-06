@@ -11,7 +11,7 @@ from slowapi.errors import RateLimitExceeded
 
 from app.config import settings
 from app.rate_limit import limiter
-from app.routers import auth, dev, disruptions, flights, health, me, ml, pnrs
+from app.routers import auth, dev, disruptions, flights, health, me, ml, pnrs, push
 
 logger = structlog.get_logger(__name__)
 
@@ -93,6 +93,7 @@ app.include_router(auth.router, prefix=prefix)
 app.include_router(flights.router, prefix=prefix)
 app.include_router(pnrs.router, prefix=prefix)
 app.include_router(me.router, prefix=prefix)
+app.include_router(push.router, prefix=prefix)
 app.include_router(disruptions.router, prefix=prefix)
 app.include_router(ml.router, prefix=prefix)
 
