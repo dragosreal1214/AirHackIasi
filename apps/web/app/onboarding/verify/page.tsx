@@ -67,7 +67,7 @@ export default function VerifyPage() {
   }
 
   return (
-    <div className="cine-surface flex min-h-screen flex-1 flex-col px-6 pt-safe-top">
+    <div className="cine-surface flex min-h-screen flex-1 flex-col px-6 pt-safe-top lg:min-h-0">
       <div className="pt-6 animate-c-fade-up">
         <Link
           href={backHref}

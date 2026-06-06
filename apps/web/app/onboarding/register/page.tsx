@@ -110,7 +110,7 @@ export default function RegisterPage() {
   }[current.field];
 
   return (
-    <div className="cine-surface flex min-h-[100dvh] flex-1 flex-col px-6 pb-safe-bottom pt-safe-top">
+    <div className="cine-surface flex min-h-[100dvh] flex-1 flex-col px-6 pb-safe-bottom pt-safe-top lg:min-h-0">
       {/* header: back + step progress */}
       <div className="flex items-center gap-3 pt-4">
         <button

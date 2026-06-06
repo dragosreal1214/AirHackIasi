@@ -15,7 +15,7 @@ export default function SuccessPage() {
 
   return (
     <div
-      className="flex min-h-[100dvh] flex-1 flex-col items-center justify-center px-9 text-center"
+      className="flex min-h-[100dvh] flex-1 flex-col items-center justify-center px-9 text-center lg:min-h-0 lg:rounded-card lg:py-20"
       style={{
         background:
           "linear-gradient(180deg, rgb(var(--color-sky) / 0.35) 0%, rgb(var(--color-ivory)) 50%, rgb(var(--color-cream)) 100%)",

@@ -39,7 +39,7 @@ export default function PhonePage() {
   }
 
   return (
-    <div className="cine-surface flex min-h-screen flex-1 flex-col px-6 pt-safe-top">
+    <div className="cine-surface flex min-h-screen flex-1 flex-col px-6 pt-safe-top lg:min-h-0">
       <div className="flex flex-1 flex-col pt-10">
         <div className="animate-c-fade-up" style={{ animationDelay: "40ms" }}>
           <CWord size={36} />

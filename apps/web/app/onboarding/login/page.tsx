@@ -64,10 +64,10 @@ export default function LoginPage() {
   return (
     <div
       ref={scrollRef}
-      className="no-sb relative h-[100dvh] overflow-x-hidden overflow-y-auto bg-espresso"
+      className="no-sb relative h-[100dvh] overflow-x-hidden overflow-y-auto bg-espresso lg:h-auto lg:overflow-visible lg:bg-transparent"
     >
-      {/* sticky cinematic hero */}
-      <div className="sticky top-0 z-[1] h-[100dvh] overflow-hidden">
+      {/* sticky cinematic hero — mobile only */}
+      <div className="sticky top-0 z-[1] h-[100dvh] overflow-hidden lg:hidden">
         <img
           src="/cine/login-plane-window.png"
           alt=""
@@ -115,11 +115,11 @@ export default function LoginPage() {
         </button>
       </div>
 
-      {/* scroll distance */}
-      <div className="h-[70%]" />
+      {/* scroll distance — mobile only */}
+      <div className="h-[70%] lg:hidden" />
 
-      {/* login card rises over the hero */}
-      <div className="relative z-[2] -mt-7 px-3.5 pb-safe-bottom">
+      {/* login card rises over the hero (mobile); static in desktop column */}
+      <div className="relative z-[2] -mt-7 px-3.5 pb-safe-bottom lg:mt-0 lg:px-0 lg:pb-0">
         <div
           className={cn(
             "rounded-[28px_28px_22px_22px] border border-accent/40 bg-ivory/95 px-6 pb-7 pt-2.5 backdrop-blur-xl",
