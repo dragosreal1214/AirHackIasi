@@ -10,7 +10,9 @@ router = APIRouter(prefix="/flights", tags=["flights"])
 
 @router.get("/search", response_model=list[FlightSummary])
 async def search_flights(
-    q: str = Query(..., min_length=1),
-    date: str | None = Query(None),
+    q: str | None = Query(None, description="flight number or city"),
+    date: str | None = Query(None, description="YYYY-MM-DD"),
+    origin: str | None = Query(None, description="from (IATA or city)"),
+    destination: str | None = Query(None, description="to (IATA or city)"),
 ) -> list[FlightSummary]:
-    return await flight_service.search_flights(q, date)
+    return await flight_service.search_flights(q, date, origin, destination)

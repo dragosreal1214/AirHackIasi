@@ -24,7 +24,7 @@ import type {
   TokenResponse,
 } from "@aerly/shared";
 
-import { clearTokens, getAccessToken } from "./auth";
+import { clearTokens, getAccessToken, getRefreshToken, setTokens } from "./auth";
 import {
   ALTERNATIVES,
   DISRUPTIONS,
@@ -48,7 +48,35 @@ class ApiClientError extends Error {
   }
 }
 
-async function http<T>(path: string, init?: RequestInit): Promise<T> {
+let _refreshing: Promise<boolean> | null = null;
+
+/** Exchange the refresh token for a fresh pair. Deduped across concurrent 401s. */
+async function tryRefresh(): Promise<boolean> {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return false;
+  if (!_refreshing) {
+    _refreshing = (async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/v1/auth/refresh`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refreshToken }),
+        });
+        if (!res.ok) return false;
+        const t = await res.json();
+        setTokens(t.accessToken, t.refreshToken);
+        return true;
+      } catch {
+        return false;
+      }
+    })();
+  }
+  const ok = await _refreshing;
+  _refreshing = null;
+  return ok;
+}
+
+async function http<T>(path: string, init?: RequestInit, retried = false): Promise<T> {
   const token = getAccessToken();
   const res = await fetch(`${API_URL}/api/v1${path}`, {
     ...init,
@@ -58,9 +86,13 @@ async function http<T>(path: string, init?: RequestInit): Promise<T> {
       ...(init?.headers ?? {}),
     },
   });
-  if (res.status === 401) {
+
+  // Access token expired: refresh once and retry (never for /auth/* itself).
+  if (res.status === 401 && !retried && !path.startsWith("/auth/")) {
+    if (await tryRefresh()) return http(path, init, true);
     clearTokens();
   }
+
   if (!res.ok) {
     const body = await res.json().catch(() => null);
     throw new ApiClientError(
@@ -133,21 +165,35 @@ export async function deletePnr(id: string): Promise<void> {
 // Flights
 // ---------------------------------------------------------------------------
 
+export interface FlightSearchParams {
+  q?: string;
+  date?: string;
+  origin?: string;
+  destination?: string;
+}
+
 export async function searchFlights(
-  query: string,
-  date?: string,
+  params: FlightSearchParams,
 ): Promise<FlightSummary[]> {
+  const { q, date, origin, destination } = params;
   if (USE_MOCKS) {
     await delay(250);
-    const q = query.trim().toLowerCase().replace(/\s+/g, "");
-    if (!q) return [];
-    return FLIGHT_CATALOG.filter((f) =>
-      f.flightNumber.toLowerCase().replace(/\s+/g, "").includes(q),
-    );
+    const needle = (q ?? "").trim().toLowerCase().replace(/\s+/g, "");
+    return FLIGHT_CATALOG.filter((f) => {
+      if (needle && !f.flightNumber.toLowerCase().replace(/\s+/g, "").includes(needle))
+        return false;
+      if (origin && !f.originIata.toLowerCase().includes(origin.toLowerCase())) return false;
+      if (destination && !f.destinationIata.toLowerCase().includes(destination.toLowerCase()))
+        return false;
+      return true;
+    });
   }
-  const params = new URLSearchParams({ q: query });
-  if (date) params.set("date", date);
-  return http(`/flights/search?${params.toString()}`);
+  const sp = new URLSearchParams();
+  if (q) sp.set("q", q);
+  if (date) sp.set("date", date);
+  if (origin) sp.set("origin", origin);
+  if (destination) sp.set("destination", destination);
+  return http(`/flights/search?${sp.toString()}`);
 }
 
 // ---------------------------------------------------------------------------

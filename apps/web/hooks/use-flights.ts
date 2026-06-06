@@ -2,13 +2,18 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { searchFlights } from "@/lib/api";
+import { searchFlights, type FlightSearchParams } from "@/lib/api";
 
-export function useFlightSearch(query: string, date?: string) {
-  const trimmed = query.trim();
+export function useFlightSearch(params: FlightSearchParams) {
+  const q = (params.q ?? "").trim();
+  const origin = (params.origin ?? "").trim();
+  const destination = (params.destination ?? "").trim();
+  const enabled = q.length >= 2 || origin.length >= 2 || destination.length >= 2;
+
   return useQuery({
-    queryKey: ["flights", "search", trimmed, date ?? null],
-    queryFn: () => searchFlights(trimmed, date),
-    enabled: trimmed.length >= 2,
+    queryKey: ["flights", "search", q, origin, destination, params.date ?? null],
+    queryFn: () =>
+      searchFlights({ q: q || undefined, origin: origin || undefined, destination: destination || undefined, date: params.date }),
+    enabled,
   });
 }

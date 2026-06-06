@@ -101,6 +101,32 @@ async def register(payload: RegisterRequest) -> PhoneStartResponse:
     return PhoneStartResponse(challenge_id=challenge_id, method=method)
 
 
+async def refresh_tokens(refresh_token: str) -> TokenResponse:
+    """Exchange a valid refresh token for a fresh access + refresh pair."""
+    subject = jwt_service.decode_token(refresh_token, "refresh")
+    if subject is None:
+        raise HTTPException(
+            status_code=401,
+            detail={"code": "INVALID_REFRESH", "message": "Sesiune expirată. Autentifică-te din nou."},
+        )
+    # In DB mode, make sure the user still exists / isn't deleted.
+    if settings.db_enabled and subject != "demo-user":
+        async with _session() as db:
+            if db is not None:
+                from app.services import user_service  # noqa: PLC0415
+
+                user = await user_service.get_by_id(db, subject)
+                if user is None or user.deleted_at is not None:
+                    raise HTTPException(
+                        status_code=401,
+                        detail={"code": "INVALID_REFRESH", "message": "Cont inexistent."},
+                    )
+    return TokenResponse(
+        access_token=jwt_service.create_access_token(subject),
+        refresh_token=jwt_service.create_refresh_token(subject),
+    )
+
+
 async def login_email(payload: LoginRequest) -> TokenResponse:
     """Email + password login."""
     _require_db()

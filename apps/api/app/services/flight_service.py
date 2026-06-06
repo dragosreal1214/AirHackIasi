@@ -57,16 +57,35 @@ def _matches(no: str, other: str, q: str) -> bool:
     return any(q in h for h in hay)
 
 
-async def search_flights(query: str, date: str | None = None) -> list[FlightSummary]:
-    q = "".join(query.lower().split())
-    if not q:
+def _matches_place(iata: str, city: str, term: str) -> bool:
+    t = term.strip().lower()
+    return t in iata.lower() or t in city.lower()
+
+
+async def search_flights(
+    query: str | None = None,
+    date: str | None = None,
+    origin: str | None = None,
+    destination: str | None = None,
+) -> list[FlightSummary]:
+    """Search by flight number/city (query) and/or by route (origin/destination)
+    on a given date. At least one filter must be provided."""
+    q = "".join((query or "").lower().split())
+    if not q and not origin and not destination:
         return []
     day = date or _today()
-    results = [
-        _summary(no, direction, other, time, day)
-        for (no, direction, other, time) in WEEKLY
-        if _matches(no, other, q)
-    ]
+    results: list[FlightSummary] = []
+    for (no, direction, other, time) in WEEKLY:
+        s = _summary(no, direction, other, time, day)
+        if q and not _matches(no, other, q):
+            continue
+        if origin and not _matches_place(s.origin_iata, s.origin_city, origin):
+            continue
+        if destination and not _matches_place(
+            s.destination_iata, s.destination_city, destination
+        ):
+            continue
+        results.append(s)
     results.sort(key=lambda f: f.scheduled_departure)
     return results[:40]
 

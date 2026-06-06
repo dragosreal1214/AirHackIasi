@@ -37,6 +37,38 @@ async def test_flight_search_real_schedule() -> None:
 
 
 @pytest.mark.asyncio
+async def test_flight_search_by_route() -> None:
+    async with _client() as c:
+        r = await c.get(f"{V1}/flights/search?origin=IAS&destination=OTP")
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body) >= 1
+    assert all(f["originIata"] == "IAS" and f["destinationIata"] == "OTP" for f in body)
+
+
+@pytest.mark.asyncio
+async def test_refresh_token_flow() -> None:
+    async with _client() as c:
+        start = await c.post(f"{V1}/auth/phone/start", json={"phoneNumber": "+40712345670"})
+        challenge = start.json()["challengeId"]
+        tokens = (
+            await c.post(
+                f"{V1}/auth/phone/verify",
+                json={"challengeId": challenge, "code": "000000"},
+            )
+        ).json()
+
+        refreshed = await c.post(
+            f"{V1}/auth/refresh", json={"refreshToken": tokens["refreshToken"]}
+        )
+        assert refreshed.status_code == 200
+        assert refreshed.json()["accessToken"]
+
+        bad = await c.post(f"{V1}/auth/refresh", json={"refreshToken": "garbage"})
+        assert bad.status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_add_then_duplicate() -> None:
     async with _client() as c:
         found = await c.get(f"{V1}/flights/search?q=LTN")

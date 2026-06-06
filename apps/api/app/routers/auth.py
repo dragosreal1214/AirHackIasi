@@ -7,6 +7,7 @@ from app.models.schemas import (
     PhoneStartRequest,
     PhoneStartResponse,
     PhoneVerifyRequest,
+    RefreshRequest,
     RegisterRequest,
     TokenResponse,
 )
@@ -27,6 +28,12 @@ async def register(request: Request, payload: RegisterRequest) -> PhoneStartResp
 @limiter.limit("10/minute")
 async def login(request: Request, payload: LoginRequest) -> TokenResponse:
     return await auth_service.login_email(payload)
+
+
+@router.post("/refresh", response_model=TokenResponse)
+@limiter.limit("30/minute")
+async def refresh(request: Request, payload: RefreshRequest) -> TokenResponse:
+    return await auth_service.refresh_tokens(payload.refresh_token)
 
 
 @router.post("/phone/start", response_model=PhoneStartResponse)

@@ -110,6 +110,10 @@ class LoginRequest(CamelModel):
     password: str
 
 
+class RefreshRequest(CamelModel):
+    refresh_token: str
+
+
 class PhoneStartRequest(CamelModel):
     phone_number: str
 
