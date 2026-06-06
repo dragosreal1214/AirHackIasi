@@ -14,7 +14,7 @@ from pptx.util import Inches, Pt
 
 ROOT = Path(__file__).resolve().parents[2]
 CINE = ROOT / "apps" / "web" / "public" / "cine"
-OUT = ROOT / "apps" / "web" / "public" / "pitch"
+OUT = ROOT / "docs" / "pitch"
 LOGO = str(CINE / "fogora-logo.png")
 MARK = str(CINE / "fogora-mark-256.png")
 

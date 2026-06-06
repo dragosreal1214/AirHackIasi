@@ -71,10 +71,10 @@
 <section class="slide dark hero">
   <div class="glow" style="width:520px;height:520px;background:rgba(200,162,78,.18);top:-10%;left:-6%"></div>
   <div class="glow" style="width:460px;height:460px;background:rgba(91,143,191,.16);bottom:-12%;right:-8%"></div>
-  <img class="logo" src="/cine/fogora-logo.png" alt="Fogora" />
+  <img class="logo" src="fogora-logo.png" alt="Fogora" />
   <div class="tag serif">Arhitectură & <span class="it" style="color:var(--sky)">model</span></div>
   <p class="lead" style="margin-top:1rem;color:rgba(251,246,236,.8)">Cum prezicem ceața și transformăm riscul în acțiune — pitch tehnic</p>
-  <div class="foot"><span><img src="/cine/fogora-mark-256.png"/>Fogora</span><span>01 / 10</span></div>
+  <div class="foot"><span><img src="fogora-mark-256.png"/>Fogora</span><span>01 / 10</span></div>
 </section>
 
 <!-- 2 ARCHITECTURE -->
@@ -93,7 +93,7 @@
     <div class="card"><h3>ML</h3><p>XGBoost + scikit-learn, Open-Meteo live, fallback pe reguli.</p></div>
     <div class="card"><h3>Date</h3><p>Supabase Postgres (RLS), Alembic, Twilio & Orange.</p></div>
   </div>
-  <div class="foot"><span><img src="/cine/fogora-mark-256.png"/>Fogora</span><span>02 / 10</span></div>
+  <div class="foot"><span><img src="fogora-mark-256.png"/>Fogora</span><span>02 / 10</span></div>
 </section>
 
 <!-- 3 MODEL -->
@@ -110,7 +110,7 @@
     importanță: <span class="k">dewpoint_depression</span> 0.44 · <span class="k">humidity</span> 0.34 · month/temp/hour/wind
   </div>
   <p class="lead">Fără scurgeri: features pur meteorologice. Fallback transparent pe reguli dacă modelul nu se încarcă.</p>
-  <div class="foot"><span><img src="/cine/fogora-mark-256.png"/>Fogora</span><span>03 / 10</span></div>
+  <div class="foot"><span><img src="fogora-mark-256.png"/>Fogora</span><span>03 / 10</span></div>
 </section>
 
 <!-- 4 PIPELINE -->
@@ -128,7 +128,7 @@
     <li><b>Replay</b>: rejucăm zile reale cu ceață din setul istoric pentru a demonstra detecția.</li>
     <li>Modelul se încarcă o singură dată la pornire (lifespan), niciodată per-request.</li>
   </ul>
-  <div class="foot"><span><img src="/cine/fogora-mark-256.png"/>Fogora</span><span>04 / 10</span></div>
+  <div class="foot"><span><img src="fogora-mark-256.png"/>Fogora</span><span>04 / 10</span></div>
 </section>
 
 <!-- 5 RISK LAYERS -->
@@ -141,7 +141,7 @@
     <div class="card"><h3>Vreme rea (non-ceață)</h3><p>Al doilea model: furtuni/precipitații/vânt, din fenomenele METAR. Calibrat.</p></div>
     <div class="card"><h3>Risc de anulare</h3><p>Derivat din toate cele de mai sus → % afișat pasagerului + prag de alertă.</p></div>
   </div>
-  <div class="foot"><span><img src="/cine/fogora-mark-256.png"/>Fogora</span><span>05 / 10</span></div>
+  <div class="foot"><span><img src="fogora-mark-256.png"/>Fogora</span><span>05 / 10</span></div>
 </section>
 
 <!-- 6 ALTERNATIVES -->
@@ -157,7 +157,7 @@
     <li>Reroute prin aeroport vecin: autocar + zbor, cu pașii și linkurile fiecărui segment.</li>
     <li>Sortabile după <b>cel mai rapid</b> sau <b>cel mai ieftin</b>.</li>
   </ul>
-  <div class="foot"><span><img src="/cine/fogora-mark-256.png"/>Fogora</span><span>06 / 10</span></div>
+  <div class="foot"><span><img src="fogora-mark-256.png"/>Fogora</span><span>06 / 10</span></div>
 </section>
 
 <!-- 7 INTEGRATIONS -->
@@ -170,7 +170,7 @@
     <div class="card"><h3>Web Push</h3><p>Notificări native în PWA (VAPID), deep-link la zborul în cauză.</p></div>
   </div>
   <p class="lead">Alertele pleacă <b>doar</b> la risc ridicat; canalul e ales după cum e dispozitivul accesibil.</p>
-  <div class="foot"><span><img src="/cine/fogora-mark-256.png"/>Fogora</span><span>07 / 10</span></div>
+  <div class="foot"><span><img src="fogora-mark-256.png"/>Fogora</span><span>07 / 10</span></div>
 </section>
 
 <!-- 8 PUBLIC API -->
@@ -183,7 +183,7 @@
     <span class="k">GET</span> /api/public/v1/airports/&#123;iata&#125;/risc  <span style="color:#a89b82">// tablou per-zbor (B2B)</span>
   </div>
   <p class="lead">Auth prin <code>X-API-Key</code>, rate-limit per IP, docs OpenAPI (/docs) + pagina /developers.</p>
-  <div class="foot"><span><img src="/cine/fogora-mark-256.png"/>Fogora</span><span>08 / 10</span></div>
+  <div class="foot"><span><img src="fogora-mark-256.png"/>Fogora</span><span>08 / 10</span></div>
 </section>
 
 <!-- 9 INFRA / SECURITY -->
@@ -196,20 +196,20 @@
     <div class="card"><h3>Calitate</h3><p>18 teste backend, typecheck strict, migrări Alembic reversibile.</p></div>
     <div class="card"><h3>PWA</h3><p>Instalabilă pe ecranul principal, service worker, layout desktop dedicat.</p></div>
   </div>
-  <div class="foot"><span><img src="/cine/fogora-mark-256.png"/>Fogora</span><span>09 / 10</span></div>
+  <div class="foot"><span><img src="fogora-mark-256.png"/>Fogora</span><span>09 / 10</span></div>
 </section>
 
 <!-- 10 ROADMAP / CLOSE -->
 <section class="slide dark hero">
   <div class="glow" style="width:560px;height:560px;background:rgba(200,162,78,.2);top:50%;left:50%;transform:translate(-50%,-50%)"></div>
-  <img class="logo" src="/cine/fogora-mark-256.png" alt="Fogora" style="width:clamp(140px,18vw,200px)" />
+  <img class="logo" src="fogora-mark-256.png" alt="Fogora" style="width:clamp(140px,18vw,200px)" />
   <h1 class="title serif" style="margin-top:1.2rem">Roadmap</h1>
   <p class="lead" style="color:rgba(251,246,236,.82);text-align:center;max-width:60ch">
     Status de zbor live (AeroDataBox) · capacitate per aeronavă (flotă) · multi-aeroport ·
     chei API self-serve · i18n RO/EN.
   </p>
   <div class="tag serif" style="color:var(--gold-soft)">Cu un pas înaintea ceții.</div>
-  <div class="foot"><span><img src="/cine/fogora-mark-256.png"/>Fogora</span><span>10 / 10</span></div>
+  <div class="foot"><span><img src="fogora-mark-256.png"/>Fogora</span><span>10 / 10</span></div>
 </section>
 
 </body>
