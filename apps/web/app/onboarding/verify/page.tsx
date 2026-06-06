@@ -8,7 +8,6 @@ import { useEffect, useRef, useState } from "react";
 import { ApiClientError, verifyOtp } from "@/lib/api";
 import { setTokens } from "@/lib/auth";
 import { OtpInput } from "@/components/ui/otp-input";
-import { CRing } from "@/components/ui/success-ring";
 
 function maskPhone(phone: string): string {
   if (phone.length < 4) return phone;
@@ -24,7 +23,6 @@ export default function VerifyPage() {
   const [challengeId, setChallengeId] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
   const [isDev, setIsDev] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     const ch = sessionStorage.getItem("aerly_challenge");
@@ -45,9 +43,11 @@ export default function VerifyPage() {
     try {
       const tokens = await verifyOtp(challengeId, value);
       setTokens(tokens.accessToken, tokens.refreshToken);
+      const isRegister = sessionStorage.getItem("aerly_flow") === "register";
       sessionStorage.removeItem("aerly_challenge");
-      setSuccess(true);
-      router.replace("/");
+      sessionStorage.removeItem("aerly_flow");
+      // New sign-ups get the celebratory success screen; logins go straight in.
+      router.replace(isRegister ? "/onboarding/success" : "/");
     } catch (e) {
       setError(e instanceof ApiClientError ? e.message : "Cod greșit. Mai încearcă.");
       setCode("");
@@ -59,34 +59,6 @@ export default function VerifyPage() {
     const digits = v.replace(/\D/g, "").slice(0, 6);
     setCode(digits);
     if (digits.length === 6) void submit(digits);
-  }
-
-  if (success) {
-    return (
-      <div className="cine-surface flex min-h-screen flex-1 flex-col items-center justify-center px-8 text-center">
-        <div
-          className="rounded-full border border-accent/30 bg-white/50 p-5 animate-c-scale-in"
-          style={{
-            boxShadow:
-              "0 0 0 8px rgba(200,162,78,0.07), 0 8px 24px rgba(33,24,14,0.08)",
-          }}
-        >
-          <CRing size={108} />
-        </div>
-        <h1
-          className="mt-7 font-display text-3xl tracking-tight text-espresso animate-c-fade-up"
-          style={{ animationDelay: "200ms" }}
-        >
-          Gata, ești înăuntru.
-        </h1>
-        <p
-          className="mt-2 text-warm-muted animate-c-fade-up"
-          style={{ animationDelay: "280ms" }}
-        >
-          Te ducem la zborurile tale…
-        </p>
-      </div>
-    );
   }
 
   return (
