@@ -34,7 +34,7 @@ export default function OnboardingLayout({ children }: { children: ReactNode }) 
         {/* Headline + subline near bottom */}
         <div className="relative z-[1] mt-auto px-12 pb-14">
           <h1 className="font-display text-[2.8rem] leading-[1.05] tracking-[0.01em] text-white [text-shadow:0_2px_30px_rgba(0,0,0,0.55)]">
-            Claritate când <span className="italic text-sky">zborurile se strică.</span>
+            Cu un pas <span className="italic text-sky">înaintea ceții.</span>
           </h1>
           <p className="mt-5 max-w-[30ch] text-base leading-[1.55] text-white/80 [text-shadow:0_1px_16px_rgba(0,0,0,0.4)]">
             Copilotul tău calm — alerte de ceață, alternative reale și pașii următori, într-un singur loc.
