@@ -78,24 +78,17 @@ export default function LoginPage() {
         />
         <div className="absolute inset-0" style={{ background: `rgba(18,12,7,${dim - 0.16})` }} />
 
-        {/* Fogora logo — prominent */}
+        {/* Fogora logo + tagline — stacked, no overlap */}
         <div
-          className="absolute left-0 right-0 flex justify-center pt-safe-top"
-          style={{ opacity: 1 - p * 0.85, transform: `translateY(${p * -10}px)` }}
+          className="absolute left-0 right-0 flex flex-col items-center px-8 pt-safe-top text-center"
+          style={{ transform: `translateY(${p * -22}px) scale(${1 - p * 0.04})`, opacity: 1 - p * 1.1 }}
         >
           <img
             src="/cine/fogora-mark.png"
             alt="Fogora"
-            className="mt-2 h-[84px] w-[84px] object-contain drop-shadow-[0_6px_26px_rgba(0,0,0,0.55)]"
+            className="mt-3 h-[88px] w-[88px] object-contain drop-shadow-[0_6px_26px_rgba(0,0,0,0.55)]"
           />
-        </div>
-
-        {/* tagline */}
-        <div
-          className="absolute left-0 right-0 px-8 text-center"
-          style={{ top: "15%", transform: `translateY(${p * -26}px) scale(${1 - p * 0.04})`, opacity: 1 - p * 1.15 }}
-        >
-          <h1 className="font-display text-[2.2rem] leading-[1.06] tracking-[0.01em] text-white [text-shadow:0_2px_30px_rgba(0,0,0,0.6)]">
+          <h1 className="mt-5 font-display text-[2.1rem] leading-[1.06] tracking-[0.01em] text-white [text-shadow:0_2px_30px_rgba(0,0,0,0.6)]">
             Claritate când
             <br />
             <span className="italic text-sky">zborurile se strică.</span>
