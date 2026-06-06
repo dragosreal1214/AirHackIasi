@@ -57,6 +57,40 @@ Open-Meteo forecast scored by the model. Returns `{ source, available, airport,
 hourly[], windows[], peak }` where each hourly point has `time, probability,
 level` and the weather features used.
 
+### `GET /airports/{iata}/risk` — B2B per-flight risk board
+Fog risk for **every scheduled flight at an airport** on a date — for airlines /
+airport ops. Per-flight risk is the fog risk at that flight's **departure** airport.
+
+| param | type | meaning |
+|---|---|---|
+| `iata` | path | airport IATA (e.g. `IAS`) |
+| `date` | query | `YYYY-MM-DD` (default: today) |
+| `direction` | query | `departures` (default) · `arrivals` · `all` |
+
+```bash
+curl -H "X-API-Key: demo" \
+  "https://<host>/api/public/v1/airports/IAS/risk?direction=departures&date=2026-06-09"
+```
+```json
+{
+  "airport": { "iata": "IAS", "name": "Iași International", "city": "Iași", "country": "RO" },
+  "date": "2026-06-09",
+  "direction": "departures",
+  "airportFogRisk": { "level": "high", "probability": 0.88, "predictionFor": "..." },
+  "summary": { "total": 33, "atRisk": 2 },
+  "flights": [
+    {
+      "flightNumber": "RO 702", "airlineCode": "RO", "airlineName": "TAROM",
+      "originIata": "IAS", "destinationIata": "OTP",
+      "scheduledDeparture": "2026-06-09T07:50:00+03:00",
+      "scheduledArrival": "2026-06-09T09:50:00+03:00",
+      "riskLevel": "high", "riskProbability": 0.88, "atRisk": true
+    }
+  ]
+}
+```
+`flights` is sorted by risk (highest first). `summary.atRisk` counts high/critical.
+
 ### `GET /airports` — supported airports
 `[{ iata, name, city, country, lat, lon }]`
 

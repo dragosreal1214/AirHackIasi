@@ -5,6 +5,7 @@ an `X-API-Key` header (open/key-less until PUBLIC_API_KEYS is configured) and
 rate-limited per IP. Full reference: docs/public-api.md and the live /docs.
 """
 
+from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -16,6 +17,8 @@ from app.ml import airports as registry
 from app.ml import fog_forecast
 from app.ml.fog_model import fog_model
 from app.rate_limit import limiter
+from app.services import flight_service
+from app.services.risk_service import risk_at_airport, risk_for
 
 router = APIRouter(
     prefix="/public/v1",
@@ -93,6 +96,79 @@ async def forecast(request: Request, airport: str = Query("IAS", description="IA
     result["airportName"] = a.name
     result["city"] = a.city
     return result
+
+
+@router.get(
+    "/airports/{iata}/risk",
+    summary="B2B: per-flight fog-risk board for an airport",
+)
+@limiter.limit(_LIMIT)
+async def airport_risk(
+    request: Request,
+    iata: str,
+    date: str | None = Query(None, description="YYYY-MM-DD (default: today)"),
+    direction: str = Query("departures", description="departures | arrivals | all"),
+) -> dict[str, Any]:
+    """Fog risk for every scheduled flight at an airport on a date.
+
+    Per-flight risk is the fog risk at the flight's **departure** airport. Built
+    for airlines / airport ops to see which flights are exposed."""
+    code = iata.upper()
+    a = registry.get(code)
+    if a is None:
+        raise HTTPException(404, detail={"code": "AIRPORT_NOT_FOUND", "message": f"Unknown airport: {iata}"})
+
+    day = date or datetime.now(timezone.utc).date().isoformat()
+    flights = []
+    if direction in ("departures", "all"):
+        flights += await flight_service.search_flights(origin=code, date=day)
+    if direction in ("arrivals", "all"):
+        flights += await flight_service.search_flights(destination=code, date=day)
+
+    seen: set[str] = set()
+    items: list[dict[str, Any]] = []
+    at_risk = 0
+    for f in flights:
+        if f.id in seen:
+            continue
+        seen.add(f.id)
+        risk, _ = await risk_for(f)
+        hi = risk.level in ("high", "critical")
+        at_risk += 1 if hi else 0
+        items.append(
+            {
+                "flightId": f.id,
+                "flightNumber": f.flight_number,
+                "airlineCode": f.airline_code,
+                "airlineName": f.airline_name,
+                "originIata": f.origin_iata,
+                "destinationIata": f.destination_iata,
+                "scheduledDeparture": f.scheduled_departure,
+                "scheduledArrival": f.scheduled_arrival,
+                "riskLevel": risk.level,
+                "riskProbability": round(risk.probability, 4),
+                "atRisk": hi,
+            }
+        )
+    items.sort(key=lambda x: -x["riskProbability"])
+
+    airport_fog = await risk_at_airport(code, f"{day}T07:00:00+03:00")
+    return {
+        "airport": {"iata": a.iata, "name": a.name, "city": a.city, "country": a.country},
+        "date": day,
+        "direction": direction,
+        "airportFogRisk": (
+            {
+                "level": airport_fog.level,
+                "probability": round(airport_fog.probability, 4),
+                "predictionFor": airport_fog.prediction_for,
+            }
+            if airport_fog
+            else None
+        ),
+        "summary": {"total": len(items), "atRisk": at_risk},
+        "flights": items,
+    }
 
 
 @router.get("/airports", summary="Supported airports")

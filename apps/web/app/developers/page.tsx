@@ -12,6 +12,7 @@ const ENDPOINTS = [
   { method: "GET", path: "/api/public/v1/predict", desc: "Fog probability from weather features" },
   { method: "POST", path: "/api/public/v1/predict/batch", desc: "Up to 100 rows at once" },
   { method: "GET", path: "/api/public/v1/forecast?airport=IAS", desc: "Live hourly fog-risk timeline" },
+  { method: "GET", path: "/api/public/v1/airports/{iata}/risk", desc: "B2B: per-flight risk board for an airport" },
   { method: "GET", path: "/api/public/v1/airports", desc: "Supported airports" },
   { method: "GET", path: "/api/public/v1/model", desc: "Model metadata + thresholds" },
 ];
