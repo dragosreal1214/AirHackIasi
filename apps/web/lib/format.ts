@@ -51,30 +51,30 @@ export const RISK_META: Record<RiskLevel, RiskMeta> = {
   low: {
     label: "Risc scăzut",
     text: "text-risk-low",
-    bg: "bg-risk-low/10",
+    bg: "bg-risk-low/[0.13]",
     solid: "bg-risk-low",
-    border: "border-risk-low/30",
+    border: "border-risk-low/25",
   },
   moderate: {
     label: "Risc moderat",
-    text: "text-risk-moderate",
-    bg: "bg-risk-moderate/10",
+    text: "text-accent-deep",
+    bg: "bg-risk-moderate/[0.15]",
     solid: "bg-risk-moderate",
     border: "border-risk-moderate/30",
   },
   high: {
     label: "Risc ridicat",
     text: "text-risk-high",
-    bg: "bg-risk-high/10",
+    bg: "bg-risk-high/[0.13]",
     solid: "bg-risk-high",
-    border: "border-risk-high/30",
+    border: "border-risk-high/25",
   },
   critical: {
     label: "Risc critic",
     text: "text-risk-critical",
-    bg: "bg-risk-critical/10",
+    bg: "bg-risk-critical/[0.13]",
     solid: "bg-risk-critical",
-    border: "border-risk-critical/30",
+    border: "border-risk-critical/25",
   },
 };
 
@@ -86,18 +86,18 @@ export interface AlternativeMeta {
 }
 
 export const ALTERNATIVE_META: Record<AlternativeType, AlternativeMeta> = {
-  train: { label: "Tren", emoji: "🚆", chip: "bg-blue-100 text-blue-700" },
+  train: { label: "Tren", emoji: "🚆", chip: "bg-sky/20 text-sky-ink" },
   alternate_flight: {
     label: "Alt zbor",
     emoji: "✈️",
-    chip: "bg-slate-100 text-slate-700",
+    chip: "bg-accent/[0.15] text-accent-deep",
   },
   reroute_airport: {
     label: "Reroute",
     emoji: "🛫",
-    chip: "bg-violet-100 text-violet-700",
+    chip: "bg-sky-deep/15 text-sky-ink",
   },
-  bus: { label: "Autocar", emoji: "🚌", chip: "bg-amber-100 text-amber-700" },
+  bus: { label: "Autocar", emoji: "🚌", chip: "bg-accent-soft/25 text-accent-deep" },
 };
 
 export function riskPercent(probability: number): number {

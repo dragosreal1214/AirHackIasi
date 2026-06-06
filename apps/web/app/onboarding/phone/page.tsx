@@ -1,9 +1,13 @@
 "use client";
 
-import { ArrowRight, Plane } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { CButton } from "@/components/ui/button";
+import { CLabel } from "@/components/ui/label";
+import { PhoneField } from "@/components/ui/phone-field";
+import { CWord } from "@/components/ui/wordmark";
 import { ApiClientError, startPhoneVerification } from "@/lib/api";
 
 const RO_MOBILE = /^(\+40|0)7\d{8}$/;
@@ -44,48 +48,50 @@ export default function PhonePage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col px-6 pt-16">
-      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-        <Plane className="h-6 w-6" />
+    <div className="flex flex-1 flex-col px-6 pt-safe-top">
+      <div className="flex flex-1 flex-col pt-12 animate-fade-up">
+        <CWord size={40} />
+
+        <h1 className="mt-10 font-display text-[2.75rem] leading-[1.05] tracking-tight text-espresso">
+          Cu un <span className="text-accent-deep">aer</span> înainte.
+        </h1>
+        <p className="mt-3 text-base leading-relaxed text-warm-muted">
+          Îți trimitem un cod prin SMS ca să-ți confirmăm numărul. Fără parolă.
+        </p>
+
+        <div className="mt-10">
+          <CLabel htmlFor="phone">Numărul tău de telefon</CLabel>
+          <PhoneField
+            id="phone"
+            autoFocus
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && submit()}
+            placeholder="7xx xxx xxx"
+            containerClassName="mt-2"
+          />
+        </div>
+
+        {error && (
+          <p className="mt-3 text-sm font-medium text-risk-high">{error}</p>
+        )}
+
+        <CButton
+          variant="gold"
+          size="lg"
+          full
+          onClick={submit}
+          disabled={pending}
+          rightIcon={!pending ? <ArrowRight className="h-5 w-5" /> : undefined}
+          className="mt-8"
+        >
+          {pending ? "Se trimite…" : "Continuă"}
+        </CButton>
+
+        <p className="mt-4 text-center text-xs text-warm-faint">
+          Numărul tău e folosit doar pentru alerte de zbor.
+        </p>
       </div>
-      <h1 className="mt-6 text-3xl font-bold tracking-tight text-slate-900">
-        Cu un <span className="text-primary">aer</span> înainte.
-      </h1>
-      <p className="mt-2 text-slate-500">
-        Îți trimitem un cod prin SMS ca să-ți confirmăm numărul. Fără parolă.
-      </p>
-
-      <label className="mt-10 block text-sm font-medium text-slate-700">
-        Numărul tău de telefon
-      </label>
-      <div className="mt-2 flex items-center gap-2 rounded-xl border border-slate-200 px-3 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
-        <span className="text-sm font-medium text-slate-500">🇷🇴 +40</span>
-        <input
-          autoFocus
-          inputMode="tel"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && submit()}
-          placeholder="7xx xxx xxx"
-          className="w-full bg-transparent py-3 text-sm outline-none"
-        />
-      </div>
-
-      {error && <p className="mt-3 text-sm font-medium text-risk-high">{error}</p>}
-
-      <button
-        type="button"
-        onClick={submit}
-        disabled={pending}
-        className="mt-8 flex items-center justify-center gap-1.5 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition active:scale-[0.99] disabled:opacity-60"
-      >
-        {pending ? "Se trimite…" : "Continuă"}
-        {!pending && <ArrowRight className="h-4 w-4" />}
-      </button>
-
-      <p className="mt-4 text-center text-xs text-slate-400">
-        Numărul tău e folosit doar pentru alerte de zbor.
-      </p>
     </div>
   );
 }

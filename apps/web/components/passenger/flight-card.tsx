@@ -1,59 +1,94 @@
 import type { PnrWithFlight } from "@aerly/shared";
-import { ArrowRight, Plane } from "lucide-react";
+import { ArrowRight, Calendar, Plane, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 
+import { RouteDisplay } from "@/components/passenger/route-display";
 import { RiskBadge } from "@/components/shared/risk-badge";
-import { formatDateTime } from "@/lib/format";
-import { cn } from "@/lib/utils";
+import { GoldCard } from "@/components/ui/card";
+import { formatDate, formatTime } from "@/lib/format";
 
 export function FlightCard({ pnr }: { pnr: PnrWithFlight }) {
   const { flight, currentRisk, disruptionId } = pnr;
   const atRisk = Boolean(disruptionId);
 
   return (
-    <div
-      className={cn(
-        "rounded-2xl border bg-white p-4 shadow-sm",
-        atRisk ? "border-risk-high/40" : "border-slate-200",
-      )}
+    <GoldCard
+      active={atRisk}
+      className="animate-fade-up overflow-hidden p-5"
     >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-            <Plane className="h-3.5 w-3.5" />
-            {flight.airlineName} · {flight.flightNumber}
-          </div>
-          <div className="mt-2 flex items-center gap-2 text-xl font-bold tracking-tight text-slate-900">
-            {flight.originIata}
-            <ArrowRight className="h-4 w-4 text-slate-400" />
-            {flight.destinationIata}
-          </div>
-          <p className="mt-1 text-sm text-slate-500">
-            {formatDateTime(flight.scheduledDeparture)}
-          </p>
+      {/* Status pill row + date */}
+      <div className="flex items-center justify-between gap-3">
+        {currentRisk ? (
+          <RiskBadge level={currentRisk.level} />
+        ) : (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--gold-border)] bg-accent/[0.1] px-2.5 py-1 text-xs font-semibold tracking-tight text-accent-deep">
+            <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent" />
+            Confirmat
+          </span>
+        )}
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-warm-muted">
+          <Calendar className="h-3.5 w-3.5" />
+          {formatDate(flight.scheduledDeparture)}
         </div>
-        {currentRisk && <RiskBadge level={currentRisk.level} />}
       </div>
 
+      {/* At-risk gold banner */}
+      {atRisk && (
+        <div className="mt-4 flex items-center gap-2 rounded-input border border-[color:var(--gold-border-strong)] bg-accent/[0.12] px-3 py-2 text-xs font-semibold text-accent-deep">
+          <TriangleAlert className="h-4 w-4 flex-shrink-0" />
+          Risc de perturbare — verifică alternativele
+        </div>
+      )}
+
+      {/* Route */}
+      <div className="mt-4">
+        <RouteDisplay flight={flight} />
+      </div>
+
+      {/* Times + airline */}
+      <div className="mt-4 flex items-center justify-between gap-3 border-t border-[color:var(--gold-border)] pt-3">
+        <div className="flex items-baseline gap-2">
+          <span className="text-base font-bold tracking-tight text-espresso">
+            {formatTime(flight.scheduledDeparture)}
+          </span>
+          <ArrowRight className="h-3.5 w-3.5 self-center text-warm-faint" />
+          <span className="text-base font-bold tracking-tight text-espresso">
+            {formatTime(flight.scheduledArrival)}
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 text-xs font-medium text-warm-muted">
+          <Plane className="h-3.5 w-3.5" />
+          {flight.airlineName} · {flight.flightNumber}
+        </div>
+      </div>
+
+      {/* Vezi alternative */}
       {atRisk && (
         <Link
           href={`/d/${disruptionId}`}
-          className="mt-4 flex items-center justify-center gap-1.5 rounded-xl bg-risk-high/10 py-2.5 text-sm font-semibold text-risk-high"
+          className="mt-4 flex items-center justify-center gap-1.5 rounded-button bg-gradient-to-br from-accent-soft via-accent to-accent-deep py-3 text-sm font-bold tracking-tight text-espresso shadow-gold-button transition-all duration-150 ease-cinematic active:scale-[0.98]"
         >
           Vezi alternative
           <ArrowRight className="h-4 w-4" />
         </Link>
       )}
-    </div>
+    </GoldCard>
   );
 }
 
 export function FlightCardSkeleton() {
   return (
-    <div className="animate-pulse rounded-2xl border border-slate-200 bg-white p-4">
-      <div className="h-3 w-28 rounded bg-slate-100" />
-      <div className="mt-3 h-6 w-32 rounded bg-slate-100" />
-      <div className="mt-2 h-4 w-40 rounded bg-slate-100" />
+    <div className="animate-pulse rounded-card border border-[color:var(--gold-border)] bg-white/[0.52] p-5 shadow-glass">
+      <div className="flex items-center justify-between">
+        <div className="h-6 w-24 rounded-full bg-accent/[0.12]" />
+        <div className="h-4 w-20 rounded bg-accent/[0.1]" />
+      </div>
+      <div className="mt-5 flex items-center justify-between">
+        <div className="h-9 w-16 rounded bg-accent/[0.12]" />
+        <div className="h-4 flex-1 mx-3 rounded bg-accent/[0.08]" />
+        <div className="h-9 w-16 rounded bg-accent/[0.12]" />
+      </div>
+      <div className="mt-5 h-4 w-40 rounded bg-accent/[0.1]" />
     </div>
   );
 }

@@ -16,8 +16,11 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="sticky bottom-0 z-20 border-t border-slate-200 bg-white/90 backdrop-blur">
-      <ul className="mx-auto flex max-w-md items-stretch justify-around">
+    <nav
+      className="sticky bottom-0 z-20 border-t border-[var(--gold-border)] pb-safe-bottom backdrop-blur-xl"
+      style={{ background: "var(--bottomnav-bg)" }}
+    >
+      <ul className="mx-auto flex max-w-md items-stretch justify-around pt-1.5">
         {ITEMS.map(({ href, label, icon: Icon }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
@@ -25,11 +28,23 @@ export function BottomNav() {
               <Link
                 href={href}
                 className={cn(
-                  "flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium transition-colors",
-                  active ? "text-primary" : "text-slate-400",
+                  "flex flex-col items-center gap-1 pb-1 pt-0.5 text-[11px] tracking-tight transition-colors duration-180",
+                  active
+                    ? "font-bold text-accent-deep"
+                    : "font-medium text-warm-muted",
                 )}
               >
-                <Icon className="h-5 w-5" strokeWidth={active ? 2.4 : 2} />
+                <span
+                  className={cn(
+                    "flex h-7 w-9 items-center justify-center rounded-lg transition-colors duration-180",
+                    active ? "bg-accent/[0.18]" : "bg-transparent",
+                  )}
+                >
+                  <Icon
+                    className="h-5 w-5"
+                    strokeWidth={active ? 2.3 : 1.9}
+                  />
+                </span>
                 {label}
               </Link>
             </li>

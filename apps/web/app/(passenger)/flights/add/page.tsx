@@ -1,13 +1,17 @@
 "use client";
 
 import type { FlightSummary } from "@aerly/shared";
-import { ArrowRight, Plane, Search, SearchX } from "lucide-react";
+import { ArrowRight, MapPin, Plane, Search, SearchX } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { AppBar } from "@/components/passenger/app-bar";
+import { GoldCard } from "@/components/ui/card";
+import { CLabel } from "@/components/ui/label";
+import { TextField } from "@/components/ui/text-field";
 import { ApiClientError } from "@/lib/api";
 import { formatDateTime } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useFlightSearch } from "@/hooks/use-flights";
 import { useAddPnr } from "@/hooks/use-pnrs";
@@ -47,24 +51,25 @@ export default function AddFlightPage() {
   const hasQuery =
     mode === "number" ? flightNo.trim().length >= 2 : destination.trim().length >= 2;
   const showEmpty = hasQuery && !isFetching && results?.length === 0;
-  const field =
-    "w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20";
 
   return (
     <>
       <AppBar title="Adaugă zbor" backHref="/" />
 
-      <div className="px-4 py-4">
-        {/* Mode toggle */}
-        <div className="mb-4 grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1">
+      <div className="animate-fade-up px-4 py-5">
+        {/* Mode toggle — cinematic segmented control */}
+        <div className="mb-5 grid grid-cols-2 gap-1 rounded-button border border-[color:var(--gold-border)] bg-white/60 p-1 shadow-glass backdrop-blur-glass">
           {(["number", "route"] as Mode[]).map((m) => (
             <button
               key={m}
               type="button"
               onClick={() => setMode(m)}
-              className={`rounded-lg py-2 text-sm font-semibold transition ${
-                mode === m ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"
-              }`}
+              className={cn(
+                "rounded-button py-2.5 text-sm font-semibold transition-all duration-180 ease-cinematic",
+                mode === m
+                  ? "bg-accent text-espresso shadow-gold-button"
+                  : "text-warm-muted hover:text-espresso",
+              )}
             >
               {m === "number" ? "După număr" : "După rută"}
             </button>
@@ -72,80 +77,104 @@ export default function AddFlightPage() {
         </div>
 
         {mode === "number" ? (
-          <label className="relative block">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input
-              autoFocus
-              value={flightNo}
-              onChange={(e) => setFlightNo(e.target.value)}
-              placeholder="Număr zbor (ex. W4 3651, RO 702)"
-              className={`${field} pl-11`}
-            />
-          </label>
+          <TextField
+            autoFocus
+            leftIcon={<Search className="h-5 w-5" />}
+            value={flightNo}
+            onChange={(e) => setFlightNo(e.target.value)}
+            placeholder="Număr zbor (ex. W4 3651, RO 702)"
+          />
         ) : (
           <div className="grid grid-cols-2 gap-2">
-            <label className="block">
-              <span className="mb-1 block px-1 text-xs font-medium text-slate-500">De la</span>
-              <input value={origin} onChange={(e) => setOrigin(e.target.value)} placeholder="IAS" className={field} />
-            </label>
-            <label className="block">
-              <span className="mb-1 block px-1 text-xs font-medium text-slate-500">Către</span>
-              <input
+            <div className="space-y-1.5">
+              <CLabel className="px-1">De la</CLabel>
+              <TextField
+                leftIcon={<MapPin className="h-5 w-5" />}
+                value={origin}
+                onChange={(e) => setOrigin(e.target.value)}
+                placeholder="IAS"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <CLabel className="px-1">Către</CLabel>
+              <TextField
                 autoFocus
+                leftIcon={<MapPin className="h-5 w-5" />}
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
                 placeholder="OTP / Londra"
-                className={field}
               />
-            </label>
+            </div>
           </div>
         )}
 
-        <label className="mt-2 block">
-          <span className="mb-1 block px-1 text-xs font-medium text-slate-500">Data</span>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={field} />
-        </label>
+        <div className="mt-2 space-y-1.5">
+          <CLabel className="px-1">Data</CLabel>
+          <TextField
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </div>
 
-        <p className="mt-2 px-1 text-xs text-slate-400">
+        <p className="mt-3 px-1 text-xs font-medium text-warm-muted">
           {mode === "number"
             ? "Caută după numărul zborului. Demo: încearcă „W4” sau „RO”."
             : "Caută după rută (cod IATA sau oraș). Demo: IAS → OTP."}
         </p>
 
         {error && (
-          <div className="mt-3 rounded-xl bg-risk-high/10 px-4 py-3 text-sm font-medium text-risk-high">
+          <GoldCard
+            elevated
+            className="mt-3 border-risk-high/40 px-4 py-3 text-sm font-semibold text-risk-high"
+          >
             {error}
-          </div>
+          </GoldCard>
         )}
 
-        <div className="mt-4 space-y-2.5">
+        <div className="mt-5 space-y-2.5">
           {results?.map((flight) => (
-            <button
+            <GoldCard
               key={flight.id}
-              type="button"
-              onClick={() => handleAdd(flight)}
-              disabled={addPnr.isPending}
-              className="flex w-full items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left transition active:scale-[0.99] disabled:opacity-60"
+              interactive
+              elevated
+              role="button"
+              tabIndex={0}
+              aria-disabled={addPnr.isPending}
+              onClick={() => {
+                if (!addPnr.isPending) handleAdd(flight);
+              }}
+              className={cn(
+                "flex items-center gap-3 p-4",
+                addPnr.isPending && "pointer-events-none opacity-60",
+              )}
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-icon border border-[color:var(--gold-border)] bg-accent/[0.12] text-accent-deep">
                 <Plane className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold text-slate-900">
+                <div className="text-sm font-bold text-espresso">
                   {flight.flightNumber} · {flight.originIata} → {flight.destinationIata}
                 </div>
-                <div className="truncate text-xs text-slate-500">
+                <div className="truncate text-xs font-medium text-warm-muted">
                   {flight.airlineName} · {formatDateTime(flight.scheduledDeparture)}
                 </div>
               </div>
-              <ArrowRight className="h-4 w-4 shrink-0 text-slate-300" />
-            </button>
+              <ArrowRight className="h-4 w-4 shrink-0 text-accent-deep" />
+            </GoldCard>
           ))}
 
           {showEmpty && (
-            <div className="flex flex-col items-center py-12 text-center text-sm text-slate-500">
-              <SearchX className="mb-2 h-7 w-7 text-slate-300" />
-              Nu am găsit niciun zbor.
+            <div className="flex animate-fade-up flex-col items-center py-14 text-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-card border border-[var(--gold-border-strong)] bg-accent/[0.12] text-accent-deep shadow-glass">
+                <SearchX className="h-7 w-7" />
+              </div>
+              <h2 className="mt-5 font-display text-2xl leading-tight tracking-tight text-espresso">
+                Niciun rezultat
+              </h2>
+              <p className="mt-2 max-w-xs text-sm font-medium leading-relaxed text-warm-muted">
+                Nu am găsit niciun zbor pentru căutarea ta.
+              </p>
             </div>
           )}
         </div>

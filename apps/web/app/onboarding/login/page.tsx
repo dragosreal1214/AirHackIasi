@@ -1,10 +1,14 @@
 "use client";
 
-import { ArrowRight, Smartphone } from "lucide-react";
+import { ArrowRight, Lock, Mail, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { CButton } from "@/components/ui/button";
+import { GoldCard } from "@/components/ui/card";
+import { TextField } from "@/components/ui/text-field";
+import { CWord } from "@/components/ui/wordmark";
 import { ApiClientError, loginEmail } from "@/lib/api";
 import { setTokens } from "@/lib/auth";
 
@@ -32,58 +36,68 @@ export default function LoginPage() {
     }
   }
 
-  const input =
-    "w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20";
-
   return (
-    <div className="flex flex-1 flex-col px-6 pt-16">
-      <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-        Bine ai revenit.
-      </h1>
-      <p className="mt-2 text-slate-500">Intră în contul tău Aerly.</p>
-
-      <div className="mt-8 space-y-3">
-        <input
-          className={input}
-          type="email"
-          autoFocus
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          className={input}
-          type="password"
-          placeholder="Parolă"
-          value={pw}
-          onChange={(e) => setPw(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && submit()}
-        />
+    <div className="flex flex-1 flex-col px-6 pt-safe-top pb-safe-bottom animate-fade-up">
+      <div className="pt-12">
+        <CWord size={36} />
       </div>
 
-      {error && <p className="mt-3 text-sm font-medium text-risk-high">{error}</p>}
+      <GoldCard elevated className="mt-8 p-6">
+        <h1 className="font-display text-4xl leading-tight tracking-tight text-espresso">
+          Bine ai revenit.
+        </h1>
+        <p className="mt-2 text-warm-muted">Intră în contul tău Aerly.</p>
 
-      <button
-        type="button"
-        onClick={submit}
-        disabled={pending}
-        className="mt-6 flex items-center justify-center gap-1.5 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition active:scale-[0.99] disabled:opacity-60"
-      >
-        {pending ? "Se autentifică…" : "Autentifică-te"}
-        {!pending && <ArrowRight className="h-4 w-4" />}
-      </button>
+        <div className="mt-7 space-y-3">
+          <TextField
+            leftIcon={<Mail className="h-5 w-5" />}
+            type="email"
+            autoFocus
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            leftIcon={<Lock className="h-5 w-5" />}
+            type="password"
+            placeholder="Parolă"
+            value={pw}
+            onChange={(e) => setPw(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && submit()}
+          />
+        </div>
 
-      <Link
-        href="/onboarding/phone"
-        className="mt-3 flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-3.5 text-sm font-semibold text-slate-700"
-      >
-        <Smartphone className="h-4 w-4" />
-        Intră cu numărul de telefon
-      </Link>
+        {error && (
+          <p className="mt-3 text-sm font-medium text-risk-high">{error}</p>
+        )}
 
-      <p className="mt-6 text-center text-sm text-slate-500">
+        <CButton
+          variant="gold"
+          size="lg"
+          full
+          onClick={submit}
+          disabled={pending}
+          rightIcon={!pending && <ArrowRight className="h-5 w-5" />}
+          className="mt-6"
+        >
+          {pending ? "Se autentifică…" : "Autentifică-te"}
+        </CButton>
+
+        <Link
+          href="/onboarding/phone"
+          className="mt-3 inline-flex h-16 w-full items-center justify-center gap-2 whitespace-nowrap rounded-button border border-[rgba(200,167,97,0.65)] bg-ivory/95 px-7 text-lg font-semibold tracking-tight text-espresso shadow-ivory-button transition-all duration-150 ease-cinematic active:scale-[0.98]"
+        >
+          Intră cu numărul de telefon
+          <Smartphone className="h-5 w-5" />
+        </Link>
+      </GoldCard>
+
+      <p className="mt-6 text-center text-sm text-warm-muted">
         Nu ai cont?{" "}
-        <Link href="/onboarding/register" className="font-semibold text-primary">
+        <Link
+          href="/onboarding/register"
+          className="font-semibold text-accent-deep"
+        >
           Creează cont
         </Link>
       </p>

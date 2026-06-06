@@ -7,6 +7,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { ApiClientError, verifyOtp } from "@/lib/api";
 import { setTokens } from "@/lib/auth";
+import { OtpInput } from "@/components/ui/otp-input";
+import { CRing } from "@/components/ui/success-ring";
 
 function maskPhone(phone: string): string {
   if (phone.length < 4) return phone;
@@ -22,6 +24,7 @@ export default function VerifyPage() {
   const [challengeId, setChallengeId] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
   const [isDev, setIsDev] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     const ch = sessionStorage.getItem("aerly_challenge");
@@ -43,6 +46,7 @@ export default function VerifyPage() {
       const tokens = await verifyOtp(challengeId, value);
       setTokens(tokens.accessToken, tokens.refreshToken);
       sessionStorage.removeItem("aerly_challenge");
+      setSuccess(true);
       router.replace("/");
     } catch (e) {
       setError(e instanceof ApiClientError ? e.message : "Cod greșit. Mai încearcă.");
@@ -57,40 +61,64 @@ export default function VerifyPage() {
     if (digits.length === 6) void submit(digits);
   }
 
-  return (
-    <div className="flex flex-1 flex-col px-6 pt-6">
-      <Link
-        href="/onboarding/phone"
-        className="-ml-1 flex h-9 w-9 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100"
-        aria-label="Înapoi"
-      >
-        <ArrowLeft className="h-5 w-5" />
-      </Link>
+  if (success) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center px-6 text-center animate-fade-up">
+        <CRing size={120} />
+        <h1 className="mt-8 font-display text-3xl tracking-tight text-espresso">
+          Gata, ești înăuntru.
+        </h1>
+        <p className="mt-2 text-warm-muted">Te ducem la zborurile tale…</p>
+      </div>
+    );
+  }
 
-      <h1 className="mt-8 text-2xl font-bold tracking-tight text-slate-900">
+  return (
+    <div className="flex flex-1 flex-col px-6 pt-safe-top animate-fade-up">
+      <div className="pt-6">
+        <Link
+          href="/onboarding/phone"
+          aria-label="Înapoi"
+          className="-ml-1 flex h-[34px] w-[34px] items-center justify-center rounded-icon border border-[color:var(--gold-border)] bg-white/60 text-espresso backdrop-blur-glass transition-all duration-120 ease-cinematic active:scale-95"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
+      </div>
+
+      <h1 className="mt-8 font-display text-3xl tracking-tight text-espresso">
         Verifică numărul
       </h1>
-      <p className="mt-2 text-slate-500">
+      <p className="mt-2 text-warm-muted">
         Am trimis un cod de 6 cifre la{" "}
-        <span className="font-medium text-slate-700">{maskPhone(phone)}</span>.
+        <span className="font-semibold text-espresso">{maskPhone(phone)}</span>.
       </p>
 
-      <input
-        ref={inputRef}
-        inputMode="numeric"
-        autoComplete="one-time-code"
+      <OtpInput
         value={code}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={onChange}
         disabled={pending}
-        placeholder="••••••"
-        className="mt-8 w-full rounded-xl border border-slate-200 bg-white py-4 text-center text-2xl font-bold tracking-[0.5em] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:opacity-60"
+        className="mt-10"
       />
 
-      {error && <p className="mt-3 text-sm font-medium text-risk-high">{error}</p>}
-      {pending && <p className="mt-3 text-sm text-slate-400">Se verifică…</p>}
+      {error && (
+        <p className="mt-4 text-sm font-semibold text-risk-high">{error}</p>
+      )}
+      {pending && !error && (
+        <p className="mt-4 text-sm text-warm-muted">Se verifică…</p>
+      )}
+
+      <p className="mt-6 text-sm text-warm-muted">
+        N-ai primit codul?{" "}
+        <Link
+          href="/onboarding/phone"
+          className="font-semibold text-accent-deep underline-offset-2 hover:underline"
+        >
+          Trimite din nou
+        </Link>
+      </p>
 
       {isDev && (
-        <p className="mt-6 rounded-xl bg-amber-50 px-4 py-3 text-xs text-amber-700">
+        <p className="mt-8 rounded-card border border-[color:var(--gold-border)] bg-accent-soft/15 px-4 py-3 text-xs text-accent-deep">
           Mod demo (fără SMS real): folosește codul <b>000000</b>.
         </p>
       )}

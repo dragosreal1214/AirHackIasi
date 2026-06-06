@@ -1,16 +1,96 @@
 "use client";
 
-import { LogOut, MessageCircle, Smartphone, User } from "lucide-react";
+import {
+  Building2,
+  Calculator,
+  ChevronRight,
+  HelpCircle,
+  LogOut,
+  type LucideIcon,
+  Mail,
+  MessageCircle,
+  Phone,
+  Smartphone,
+  User,
+} from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import type { ReactNode } from "react";
 
 import { AppBar } from "@/components/passenger/app-bar";
+import { CButton } from "@/components/ui/button";
+import { GoldCard } from "@/components/ui/card";
 import { clearTokens } from "@/lib/auth";
+import { cn } from "@/lib/utils";
 
 const CHANNELS = [
   { icon: MessageCircle, label: "WhatsApp", note: "Recomandat", on: true },
   { icon: Smartphone, label: "SMS", note: "Backup", on: true },
   { icon: User, label: "Push", note: "În aplicație", on: false },
 ];
+
+function SectionLabel({ children }: { children: ReactNode }) {
+  return (
+    <h2 className="mb-2 mt-7 px-1 text-[10px] font-bold uppercase tracking-[0.16em] text-warm-faint">
+      {children}
+    </h2>
+  );
+}
+
+function PRow({
+  icon: Icon,
+  label,
+  value,
+  trailing,
+  href,
+  last,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value?: ReactNode;
+  trailing?: ReactNode;
+  href?: string;
+  last?: boolean;
+}) {
+  const content = (
+    <>
+      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-icon border border-[var(--gold-border)] bg-accent/[0.12] text-accent-deep shadow-glass">
+        <Icon className="h-[18px] w-[18px]" strokeWidth={2} />
+      </span>
+      <span className="min-w-0 flex-1 text-[15px] font-semibold leading-tight text-espresso">
+        {label}
+      </span>
+      {value && (
+        <span className="truncate text-xs font-medium text-warm-muted">{value}</span>
+      )}
+      {trailing ??
+        (href ? (
+          <ChevronRight className="h-4 w-4 flex-shrink-0 text-warm-faint" strokeWidth={2.2} />
+        ) : null)}
+    </>
+  );
+
+  const rowClass = cn(
+    "flex min-h-[52px] items-center gap-3 px-4 py-3",
+    !last && "border-b border-[var(--gold-border)]",
+  );
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className={cn(
+          rowClass,
+          "transition-transform duration-120 ease-cinematic active:scale-[0.985]",
+        )}
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return <div className={rowClass}>{content}</div>;
+}
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -22,53 +102,79 @@ export default function ProfilePage() {
 
   return (
     <>
-      <AppBar title="Profil" />
-      <div className="px-4 py-4">
-        <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-base font-bold text-primary">
-            AP
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-slate-900">Andrei Pop</div>
-            <div className="text-xs text-slate-500">+40 ••• ••• 678</div>
-          </div>
-        </div>
-
-        <h2 className="mb-2 mt-6 px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Canale de notificare
-        </h2>
-        <div className="space-y-2.5">
-          {CHANNELS.map(({ icon: Icon, label, note, on }) => (
-            <div
-              key={label}
-              className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4"
-            >
-              <Icon className="h-5 w-5 text-slate-500" />
-              <div className="flex-1">
-                <div className="text-sm font-medium text-slate-900">{label}</div>
-                <div className="text-xs text-slate-500">{note}</div>
-              </div>
-              <span
-                className={`h-5 w-9 rounded-full p-0.5 transition ${on ? "bg-primary" : "bg-slate-200"}`}
-              >
-                <span
-                  className={`block h-4 w-4 rounded-full bg-white transition ${on ? "translate-x-4" : ""}`}
-                />
-              </span>
+      <AppBar title="Profil" subtitle="Contul tău Aerly" />
+      <div className="animate-fade-up px-4 pb-10 pt-5">
+        {/* Avatar */}
+        <div className="flex flex-col items-center text-center">
+          <div className="rounded-full bg-gradient-to-br from-accent-soft via-accent to-accent-deep p-[2.5px] shadow-gold-button">
+            <div className="flex h-[88px] w-[88px] items-center justify-center rounded-full bg-ivory text-2xl font-bold tracking-tight text-espresso">
+              AP
             </div>
-          ))}
+          </div>
+          <h2 className="mt-4 font-display text-[26px] leading-none tracking-tight text-espresso">
+            Andrei Pop
+          </h2>
+          <p className="mt-1.5 text-sm font-medium text-warm-muted">+40 ••• ••• 678</p>
         </div>
 
-        <button
-          type="button"
-          onClick={logout}
-          className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-600"
-        >
-          <LogOut className="h-4 w-4" />
-          Deconectează-te
-        </button>
+        {/* Personal */}
+        <SectionLabel>Personal</SectionLabel>
+        <GoldCard elevated className="overflow-hidden p-0">
+          <PRow icon={User} label="Nume" value="Andrei Pop" />
+          <PRow icon={Phone} label="Telefon" value="+40 ••• ••• 678" />
+          <PRow icon={Mail} label="Email" value="Adaugă" href="#" last />
+        </GoldCard>
 
-        <p className="mt-6 px-1 text-center text-xs text-slate-400">
+        {/* Canale */}
+        <SectionLabel>Canale de notificare</SectionLabel>
+        <GoldCard className="overflow-hidden p-0">
+          {CHANNELS.map(({ icon, label, note, on }, i) => (
+            <PRow
+              key={label}
+              icon={icon}
+              label={label}
+              value={note}
+              last={i === CHANNELS.length - 1}
+              trailing={
+                <span
+                  className={cn(
+                    "h-5 w-9 flex-shrink-0 rounded-full p-0.5 transition-colors duration-150 ease-cinematic",
+                    on ? "bg-accent" : "bg-warm-faint/30",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "block h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-150 ease-cinematic",
+                      on && "translate-x-4",
+                    )}
+                  />
+                </span>
+              }
+            />
+          ))}
+        </GoldCard>
+
+        {/* Mai multe */}
+        <SectionLabel>Mai multe</SectionLabel>
+        <GoldCard className="overflow-hidden p-0">
+          <PRow icon={Building2} label="Hoteluri partenere" href="/hotels" />
+          <PRow icon={Calculator} label="Calculează compensația" href="/compensation" />
+          <PRow icon={HelpCircle} label="Ajutor & întrebări" href="/help" last />
+        </GoldCard>
+
+        {/* Cont */}
+        <SectionLabel>Cont</SectionLabel>
+        <CButton
+          variant="ghost"
+          full
+          onClick={logout}
+          className="h-12 gap-2 rounded-card border border-[var(--gold-border)] bg-ivory/70 text-sm text-warm-ink shadow-glass active:scale-[0.985]"
+        >
+          <LogOut className="h-4 w-4" strokeWidth={2.2} />
+          Deconectează-te
+        </CButton>
+
+        <p className="mt-7 px-1 text-center text-xs font-medium text-warm-faint">
           Aerly · Cu un aer înainte.
         </p>
       </div>

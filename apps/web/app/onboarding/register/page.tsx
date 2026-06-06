@@ -1,11 +1,16 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Lock, Mail, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { ApiClientError, register } from "@/lib/api";
+import { CButton } from "@/components/ui/button";
+import { GoldCard } from "@/components/ui/card";
+import { CLabel } from "@/components/ui/label";
+import { PhoneField } from "@/components/ui/phone-field";
+import { TextField } from "@/components/ui/text-field";
 
 const RO_MOBILE = /^(\+40|0)7\d{8}$/;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -55,47 +60,76 @@ export default function RegisterPage() {
     }
   }
 
-  const input =
-    "w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20";
-
   return (
-    <div className="flex flex-1 flex-col px-6 pt-12">
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900">Creează cont</h1>
-      <p className="mt-1.5 text-sm text-slate-500">
+    <div className="flex flex-1 flex-col px-6 pb-safe-bottom pt-12 animate-fade-up">
+      <h1 className="font-display text-4xl leading-tight text-espresso">Creează cont</h1>
+      <p className="mt-1.5 text-sm text-warm-muted">
         Îți confirmăm numărul printr-un cod SMS.
       </p>
 
-      <div className="mt-6 space-y-3">
-        <input className={input} placeholder="Nume complet" value={form.fullName} onChange={set("fullName")} />
-        <input className={input} type="email" placeholder="Email" value={form.email} onChange={set("email")} />
-        <div className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
-          <span className="text-sm font-medium text-slate-500">🇷🇴 +40</span>
-          <input
-            className="w-full bg-transparent py-3 text-sm outline-none"
-            inputMode="tel"
+      <GoldCard elevated className="mt-6 space-y-5 p-5">
+        <div className="space-y-2">
+          <CLabel htmlFor="reg-name">Nume complet</CLabel>
+          <TextField
+            id="reg-name"
+            leftIcon={<User className="h-5 w-5" />}
+            placeholder="Nume complet"
+            value={form.fullName}
+            onChange={set("fullName")}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <CLabel htmlFor="reg-email">Email</CLabel>
+          <TextField
+            id="reg-email"
+            type="email"
+            leftIcon={<Mail className="h-5 w-5" />}
+            placeholder="nume@email.ro"
+            value={form.email}
+            onChange={set("email")}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <CLabel htmlFor="reg-phone">Număr de telefon</CLabel>
+          <PhoneField
+            id="reg-phone"
             placeholder="7xx xxx xxx"
             value={form.phone}
             onChange={set("phone")}
           />
         </div>
-        <input className={input} type="password" placeholder="Parolă (min. 8 caractere)" value={form.password} onChange={set("password")} />
-      </div>
 
-      {error && <p className="mt-3 text-sm font-medium text-risk-high">{error}</p>}
+        <div className="space-y-2">
+          <CLabel htmlFor="reg-password">Parolă</CLabel>
+          <TextField
+            id="reg-password"
+            type="password"
+            leftIcon={<Lock className="h-5 w-5" />}
+            placeholder="Min. 8 caractere"
+            value={form.password}
+            onChange={set("password")}
+          />
+        </div>
 
-      <button
-        type="button"
-        onClick={submit}
-        disabled={pending}
-        className="mt-6 flex items-center justify-center gap-1.5 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition active:scale-[0.99] disabled:opacity-60"
-      >
-        {pending ? "Se creează…" : "Creează cont"}
-        {!pending && <ArrowRight className="h-4 w-4" />}
-      </button>
+        {error && <p className="text-sm font-medium text-risk-high">{error}</p>}
 
-      <p className="mt-5 text-center text-sm text-slate-500">
+        <CButton
+          variant="gold"
+          size="lg"
+          full
+          onClick={submit}
+          disabled={pending}
+          rightIcon={!pending ? <ArrowRight className="h-5 w-5" /> : undefined}
+        >
+          {pending ? "Se creează…" : "Creează cont"}
+        </CButton>
+      </GoldCard>
+
+      <p className="mt-5 text-center text-sm text-warm-muted">
         Ai deja cont?{" "}
-        <Link href="/onboarding/login" className="font-semibold text-primary">
+        <Link href="/onboarding/login" className="font-semibold text-accent-deep">
           Autentifică-te
         </Link>
       </p>
