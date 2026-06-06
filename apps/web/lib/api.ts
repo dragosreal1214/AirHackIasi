@@ -391,4 +391,40 @@ export async function savePushSubscription(subscription: unknown): Promise<void>
   await http(`/push/subscribe`, { method: "POST", body: JSON.stringify(subscription) });
 }
 
+// ---------------------------------------------------------------------------
+// B2B airport flight-risk board (public API, /api/public/v1)
+// ---------------------------------------------------------------------------
+
+export async function getAirportRiskBoard(
+  iata: string,
+  opts?: { date?: string; direction?: "departures" | "arrivals" | "all" },
+): Promise<import("@aerly/shared").AirportRiskBoard> {
+  const direction = opts?.direction ?? "departures";
+  if (USE_MOCKS) {
+    await delay();
+    return {
+      airport: { iata, name: `${iata} Airport`, city: iata, country: "RO" },
+      date: new Date().toISOString().slice(0, 10),
+      direction,
+      airportFogRisk: { level: "high", probability: 0.88, predictionFor: "" },
+      summary: { total: 2, atRisk: 1 },
+      flights: [],
+    };
+  }
+  const sp = new URLSearchParams();
+  if (opts?.date) sp.set("date", opts.date);
+  sp.set("direction", direction);
+  const res = await fetch(
+    `${API_URL}/api/public/v1/airports/${encodeURIComponent(iata)}/risk?${sp.toString()}`,
+  );
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new ApiClientError(
+      body?.detail?.code ?? "API_ERROR",
+      body?.detail?.message ?? `Request failed (${res.status})`,
+    );
+  }
+  return res.json();
+}
+
 export { ApiClientError, USE_MOCKS };

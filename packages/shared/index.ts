@@ -217,6 +217,31 @@ export interface FlightDetail {
   alternativesCount: number;
 }
 
+// ----- B2B airport flight-risk board (public API) -----
+
+export interface BoardFlight {
+  flightId: string;
+  flightNumber: string;
+  airlineCode: string;
+  airlineName: string;
+  originIata: string;
+  destinationIata: string;
+  scheduledDeparture: string;
+  scheduledArrival: string;
+  riskLevel: RiskLevel;
+  riskProbability: number;
+  atRisk: boolean;
+}
+
+export interface AirportRiskBoard {
+  airport: { iata: string; name: string; city: string; country: string };
+  date: string;
+  direction: string;
+  airportFogRisk: CurrentRisk | null;
+  summary: { total: number; atRisk: number };
+  flights: BoardFlight[];
+}
+
 export interface Me {
   id: string;
   fullName?: string;
