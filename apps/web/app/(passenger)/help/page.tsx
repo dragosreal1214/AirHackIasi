@@ -6,6 +6,7 @@ import {
   BedDouble,
   Calculator,
   CheckCircle2,
+  ExternalLink,
   Phone,
   PlaneTakeoff,
   RotateCcw,
@@ -373,6 +374,20 @@ export default function HelpPage() {
                   Vezi cazare
                 </CButton>
               </Link>
+              <a
+                href="https://www.airhelp.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block transition-transform duration-120 ease-cinematic active:scale-[0.98]"
+              >
+                <CButton
+                  variant="ivory"
+                  full
+                  rightIcon={<ExternalLink className="h-[18px] w-[18px]" strokeWidth={2.2} />}
+                >
+                  Cere despăgubirea cu AirHelp
+                </CButton>
+              </a>
             </div>
 
             {/* Contact suport */}

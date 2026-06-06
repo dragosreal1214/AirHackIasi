@@ -1,3 +1,5 @@
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -28,6 +30,13 @@ export default function DevelopersPage() {
   return (
     <main className="cine-surface min-h-screen px-6 py-12 sm:px-10">
       <div className="mx-auto max-w-3xl">
+        <Link
+          href="/"
+          className="mb-6 inline-flex items-center gap-2 rounded-button border border-[color:var(--gold-border-strong)] bg-white/60 px-4 py-2 text-sm font-semibold text-accent-deep transition-transform duration-120 ease-cinematic hover:scale-[0.98]"
+        >
+          <ArrowLeft className="h-4 w-4" strokeWidth={2.2} />
+          Înapoi în aplicație
+        </Link>
         <div className="flex items-center gap-3">
           <img src="/cine/fogora-mark-256.png" alt="Fogora" className="h-12 w-12 object-contain" />
           <div>

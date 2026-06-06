@@ -11,7 +11,10 @@ export function AuthGuard({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated()) {
+    const guest =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem("fogora_guest") === "1";
+    if (!isAuthenticated() && !guest) {
       router.replace("/onboarding/login");
     } else {
       setReady(true);

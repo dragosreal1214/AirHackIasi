@@ -147,6 +147,7 @@ ALTERNATIVES: dict[str, list[Alternative]] = {
             cost_eur=28,
             reliability=0.92,
             score=88,
+            # CFR exposes no stable prefilled-search URL — booking page only.
             action_url="https://bilete.cfrcalatori.ro/",
             action_label="Rezervă pe CFR",
         ),
@@ -162,7 +163,8 @@ ALTERNATIVES: dict[str, list[Alternative]] = {
             cost_eur=95,
             reliability=0.85,
             score=79,
-            action_url="https://www.tarom.ro/",
+            # Deep-link to Google Flights prefilled with the real IAS → OTP route.
+            action_url="https://www.google.com/travel/flights?q=Flights%20from%20IAS%20to%20OTP",
             action_label="Rezervă pe TAROM",
         ),
         Alternative(
@@ -185,7 +187,8 @@ ALTERNATIVES: dict[str, list[Alternative]] = {
                     title="Autocar Iași → Bacău",
                     detail="~1h 40min până la aeroportul BCM",
                     duration_minutes=100,
-                    url="https://www.flixbus.ro/",
+                    # FlixBus exposes no stable prefilled-search URL — booking page only.
+                    url="https://global.flixbus.com/",
                 ),
                 Leg(
                     mode="flight",
@@ -208,7 +211,8 @@ ALTERNATIVES: dict[str, list[Alternative]] = {
             cost_eur=22,
             reliability=0.78,
             score=58,
-            action_url="https://www.flixbus.ro/",
+            # FlixBus exposes no stable prefilled-search URL — booking page only.
+            action_url="https://global.flixbus.com/",
             action_label="Rezervă pe FlixBus",
         ),
     ]

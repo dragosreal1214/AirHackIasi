@@ -16,14 +16,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { AppBar } from "@/components/passenger/app-bar";
 import { CButton } from "@/components/ui/button";
 import { GoldCard } from "@/components/ui/card";
 import { TextField } from "@/components/ui/text-field";
 import { useMe, useUpdateMe } from "@/hooks/use-me";
-import { clearTokens } from "@/lib/auth";
+import { clearTokens, getAccessToken } from "@/lib/auth";
 import { subscribeToPush } from "@/lib/push";
 import { cn } from "@/lib/utils";
 
@@ -275,6 +275,12 @@ export default function ProfilePage() {
   const { data: me, isLoading } = useMe();
   const updateMe = useUpdateMe();
 
+  // Guest = no auth token. Resolved after mount to stay SSR-safe.
+  const [isGuest, setIsGuest] = useState(false);
+  useEffect(() => {
+    setIsGuest(!getAccessToken());
+  }, []);
+
   const [pushNote, setPushNote] = useState<string | null>(null);
   // Optimistic override: the toggle flips instantly and reverts on error.
   const [override, setOverride] = useState<NotificationChannel[] | null>(null);
@@ -326,6 +332,7 @@ export default function ProfilePage() {
 
   function logout() {
     clearTokens();
+    window.localStorage.removeItem("fogora_guest");
     router.replace("/onboarding/login");
   }
 
@@ -448,15 +455,25 @@ export default function ProfilePage() {
         {/* Cont */}
         <div className="animate-c-fade-up" style={{ animationDelay: "280ms" }}>
           <SectionLabel>Cont</SectionLabel>
-          <CButton
-            variant="ghost"
-            full
-            onClick={logout}
-            className="h-12 gap-2 rounded-card border border-[var(--gold-border)] bg-ivory/70 text-sm text-warm-ink shadow-glass active:scale-[0.985]"
-          >
-            <LogOut className="h-4 w-4" strokeWidth={2.2} />
-            Deconectează-te
-          </CButton>
+          {isGuest ? (
+            <Link
+              href="/onboarding/register"
+              className="flex min-h-[52px] items-center justify-center gap-2 rounded-card border border-[rgba(217,189,116,0.9)] bg-gradient-to-br from-accent-soft via-accent to-accent-deep px-6 text-sm font-semibold tracking-tight text-espresso shadow-gold-button transition-transform duration-150 ease-cinematic active:scale-[0.985]"
+            >
+              <Phone className="h-4 w-4" strokeWidth={2.2} />
+              Conectează-te / Adaugă numărul pentru alerte
+            </Link>
+          ) : (
+            <CButton
+              variant="ghost"
+              full
+              onClick={logout}
+              className="h-12 gap-2 rounded-card border border-[var(--gold-border)] bg-ivory/70 text-sm text-warm-ink shadow-glass active:scale-[0.985]"
+            >
+              <LogOut className="h-4 w-4" strokeWidth={2.2} />
+              Deconectează-te
+            </CButton>
+          )}
         </div>
 
         <p className="mt-7 px-1 text-center text-xs font-medium text-warm-faint">

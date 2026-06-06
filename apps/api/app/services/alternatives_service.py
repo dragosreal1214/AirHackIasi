@@ -21,14 +21,16 @@ from app.models.schemas import Alternative, Disruption, Leg
 from app.services import flight_service, store
 from app.services.risk_service import destination_landing_risk, risk_for
 
-_AIRLINE_BOOKING = {
-    "W4": "https://wizzair.com/",
-    "RO": "https://www.tarom.ro/",
-    "FR": "https://www.ryanair.com/",
-    "OS": "https://www.austrian.com/",
-    "A2": "https://www.animawings.com/",
-    "H4": "https://www.hisky.aero/",
-}
+def _google_flights_url(origin_iata: str, dest_iata: str) -> str:
+    """Deep-link into Google Flights prefilled with the real route.
+
+    Note: CFR (bilete.cfrcalatori.ro) and FlixBus (global.flixbus.com) expose no
+    stable public prefilled-search URL, so those keep their plain booking pages.
+    """
+    return (
+        "https://www.google.com/travel/flights?q="
+        f"Flights%20from%20{origin_iata}%20to%20{dest_iata}"
+    )
 
 # Nearby airports a passenger can drive to and depart from instead.
 # origin_iata -> [(alternate_iata, drive_minutes)]
@@ -81,7 +83,7 @@ def generate_alternatives(flight) -> list[Alternative]:
                     reliability=rel,
                     cost=cost,
                 ),
-                action_url=_AIRLINE_BOOKING.get(f.airline_code, "https://www.google.com/travel/flights"),
+                action_url=_google_flights_url(f.origin_iata, f.destination_iata),
                 action_label=f"Rezervă pe {f.airline_name}",
             )
         )
@@ -153,17 +155,16 @@ def generate_alternatives(flight) -> list[Alternative]:
                         title=f"Autocar {flight.origin_city} → {alt_city}",
                         detail=f"~{hrs}h până la aeroportul {alt_iata}",
                         duration_minutes=drive,
-                        url="https://www.flixbus.ro/",
+                        # FlixBus exposes no stable prefilled-search URL — booking page only.
+                        url="https://global.flixbus.com/",
                     ),
                     Leg(
                         mode="flight",
                         title=f"Zbor {alt_iata} → {flight.destination_iata}",
                         detail=f"Către {flight.destination_city}",
                         duration_minutes=flight_leg,
-                        url=(
-                            "https://www.google.com/travel/flights?q="
-                            f"Flights%20from%20{alt_iata}%20to%20{flight.destination_iata}"
-                        ),
+                        # Real nearby-airport IATA → destination, prefilled in Google Flights.
+                        url=_google_flights_url(alt_iata, flight.destination_iata),
                     ),
                 ],
             )

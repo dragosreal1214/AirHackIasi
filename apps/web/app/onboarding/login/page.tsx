@@ -38,6 +38,11 @@ export default function LoginPage() {
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   };
 
+  const continueAsGuest = () => {
+    window.localStorage.setItem("fogora_guest", "1");
+    router.replace("/");
+  };
+
   async function submit() {
     setError(null);
     if (!EMAIL.test(email)) return setError("Introdu un email valid.");
@@ -124,11 +129,43 @@ export default function LoginPage() {
           <div className="mx-auto mb-5 h-[5px] w-11 rounded-full bg-accent/25" />
 
           <h2 className="font-display text-3xl leading-tight tracking-tight text-espresso">
-            Bine ai revenit.
+            Verifică un zbor.
           </h2>
-          <p className="mt-1.5 text-warm-muted">Intră în contul tău Fogora.</p>
+          <p className="mt-1.5 text-warm-muted">
+            Intri direct, fără cont — vezi statusul și riscul de perturbare.
+          </p>
 
-          <div className="mt-6 space-y-3">
+          {/* PRIMARY: continue as guest, no account */}
+          <CButton
+            variant="gold"
+            size="lg"
+            full
+            onClick={continueAsGuest}
+            rightIcon={<ArrowRight className="h-5 w-5" />}
+            className="mt-6"
+          >
+            Verifică un zbor — fără cont
+          </CButton>
+
+          <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[12px] text-warm-faint">
+            <Lock className="h-3.5 w-3.5" />
+            Ai nevoie de cont doar pentru alerte în timp real.
+          </p>
+
+          <div
+            className="my-5 h-px"
+            style={{
+              background:
+                "linear-gradient(to right, transparent, rgba(200,162,78,0.22) 30%, rgba(200,162,78,0.22) 70%, transparent)",
+            }}
+          />
+
+          {/* SECONDARY: email/password login */}
+          <p className="mb-3 text-center text-[11px] font-bold uppercase tracking-[0.16em] text-warm-faint">
+            Ai deja cont?
+          </p>
+
+          <div className="space-y-3">
             <TextField
               leftIcon={<Mail className="h-5 w-5" />}
               type="email"
@@ -149,31 +186,23 @@ export default function LoginPage() {
           {error && <p className="mt-3 text-sm font-medium text-risk-high">{error}</p>}
 
           <CButton
-            variant="gold"
-            size="lg"
+            variant="ivory"
+            size="md"
             full
             onClick={submit}
             disabled={pending}
             rightIcon={!pending && <ArrowRight className="h-5 w-5" />}
-            className="mt-6"
+            className="mt-4"
           >
             {pending ? "Se autentifică…" : "Autentifică-te"}
           </CButton>
 
-          <div
-            className="my-4 h-px"
-            style={{
-              background:
-                "linear-gradient(to right, transparent, rgba(200,162,78,0.22) 30%, rgba(200,162,78,0.22) 70%, transparent)",
-            }}
-          />
-
           <Link
             href="/onboarding/register"
-            className="inline-flex h-14 w-full items-center justify-center gap-2 whitespace-nowrap rounded-button border border-[rgba(200,167,97,0.65)] bg-ivory/95 px-7 text-base font-semibold tracking-tight text-espresso shadow-ivory-button transition-all duration-150 ease-cinematic active:scale-[0.98]"
+            className="mt-3 flex items-center justify-center gap-1.5 text-sm font-semibold text-accent-deep"
           >
             Creează cont
-            <ArrowRight className="h-5 w-5" />
+            <ArrowRight className="h-4 w-4" />
           </Link>
 
           <Link
@@ -183,11 +212,6 @@ export default function LoginPage() {
             <Smartphone className="h-4 w-4" />
             Intră cu numărul de telefon
           </Link>
-
-          <p className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-warm-faint">
-            <Lock className="h-3.5 w-3.5" />
-            Îți trimitem un cod unic ca să confirmăm că ești tu.
-          </p>
         </div>
       </div>
     </div>

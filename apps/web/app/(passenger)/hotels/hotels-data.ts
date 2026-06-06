@@ -37,7 +37,7 @@ export const HOTELS: Hotel[] = [
     blurb: "5 stele în centru · spa și transfer gratuit",
     gradient: "from-[#c8a24e] via-[#e8c97a] to-[#b8924e]",
     image:
-      "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=70",
+      "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=800&q=70",
     bookingUrl: "https://www.booking.com/hotel/ro/international-iasi.ro.html",
     phone: "+40232942020",
     amenities: [
@@ -61,7 +61,7 @@ export const HOTELS: Hotel[] = [
     blurb: "Vedere panoramică · restaurant la etaj 13",
     gradient: "from-[#5b8fa8] via-[#7ab5cc] to-[#3d7090]",
     image:
-      "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=70",
+      "https://upload.wikimedia.org/wikipedia/commons/d/df/Ia%C5%9Fi_%2C_Hotel_Unirea_3.JPG",
     bookingUrl: "https://www.booking.com/hotel/ro/grand-unirea-iasi.ro.html",
     phone: "+40232205000",
     amenities: [
@@ -157,7 +157,7 @@ export const HOTELS: Hotel[] = [
     blurb: "Cel mai aproape de LRIA · check-in 24/7",
     gradient: "from-[#c8a24e] via-[#e8c97a] to-[#b8924e]",
     image:
-      "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=800&q=70",
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=70",
     bookingUrl: "https://www.booking.com/hotel/ro/ramada-iasi.ro.html",
     phone: "+40232999999",
     amenities: [

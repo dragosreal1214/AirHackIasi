@@ -21,6 +21,7 @@ import { AppBar } from "@/components/passenger/app-bar";
 import { RouteDisplay } from "@/components/passenger/route-display";
 import { RiskGauge } from "@/components/passenger/risk-gauge";
 import { GoldCard } from "@/components/ui/card";
+import { FilterChips } from "@/components/ui/filter-chips";
 import { useAlternatives, useSelectAlternative } from "@/hooks/use-disruption";
 import { useFlightDetail } from "@/hooks/use-flight-detail";
 import {
@@ -44,6 +45,14 @@ const WEATHER_ICON: Record<string, ReactNode> = {
   bad_weather: <CloudRain className="h-3.5 w-3.5" strokeWidth={2} />,
   overall: <CircleAlert className="h-3.5 w-3.5" strokeWidth={2} />,
 };
+
+type AltSort = "recommended" | "fastest" | "cheapest";
+
+const ALT_SORT_OPTIONS: { value: AltSort; label: string }[] = [
+  { value: "recommended", label: "Recomandate" },
+  { value: "fastest", label: "Cel mai rapid" },
+  { value: "cheapest", label: "Cel mai ieftin" },
+];
 
 export default function FlightDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -84,6 +93,19 @@ function FlightDetailBody({
   const select = useSelectAlternative();
   const [selected, setSelected] = useState<Alternative | null>(null);
   const [selectingId, setSelectingId] = useState<string | null>(null);
+  const [altSort, setAltSort] = useState<AltSort>("recommended");
+
+  const sortedAlternatives = (() => {
+    const list = alternatives.data ? [...alternatives.data] : [];
+    if (altSort === "fastest") {
+      list.sort((a, b) => a.durationMinutes - b.durationMinutes);
+    } else if (altSort === "cheapest") {
+      list.sort((a, b) => a.costEur - b.costEur);
+    } else {
+      list.sort((a, b) => a.rank - b.rank);
+    }
+    return list;
+  })();
 
   function handleSelect(alt: Alternative) {
     setSelectingId(alt.id);
@@ -335,6 +357,15 @@ function FlightDetailBody({
             Alternative recomandate
           </h2>
 
+          {alternatives.data && alternatives.data.length > 1 && (
+            <FilterChips
+              className="mb-3"
+              options={ALT_SORT_OPTIONS}
+              value={altSort}
+              onChange={setAltSort}
+            />
+          )}
+
           {selected && (
             <div className="mb-3 flex items-start gap-2 rounded-card border border-risk-low/30 bg-risk-low/[0.1] px-4 py-3 text-sm text-risk-low">
               <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0" strokeWidth={2.2} />
@@ -353,7 +384,7 @@ function FlightDetailBody({
                 />
               ))}
 
-            {alternatives.data?.map((alt) => (
+            {sortedAlternatives.map((alt) => (
               <AlternativeCard
                 key={alt.id}
                 alternative={alt}

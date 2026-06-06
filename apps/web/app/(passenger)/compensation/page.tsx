@@ -1,9 +1,10 @@
 "use client";
 
-import { Banknote, Plane, Scale, Sparkles } from "lucide-react";
+import { Banknote, ExternalLink, Plane, Scale, ShieldCheck, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { AppBar } from "@/components/passenger/app-bar";
+import { CButton } from "@/components/ui/button";
 import { GoldCard } from "@/components/ui/card";
 import { CLabel } from "@/components/ui/label";
 import { GoldDivider } from "@/components/ui/divider";
@@ -218,6 +219,42 @@ export default function CompensationPage() {
               )}
             </div>
           </div>
+        </GoldCard>
+
+        {/* AirHelp — cere despăgubirea */}
+        <GoldCard
+          elevated
+          className="mt-4 animate-c-fade-up p-5"
+          style={{ animationDelay: "320ms" }}
+        >
+          <div className="flex items-start gap-2.5">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-icon border border-[var(--gold-border)] bg-accent/[0.12] text-accent-deep shadow-glass">
+              <ShieldCheck className="h-5 w-5" strokeWidth={2} />
+            </span>
+            <div className="min-w-0">
+              <h3 className="font-display text-lg leading-tight tracking-tight text-espresso">
+                Cere despăgubirea fără efort
+              </h3>
+              <p className="mt-1.5 text-sm font-medium leading-relaxed text-warm-muted">
+                AirHelp gestionează cererea EU261 în locul tău — de la depunere până
+                la plată, fără costuri inițiale.
+              </p>
+            </div>
+          </div>
+          <a
+            href="https://www.airhelp.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 block transition-transform duration-120 ease-cinematic active:scale-[0.98]"
+          >
+            <CButton
+              variant="gold"
+              full
+              rightIcon={<ExternalLink className="h-[18px] w-[18px]" strokeWidth={2.2} />}
+            >
+              Cere despăgubirea cu AirHelp
+            </CButton>
+          </a>
         </GoldCard>
 
         <p

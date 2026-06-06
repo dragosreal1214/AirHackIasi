@@ -2,6 +2,7 @@
 
 import {
   ArrowUpRight,
+  Bell,
   FileText,
   type LucideIcon,
   LifeBuoy,
@@ -12,10 +13,11 @@ import {
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { getMe, getPnrs } from "@/lib/api";
 import { pnrKeys } from "@/hooks/use-pnrs";
+import { getAccessToken } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 type MenuItem = {
@@ -59,6 +61,12 @@ const MENU: MenuItem[] = [
 
 export default function HomePage() {
   const qc = useQueryClient();
+  // Guest = no auth token. Resolved after mount to stay SSR-safe.
+  const [isGuest, setIsGuest] = useState(false);
+
+  useEffect(() => {
+    setIsGuest(!getAccessToken());
+  }, []);
 
   // Warm the most-used screens so the bottom-nav tabs open instantly.
   useEffect(() => {
@@ -153,6 +161,31 @@ export default function HomePage() {
           }}
         />
 
+        {/* guest: invite to add phone for real-time alerts */}
+        {isGuest && (
+          <Link
+            href="/onboarding/register"
+            className="animate-c-fade-up mb-[15px] flex items-center gap-3 rounded-[18px] border border-[color:var(--gold-border)] bg-white/55 p-4 backdrop-blur-glass transition-transform duration-150 ease-cinematic active:scale-[0.98] [animation-delay:90ms]"
+            style={{
+              boxShadow:
+                "0 1px 0 rgba(255,255,255,0.5) inset, 0 8px 22px rgba(33,24,14,0.08)",
+            }}
+          >
+            <span className="grid h-[42px] w-[42px] flex-shrink-0 place-items-center rounded-[13px] bg-sky/[0.32] text-sky-ink">
+              <Bell className="h-[20px] w-[20px]" strokeWidth={1.8} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[15px] font-semibold leading-tight text-espresso">
+                Primește alerte în timp real
+              </span>
+              <span className="mt-0.5 block text-[12px] leading-snug text-warm-muted">
+                Adaugă-ți numărul ca să te anunțăm de ceață înainte să-ți afecteze zborul.
+              </span>
+            </span>
+            <ArrowUpRight className="h-5 w-5 flex-shrink-0 text-accent-deep" strokeWidth={1.9} />
+          </Link>
+        )}
+
         {/* menu grid */}
         <div className="grid grid-cols-2 gap-3">
           {MENU.map((item, i) => (
@@ -162,7 +195,7 @@ export default function HomePage() {
 
         {/* footer note */}
         <p className="animate-c-fade-up mt-[22px] text-center text-[12px] font-normal leading-relaxed text-warm-faint [animation-delay:400ms]">
-          Fogora veghează ca tu să nu fie nevoie.
+          Fogora veghează în locul tău.
         </p>
       </div>
     </div>
