@@ -1,0 +1,13 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "_comment": "WEB service config. Set this Railway service's Root Directory to the repo root. The API service uses apps/api (apps/api/railway.json). See docs/deploy-railway.md.",
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "pnpm install --frozen-lockfile && pnpm --filter web build"
+  },
+  "deploy": {
+    "startCommand": "pnpm --filter web exec next start -H 0.0.0.0 -p $PORT",
+    "restartPolicyType": "ON_FAILURE",
+    "numReplicas": 1
+  }
+}

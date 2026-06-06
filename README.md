@@ -95,8 +95,16 @@ poetry run mypy app        # type check
 | P4   | Frontend (ops) — `apps/web/app/(ops)`, integrations       |
 | P5   | Coordinator / UX — design system, copy                    |
 
+## Deployment
+
+Deploy to **Railway** (two services: `apps/api` via Dockerfile, web via Nixpacks)
+— see [`docs/deploy-railway.md`](./docs/deploy-railway.md). Credentials map in
+[`docs/credentials.md`](./docs/credentials.md).
+
 ## Status
 
-🟢 **Scaffold committed.** The web app currently ships a placeholder landing
-page that the final design will replace. See [`docs/`](./docs) for the plan and
-architecture decisions.
+🟢 **MVP.** Cinematic Fogora frontend (onboarding → hub → trips → disruption +
+alternatives, help/hotels/compensation, PWA-installable) on a live backend:
+Supabase persistence, phone-OTP + email/password auth (JWT), XGBoost fog model
+with live Open-Meteo forecast, real LRIA schedule, WhatsApp alerts (Twilio),
+Orange SIM-swap/KYC. See [`docs/`](./docs).
