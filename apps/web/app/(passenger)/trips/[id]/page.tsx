@@ -6,7 +6,6 @@ import {
   CloudRain,
   Clock,
   Calendar,
-  Plane,
   PlaneLanding,
   ArrowRight,
   CircleAlert,
@@ -16,6 +15,7 @@ import {
 import { useParams } from "next/navigation";
 import { type ReactNode, useState } from "react";
 
+import { AirlineBadge } from "@/components/passenger/airline-badge";
 import { AlternativeCard } from "@/components/passenger/alternative-card";
 import { AppBar } from "@/components/passenger/app-bar";
 import { RouteDisplay } from "@/components/passenger/route-display";
@@ -143,7 +143,7 @@ function FlightDetailBody({
           </span>
           <span className="text-warm-faint">·</span>
           <span className="inline-flex items-center gap-1.5">
-            <Plane className="h-3.5 w-3.5" />
+            <AirlineBadge code={flight.airlineCode} size={20} />
             {flight.airlineName}
           </span>
           <span className="text-warm-faint">·</span>

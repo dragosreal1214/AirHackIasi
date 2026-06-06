@@ -15,7 +15,7 @@ export function AppBar({
 }) {
   return (
     <header
-      className="sticky top-0 z-30 flex items-end gap-3 border-b border-[var(--gold-border)] px-4 pb-3 pt-safe-top backdrop-blur-glass"
+      className="sticky top-0 z-30 flex items-center gap-3 border-b border-[var(--gold-border)] px-4 pb-3 pt-[calc(theme(spacing.safe-top)+12px)] backdrop-blur-glass"
       style={{ background: "var(--appbar-bg)" }}
     >
       {backHref ? (

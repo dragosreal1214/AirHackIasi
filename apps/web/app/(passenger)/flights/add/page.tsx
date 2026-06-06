@@ -1,15 +1,18 @@
 "use client";
 
 import type { FlightSummary } from "@aerly/shared";
-import { ArrowRight, Clock, MapPin, Plane, Search, SearchX } from "lucide-react";
+import { ArrowRight, MapPin, Search, SearchX } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { AirlineBadge } from "@/components/passenger/airline-badge";
 import { AppBar } from "@/components/passenger/app-bar";
 import { GoldCard } from "@/components/ui/card";
+import { DatePicker } from "@/components/ui/date-picker";
 import { FilterChips } from "@/components/ui/filter-chips";
 import { CLabel } from "@/components/ui/label";
 import { TextField } from "@/components/ui/text-field";
+import { TimePicker } from "@/components/ui/time-picker";
 import { ApiClientError } from "@/lib/api";
 import { formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -105,20 +108,11 @@ export default function AddFlightPage() {
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1.5">
                 <CLabel className="px-1">Dată</CLabel>
-                <TextField
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                />
+                <DatePicker value={date} onChange={setDate} />
               </div>
               <div className="space-y-1.5">
                 <CLabel className="px-1">Oră</CLabel>
-                <TextField
-                  type="time"
-                  leftIcon={<Clock className="h-5 w-5" />}
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                />
+                <TimePicker value={time} onChange={setTime} />
               </div>
             </div>
           </div>
@@ -136,11 +130,7 @@ export default function AddFlightPage() {
             </div>
             <div className="space-y-1.5">
               <CLabel className="px-1">Dată (opțional)</CLabel>
-              <TextField
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
+              <DatePicker value={date} onChange={setDate} placeholder="Orice dată" />
             </div>
           </div>
         )}
@@ -177,9 +167,7 @@ export default function AddFlightPage() {
                 addPnr.isPending && "pointer-events-none opacity-60",
               )}
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-icon border border-[color:var(--gold-border)] bg-accent/[0.12] text-accent-deep">
-                <Plane className="h-5 w-5" />
-              </div>
+              <AirlineBadge code={flight.airlineCode} size={40} />
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-bold text-espresso">
                   {flight.flightNumber} · {flight.originIata} → {flight.destinationIata}

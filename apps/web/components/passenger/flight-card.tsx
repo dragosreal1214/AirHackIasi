@@ -5,13 +5,13 @@ import {
   ArrowRight,
   Calendar,
   Loader2,
-  Plane,
   Trash2,
   TriangleAlert,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
+import { AirlineBadge } from "@/components/passenger/airline-badge";
 import { RouteDisplay } from "@/components/passenger/route-display";
 import { RiskBadge } from "@/components/shared/risk-badge";
 import { GoldCard } from "@/components/ui/card";
@@ -99,8 +99,8 @@ export function FlightCard({ pnr }: { pnr: PnrWithFlight }) {
             {formatTime(flight.scheduledArrival)}
           </span>
         </div>
-        <div className="flex items-center gap-1.5 text-xs font-medium text-warm-muted">
-          <Plane className="h-3.5 w-3.5" />
+        <div className="flex items-center gap-2 text-xs font-medium text-warm-muted">
+          <AirlineBadge code={flight.airlineCode} size={26} />
           {flight.airlineName} · {flight.flightNumber}
         </div>
       </div>
