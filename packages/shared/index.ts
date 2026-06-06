@@ -202,6 +202,7 @@ export interface FlightDetail {
   weather: Gauge[];
   info: FlightInfo;
   timeline: TimelineStep[];
+  destinationIls?: string | null;
   disruptionId?: string | null;
   alternativesCount: number;
 }

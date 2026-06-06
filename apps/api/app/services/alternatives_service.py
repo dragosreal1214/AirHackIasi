@@ -19,7 +19,7 @@ from app.data import ground_transport
 from app.ml import airports as registry
 from app.models.schemas import Alternative, Disruption
 from app.services import flight_service, store
-from app.services.risk_service import risk_at_airport, risk_for
+from app.services.risk_service import destination_landing_risk, risk_for
 
 _AIRLINE_BOOKING = {
     "W4": "https://wizzair.com/",
@@ -171,7 +171,7 @@ async def get_disruption(disruption_id: str) -> Disruption:
             detail={"code": "DISRUPTION_NOT_FOUND", "message": "Alertă inexistentă."},
         )
     risk, _ = await risk_for(flight)
-    dest_risk = await risk_at_airport(flight.destination_iata, flight.scheduled_arrival)
+    dest_risk = await destination_landing_risk(flight.destination_iata, flight.scheduled_arrival)
     alts = generate_alternatives(flight)
     return Disruption(
         id=disruption_id,

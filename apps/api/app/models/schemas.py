@@ -101,6 +101,7 @@ class FlightDetail(CamelModel):
     weather: list[Gauge]
     info: FlightInfo
     timeline: list[TimelineStep]
+    destination_ils: str | None = None
     disruption_id: str | None = None
     alternatives_count: int = 0
 

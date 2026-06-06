@@ -68,6 +68,42 @@ async def risk_at_airport(iata: str, when_iso: str) -> CurrentRisk | None:
     return None
 
 
+async def destination_landing_risk(iata: str, when_iso: str) -> CurrentRisk:
+    """Fog at the destination discounted by its landing capability (ILS cat).
+
+    A CAT III field autolands in dense fog (low disruption); a CAT I field
+    (RVR 550 m, like Iași) can't, so its fog stays a real diversion risk.
+    """
+    from app.ml import airport_ops  # noqa: PLC0415
+    from app.ml import airports as registry  # noqa: PLC0415
+    from app.ml.fog_model import fog_model  # noqa: PLC0415
+
+    cap = airport_ops.capability(iata)
+    fog = await risk_at_airport(iata, when_iso)
+    fog_p = fog.probability if fog else 0.0
+    disruption = round(fog_p * (1 - cap["mitigation"]), 4)
+
+    a = registry.get(iata)
+    city = a.city if a else iata
+    cat, rvr = cap["category"], cap["min_rvr_m"]
+    if cap["autoland"]:
+        expl = (
+            f"{city} ({iata}) are ILS {cat} — avioanele pot ateriza automat pe ceață "
+            f"densă (RVR ~{rvr} m), deci ceața afectează rar aterizarea."
+        )
+    else:
+        expl = (
+            f"{city} ({iata}) are doar ILS {cat} (minim RVR {rvr} m) — pe ceață densă "
+            f"aterizările pot fi amânate sau deviate."
+        )
+    return CurrentRisk(
+        level=fog_model.risk_level(disruption),
+        probability=disruption,
+        prediction_for=when_iso,
+        explanation=expl,
+    )
+
+
 async def risk_for(
     flight: FlightSummary, force_fog_iata: str | None = None
 ) -> tuple[CurrentRisk, str | None]:

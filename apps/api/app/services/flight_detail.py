@@ -9,10 +9,11 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
+from app.ml import airport_ops
 from app.ml.fog_model import fog_model
 from app.models.schemas import FlightDetail, FlightInfo, Gauge, TimelineStep
 from app.services import alternatives_service, flight_service
-from app.services.risk_service import risk_at_airport, risk_for
+from app.services.risk_service import destination_landing_risk, risk_for
 
 
 def _hash(s: str) -> int:
@@ -25,7 +26,8 @@ async def build_flight_detail(flight_id: str) -> FlightDetail | None:
         return None
 
     risk, disruption_id = await risk_for(flight)
-    dest = await risk_at_airport(flight.destination_iata, flight.scheduled_arrival)
+    dest = await destination_landing_risk(flight.destination_iata, flight.scheduled_arrival)
+    dest_ils = airport_ops.capability(flight.destination_iata)["category"]
 
     h = _hash(flight.id)
     fog = risk.probability
@@ -73,6 +75,7 @@ async def build_flight_detail(flight_id: str) -> FlightDetail | None:
         weather=weather,
         info=info,
         timeline=timeline,
+        destination_ils=dest_ils,
         disruption_id=disruption_id,
         alternatives_count=alts_count,
     )
