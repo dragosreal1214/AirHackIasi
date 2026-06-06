@@ -40,6 +40,9 @@ export function AlternativeCard({
   const hasLegs = legs.length > 0;
   const [open, setOpen] = useState(false);
 
+  const btnClass =
+    "mt-4 flex h-12 w-full items-center justify-center gap-1.5 rounded-button text-sm font-semibold tracking-tight transition-all duration-150 ease-cinematic active:scale-[0.98]";
+
   return (
     <GoldCard
       elevated={recommended}
@@ -86,24 +89,35 @@ export function AlternativeCard({
         </span>
       </div>
 
-      <button
-        type="button"
-        onClick={() => (hasLegs ? setOpen(true) : onSelect(alternative))}
-        disabled={pending}
-        className={cn(
-          "mt-4 flex h-12 w-full items-center justify-center gap-1.5 rounded-button text-sm font-semibold tracking-tight transition-all duration-150 ease-cinematic active:scale-[0.98] disabled:opacity-50",
-          recommended
-            ? "bg-gradient-to-br from-accent-soft via-accent to-accent-deep border border-[rgba(217,189,116,0.9)] text-espresso shadow-gold-button"
-            : "border border-[color:var(--gold-border-strong)] bg-white/60 text-accent-deep backdrop-blur-lg",
-        )}
-      >
-        {hasLegs ? "Vezi pașii rerutării" : alternative.actionLabel}
-        {hasLegs || recommended ? (
+      {hasLegs ? (
+        // Multi-leg reroute → show the steps modal (each step links to its provider).
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className={cn(btnClass, "bg-gradient-to-br from-accent-soft via-accent to-accent-deep border border-[rgba(217,189,116,0.9)] text-espresso shadow-gold-button")}
+        >
+          Vezi pașii rerutării
           <ArrowRight className="h-4 w-4" strokeWidth={2.2} />
-        ) : (
+        </button>
+      ) : (
+        // Single provider → open its site (deep-linked where possible) + record the choice.
+        <a
+          href={alternative.actionUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => onSelect(alternative)}
+          className={cn(
+            btnClass,
+            recommended
+              ? "bg-gradient-to-br from-accent-soft via-accent to-accent-deep border border-[rgba(217,189,116,0.9)] text-espresso shadow-gold-button"
+              : "border border-[color:var(--gold-border-strong)] bg-white/60 text-accent-deep backdrop-blur-lg",
+            pending && "pointer-events-none opacity-60",
+          )}
+        >
+          {alternative.actionLabel}
           <ExternalLink className="h-3.5 w-3.5" strokeWidth={2.2} />
-        )}
-      </button>
+        </a>
+      )}
 
       {open &&
         hasLegs &&
