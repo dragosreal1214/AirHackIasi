@@ -43,11 +43,10 @@ export default function VerifyPage() {
     try {
       const tokens = await verifyOtp(challengeId, value);
       setTokens(tokens.accessToken, tokens.refreshToken);
-      const isRegister = sessionStorage.getItem("aerly_flow") === "register";
       sessionStorage.removeItem("aerly_challenge");
       sessionStorage.removeItem("aerly_flow");
-      // New sign-ups get the celebratory success screen; logins go straight in.
-      router.replace(isRegister ? "/onboarding/success" : "/");
+      // After the code is verified, always show the success screen (tick draw).
+      router.replace("/onboarding/success");
     } catch (e) {
       setError(e instanceof ApiClientError ? e.message : "Cod greșit. Mai încearcă.");
       setCode("");

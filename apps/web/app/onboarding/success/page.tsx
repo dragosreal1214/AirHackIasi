@@ -9,7 +9,7 @@ export default function SuccessPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const t = setTimeout(() => router.replace("/"), 1900);
+    const t = setTimeout(() => router.replace("/"), 2200);
     return () => clearTimeout(t);
   }, [router]);
 
