@@ -65,10 +65,10 @@ export default function LoginPage() {
       {/* sticky cinematic hero */}
       <div className="sticky top-0 z-[1] h-[100dvh] overflow-hidden">
         <img
-          src="/cine/window-hero.jpg"
+          src="/cine/login-plane-window.png"
           alt=""
           aria-hidden
-          className="absolute inset-0 h-full w-full object-cover object-[50%_48%] will-change-transform"
+          className="absolute inset-0 h-full w-full object-cover object-[50%_46%] will-change-transform"
           style={{ transform: `scale(${scale}) translateY(${p * -16}px)`, transition: "transform .08s linear" }}
         />
         <div
@@ -177,19 +177,20 @@ export default function LoginPage() {
           />
 
           <Link
-            href="/onboarding/phone"
+            href="/onboarding/register"
             className="inline-flex h-14 w-full items-center justify-center gap-2 whitespace-nowrap rounded-button border border-[rgba(200,167,97,0.65)] bg-ivory/95 px-7 text-base font-semibold tracking-tight text-espresso shadow-ivory-button transition-all duration-150 ease-cinematic active:scale-[0.98]"
           >
-            Intră cu numărul de telefon
-            <Smartphone className="h-5 w-5" />
+            Creează cont
+            <ArrowRight className="h-5 w-5" />
           </Link>
 
-          <p className="mt-4 text-center text-sm text-warm-muted">
-            Nu ai cont?{" "}
-            <Link href="/onboarding/register" className="font-semibold text-accent-deep">
-              Creează cont
-            </Link>
-          </p>
+          <Link
+            href="/onboarding/phone"
+            className="mt-3 flex items-center justify-center gap-1.5 text-sm font-semibold text-accent-deep"
+          >
+            <Smartphone className="h-4 w-4" />
+            Intră cu numărul de telefon
+          </Link>
 
           <p className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-warm-faint">
             <Lock className="h-3.5 w-3.5" />
