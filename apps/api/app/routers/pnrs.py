@@ -34,3 +34,11 @@ async def create_pnr(
             notification_service.dispatch, user.phone_number, pnr.disruption_id
         )
     return pnr
+
+
+@router.delete("/{pnr_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_pnr(
+    pnr_id: str,
+    user: CurrentUser = Depends(get_current_user),
+) -> None:
+    await pnr_service.cancel_pnr(user.id, pnr_id)
