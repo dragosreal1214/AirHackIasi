@@ -17,9 +17,9 @@ const instrument = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "Aerly — Cu un aer înainte.",
+  title: "Fogora — Copilotul tău calm.",
   description:
-    "Aerly îți spune din timp când zborul tău e la risc de ceață și îți dă alternative.",
+    "Fogora îți spune din timp când zborul tău e la risc de ceață și îți dă alternative.",
 };
 
 export const viewport: Viewport = {

@@ -138,7 +138,7 @@ export default function HomePage() {
 
         {/* footer note */}
         <p className="animate-c-fade-up mt-[22px] text-center text-[12px] font-normal leading-relaxed text-warm-faint [animation-delay:400ms]">
-          Aerly veghează ca tu să nu fie nevoie.
+          Fogora veghează ca tu să nu fie nevoie.
         </p>
       </div>
     </div>

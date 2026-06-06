@@ -164,7 +164,7 @@ export default function HelpPage() {
         </GoldCard>
 
         <p className="mt-7 px-1 text-center text-xs font-medium text-warm-faint">
-          Aerly · Cu un aer înainte.
+          Fogora · Copilotul tău calm.
         </p>
       </div>
     </>

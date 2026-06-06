@@ -39,7 +39,7 @@ export function CWord({ light, size = 32, className, ...props }: CWordProps) {
         )}
         style={{ fontSize: size * 0.85 }}
       >
-        Aerly
+        Fogora
       </span>
     </div>
   );

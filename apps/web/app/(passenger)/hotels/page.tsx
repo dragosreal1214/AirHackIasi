@@ -144,7 +144,7 @@ export default function HotelsPage() {
           style={{ animationDelay: "60ms" }}
         >
           Cazare peste noapte lângă Aeroportul Iași (LRIA) dacă zborul tău este
-          anulat sau reprogramat. Tarife negociate pentru pasageri Aerly.
+          anulat sau reprogramat. Tarife negociate pentru pasageri Fogora.
         </p>
 
         <div

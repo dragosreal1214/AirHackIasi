@@ -37,7 +37,7 @@ export default function SuccessPage() {
         className="mt-3 text-warm-muted animate-c-fade-up"
         style={{ animationDelay: "340ms" }}
       >
-        Bine ai venit la Aerly. Te ducem înăuntru…
+        Bine ai venit la Fogora. Te ducem înăuntru…
       </p>
     </div>
   );

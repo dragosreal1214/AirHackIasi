@@ -134,7 +134,7 @@ export default function LoginPage() {
           <h2 className="font-display text-3xl leading-tight tracking-tight text-espresso">
             Bine ai revenit.
           </h2>
-          <p className="mt-1.5 text-warm-muted">Intră în contul tău Aerly.</p>
+          <p className="mt-1.5 text-warm-muted">Intră în contul tău Fogora.</p>
 
           <div className="mt-6 space-y-3">
             <TextField

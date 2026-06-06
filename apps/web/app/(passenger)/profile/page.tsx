@@ -102,7 +102,7 @@ export default function ProfilePage() {
 
   return (
     <>
-      <AppBar title="Profil" subtitle="Contul tău Aerly" />
+      <AppBar title="Profil" subtitle="Contul tău Fogora" />
       <div className="px-4 pb-10 pt-5">
         {/* Avatar */}
         <div className="flex animate-c-fade-up flex-col items-center text-center">
@@ -183,7 +183,7 @@ export default function ProfilePage() {
         </div>
 
         <p className="mt-7 px-1 text-center text-xs font-medium text-warm-faint">
-          Aerly · Cu un aer înainte.
+          Fogora · Copilotul tău calm.
         </p>
       </div>
     </>
