@@ -9,15 +9,7 @@ import { CLabel } from "@/components/ui/label";
 import { PhoneField } from "@/components/ui/phone-field";
 import { CWord } from "@/components/ui/wordmark";
 import { ApiClientError, startPhoneVerification } from "@/lib/api";
-
-const RO_MOBILE = /^(\+40|0)7\d{8}$/;
-
-function normalize(input: string): string {
-  const digits = input.replace(/\s+/g, "");
-  if (digits.startsWith("0")) return "+40" + digits.slice(1);
-  if (digits.startsWith("7")) return "+40" + digits;
-  return digits;
-}
+import { isValidRoMobile, normalizeRoMobile } from "@/lib/phone";
 
 export default function PhonePage() {
   const router = useRouter();
@@ -27,12 +19,11 @@ export default function PhonePage() {
 
   async function submit() {
     setError(null);
-    const value = phone.replace(/\s+/g, "");
-    if (!RO_MOBILE.test(value)) {
-      setError("Introdu un număr de mobil valid (07xx xxx xxx).");
+    if (!isValidRoMobile(phone)) {
+      setError("Introdu un număr de mobil valid (ex. 712 345 678).");
       return;
     }
-    const e164 = normalize(value);
+    const e164 = normalizeRoMobile(phone);
     setPending(true);
     try {
       const res = await startPhoneVerification(e164);
@@ -78,7 +69,7 @@ export default function PhonePage() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && submit()}
-            placeholder="7xx xxx xxx"
+            placeholder="712 345 678"
             containerClassName="mt-2"
           />
         </div>

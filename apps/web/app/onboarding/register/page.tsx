@@ -10,16 +10,9 @@ import { CLabel } from "@/components/ui/label";
 import { PhoneField } from "@/components/ui/phone-field";
 import { TextField } from "@/components/ui/text-field";
 import { ApiClientError, register } from "@/lib/api";
+import { isValidRoMobile, normalizeRoMobile } from "@/lib/phone";
 
-const RO_MOBILE = /^(\+40|0)7\d{8}$/;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function normalizePhone(input: string): string {
-  const d = input.replace(/\s+/g, "");
-  if (d.startsWith("0")) return "+40" + d.slice(1);
-  if (d.startsWith("7")) return "+40" + d;
-  return d;
-}
 
 type Field = "fullName" | "email" | "phone" | "password";
 
@@ -50,7 +43,7 @@ const STEPS: {
     title: "Și numărul de telefon?",
     hint: "Aici primești alertele de ceață, pe WhatsApp/SMS.",
     validate: (v) =>
-      RO_MOBILE.test(v.replace(/\s+/g, "")) ? null : "Introdu un mobil valid (07xx xxx xxx).",
+      isValidRoMobile(v) ? null : "Introdu un mobil valid (ex. 712 345 678).",
   },
   {
     field: "password",
@@ -83,7 +76,7 @@ export default function RegisterPage() {
       setStep(step + 1);
       return;
     }
-    const phoneNumber = normalizePhone(form.phone);
+    const phoneNumber = normalizeRoMobile(form.phone);
     setPending(true);
     try {
       const res = await register({
@@ -157,7 +150,7 @@ export default function RegisterPage() {
           {current.field === "phone" ? (
             <PhoneField
               autoFocus
-              placeholder="7xx xxx xxx"
+              placeholder="712 345 678"
               value={value}
               onChange={set}
               onKeyDown={(e) => e.key === "Enter" && next()}
