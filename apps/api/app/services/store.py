@@ -15,6 +15,7 @@ from app.models.schemas import (
     Disruption,
     FlightSummary,
     FogWindow,
+    Leg,
     PnrWithFlight,
 )
 
@@ -177,7 +178,23 @@ ALTERNATIVES: dict[str, list[Alternative]] = {
             reliability=0.74,
             score=61,
             action_url="https://www.aerodatabox.com/",
-            action_label="Vezi detalii",
+            action_label="Vezi pașii rerutării",
+            legs=[
+                Leg(
+                    mode="bus",
+                    title="Autocar Iași → Bacău",
+                    detail="~1h 40min până la aeroportul BCM",
+                    duration_minutes=100,
+                    url="https://www.flixbus.ro/",
+                ),
+                Leg(
+                    mode="flight",
+                    title="Zbor Bacău (BCM) → OTP",
+                    detail="Către București",
+                    duration_minutes=60,
+                    url="https://www.google.com/travel/flights?q=Flights%20from%20BCM%20to%20OTP",
+                ),
+            ],
         ),
         Alternative(
             id="alt_bus_flix",

@@ -17,7 +17,7 @@ from fastapi import HTTPException
 from app.config import settings
 from app.data import ground_transport
 from app.ml import airports as registry
-from app.models.schemas import Alternative, Disruption
+from app.models.schemas import Alternative, Disruption, Leg
 from app.services import flight_service, store
 from app.services.risk_service import destination_landing_risk, risk_for
 
@@ -146,7 +146,26 @@ def generate_alternatives(flight) -> list[Alternative]:
                     cost=cost,
                 ),
                 action_url="https://www.aerodatabox.com/",
-                action_label="Vezi detalii reroute",
+                action_label="Vezi pașii rerutării",
+                legs=[
+                    Leg(
+                        mode="bus",
+                        title=f"Autocar {flight.origin_city} → {alt_city}",
+                        detail=f"~{hrs}h până la aeroportul {alt_iata}",
+                        duration_minutes=drive,
+                        url="https://www.flixbus.ro/",
+                    ),
+                    Leg(
+                        mode="flight",
+                        title=f"Zbor {alt_iata} → {flight.destination_iata}",
+                        detail=f"Către {flight.destination_city}",
+                        duration_minutes=flight_leg,
+                        url=(
+                            "https://www.google.com/travel/flights?q="
+                            f"Flights%20from%20{alt_iata}%20to%20{flight.destination_iata}"
+                        ),
+                    ),
+                ],
             )
         )
 

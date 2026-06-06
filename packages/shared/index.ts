@@ -91,6 +91,14 @@ export interface Disruption {
   alternativesCount: number;
 }
 
+export interface Leg {
+  mode: "bus" | "train" | "flight" | "transfer";
+  title: string;
+  detail?: string;
+  durationMinutes?: number;
+  url?: string;
+}
+
 export interface Alternative {
   id: string;
   rank: number;
@@ -105,6 +113,8 @@ export interface Alternative {
   score: number; // 0..100
   actionUrl: string;
   actionLabel: string;
+  /** Multi-leg breakdown (reroutes): each step + its booking link. */
+  legs?: Leg[];
 }
 
 /** Request body for creating a PNR. */

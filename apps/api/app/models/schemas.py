@@ -121,6 +121,16 @@ class UpdateMeRequest(CamelModel):
     notification_channels: list[NotificationChannel] | None = None
 
 
+class Leg(CamelModel):
+    """One segment of a multi-leg alternative (e.g. reroute: bus + flight)."""
+
+    mode: str  # "bus" | "train" | "flight" | "transfer"
+    title: str
+    detail: str | None = None
+    duration_minutes: int | None = None
+    url: str | None = None
+
+
 class Alternative(CamelModel):
     id: str
     rank: int
@@ -135,6 +145,8 @@ class Alternative(CamelModel):
     score: float
     action_url: str
     action_label: str
+    # Multi-leg breakdown (reroutes): each step + its booking link.
+    legs: list[Leg] | None = None
 
 
 class CreatePnrInput(CamelModel):
