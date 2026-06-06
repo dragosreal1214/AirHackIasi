@@ -40,8 +40,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ro" className={`${hanken.variable} ${instrument.variable}`}>
-      <body className="font-sans">
+    <html
+      lang="ro"
+      className={`${hanken.variable} ${instrument.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="font-sans" suppressHydrationWarning>
         <Providers>{children}</Providers>
         <PwaRegister />
       </body>
