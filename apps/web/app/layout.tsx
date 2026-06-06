@@ -1,9 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Hanken_Grotesk, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const hanken = Hanken_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-sans",
+});
+
+const instrument = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-display",
+});
 
 export const metadata: Metadata = {
   title: "Aerly — Cu un aer înainte.",
@@ -12,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#2563eb",
+  themeColor: "#1d1610",
   width: "device-width",
   initialScale: 1,
 };
@@ -23,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ro" className={inter.variable}>
+    <html lang="ro" className={`${hanken.variable} ${instrument.variable}`}>
       <body className="font-sans">
         <Providers>{children}</Providers>
       </body>

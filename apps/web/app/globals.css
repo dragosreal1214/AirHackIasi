@@ -3,18 +3,61 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: 37 99 235; /* blue-600 */
-  --color-risk-low: 16 185 129; /* green */
-  --color-risk-moderate: 245 158 11; /* amber */
-  --color-risk-high: 249 115 22; /* orange */
-  --color-risk-critical: 220 38 38; /* red */
+  /* --- Aerly Cinematic palette (channel form for Tailwind <alpha-value>) --- */
+  /* primary repointed to gold so every existing bg-primary/text-primary reskins */
+  --color-primary: 200 162 78;
+  --color-accent: 200 162 78; /* #C8A24E */
+  --color-accent-deep: 168 132 47; /* #A8842F */
+  --color-accent-soft: 228 203 137; /* #E4CB89 */
+  --color-sky: 156 196 228; /* #9CC4E4 */
+  --color-sky-deep: 91 143 191; /* #5B8FBF */
+  --color-sky-ink: 46 92 130; /* #2E5C82 */
+  --color-espresso: 43 34 24; /* #2B2218 */
+  --color-warm-ink: 74 63 49; /* #4A3F31 */
+  --color-warm-muted: 140 124 102; /* #8C7C66 */
+  --color-warm-faint: 180 164 136; /* #B4A488 */
+  --color-ivory: 251 246 236; /* #FBF6EC */
+  --color-cream: 244 236 221; /* #F4ECDD */
 
-  --background: 255 255 255;
-  --foreground: 15 23 42; /* slate-900 */
+  /* risk re-mapped onto the demo status palette (RiskBadge/RISK_META unchanged) */
+  --color-risk-low: 34 197 94; /* on-time green */
+  --color-risk-moderate: 200 162 78; /* at-risk gold */
+  --color-risk-high: 249 115 22; /* delayed orange */
+  --color-risk-critical: 239 68 68; /* cancelled red */
+
+  --background: 251 246 236; /* ivory */
+  --foreground: 43 34 24; /* espresso */
+
+  /* direct-use rgba (inline gradients / glass that can't use alpha classes) */
+  --line: rgba(74, 63, 49, 0.16);
+  --glass-bg: rgba(255, 255, 255, 0.52);
+  --glass-strong-bg: rgba(251, 246, 236, 0.88);
+  --appbar-bg: rgba(255, 253, 247, 0.88);
+  --bottomnav-bg: rgba(255, 253, 247, 0.92);
+  --gold-border: rgba(200, 162, 78, 0.22);
+  --gold-border-strong: rgba(200, 162, 78, 0.38);
+  --backdrop: radial-gradient(130% 90% at 50% -20%, #3a2e22 0%, #2a2017 45%, #1d1610 100%);
+  --surface: linear-gradient(180deg, #fbf6ec 0%, #f4ecdd 100%);
 }
 
 body {
   background: rgb(var(--background));
   color: rgb(var(--foreground));
+  font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.ff-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
