@@ -12,8 +12,10 @@ export function FlightCard({ pnr }: { pnr: PnrWithFlight }) {
   const atRisk = Boolean(disruptionId);
 
   return (
+    <Link href={`/trips/${flight.id}`} className="block">
     <GoldCard
       active={atRisk}
+      interactive
       className="animate-c-fade-up overflow-hidden p-5"
     >
       {/* Status pill row + date */}
@@ -62,17 +64,13 @@ export function FlightCard({ pnr }: { pnr: PnrWithFlight }) {
         </div>
       </div>
 
-      {/* Vezi alternative */}
-      {atRisk && (
-        <Link
-          href={`/d/${disruptionId}`}
-          className="mt-4 flex items-center justify-center gap-1.5 rounded-button bg-gradient-to-br from-accent-soft via-accent to-accent-deep py-3 text-sm font-bold tracking-tight text-espresso shadow-gold-button transition-all duration-150 ease-cinematic active:scale-[0.98]"
-        >
-          Vezi alternative
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-      )}
+      {/* Vezi detalii */}
+      <div className="mt-4 flex items-center justify-end gap-1.5 border-t border-[color:var(--gold-border)] pt-3 text-sm font-bold tracking-tight text-accent-deep">
+        Vezi detalii
+        <ArrowRight className="h-4 w-4" />
+      </div>
     </GoldCard>
+    </Link>
   );
 }
 

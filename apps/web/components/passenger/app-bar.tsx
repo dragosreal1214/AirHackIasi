@@ -18,7 +18,7 @@ export function AppBar({
       className="sticky top-0 z-30 flex items-end gap-3 border-b border-[var(--gold-border)] px-4 pb-3 pt-safe-top backdrop-blur-glass"
       style={{ background: "var(--appbar-bg)" }}
     >
-      {backHref && (
+      {backHref ? (
         <Link
           href={backHref}
           aria-label="Înapoi"
@@ -26,6 +26,12 @@ export function AppBar({
         >
           <ArrowLeft className="h-[18px] w-[18px]" strokeWidth={2.2} />
         </Link>
+      ) : (
+        <img
+          src="/cine/fogora-mark.png"
+          alt="Fogora"
+          className="h-[26px] w-[26px] flex-shrink-0 rounded-icon object-contain"
+        />
       )}
       <div className="min-w-0 flex-1">
         <h1 className="truncate text-base font-bold leading-tight tracking-tight text-espresso">

@@ -13,6 +13,7 @@ import type {
   Alternative,
   CreatePnrInput,
   Disruption,
+  FlightDetail,
   FlightSummary,
   FogTimeline,
   LoginInput,
@@ -201,6 +202,30 @@ export async function searchFlights(
 // ---------------------------------------------------------------------------
 // Disruptions & alternatives
 // ---------------------------------------------------------------------------
+
+export async function getFlightDetail(flightId: string): Promise<FlightDetail> {
+  if (USE_MOCKS) {
+    await delay();
+    const flight = FLIGHT_CATALOG.find((f) => f.id === flightId) ?? FLIGHT_CATALOG[0];
+    const d = DISRUPTIONS.d_001;
+    return {
+      flight,
+      risk: d.risk,
+      destinationRisk: null,
+      cancelProbability: d.risk.probability,
+      weather: [
+        { key: "fog", label: "Ceață", value: d.risk.probability, level: d.risk.level },
+        { key: "bad_weather", label: "Vreme rea", value: 0.4, level: "moderate" },
+        { key: "overall", label: "General", value: 0.55, level: "moderate" },
+      ],
+      info: { terminal: "T4", gate: "G12", baggageBelt: "Banda 3", durationMinutes: 75 },
+      timeline: [],
+      disruptionId: flight.id === "fl_ro632" ? "d_001" : null,
+      alternativesCount: 4,
+    };
+  }
+  return http(`/flights/${encodeURIComponent(flightId)}`);
+}
 
 export async function getDisruption(id: string): Promise<Disruption> {
   if (USE_MOCKS) {

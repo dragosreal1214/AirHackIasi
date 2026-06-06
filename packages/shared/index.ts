@@ -172,6 +172,40 @@ export interface TokenResponse {
   tokenType: string;
 }
 
+// ----- Flight detail (rich per-flight screen) -----
+
+export interface Gauge {
+  key: string;
+  label: string;
+  value: number; // 0..1
+  level: RiskLevel;
+}
+
+export interface FlightInfo {
+  terminal?: string;
+  gate?: string;
+  baggageBelt?: string;
+  durationMinutes: number;
+}
+
+export interface TimelineStep {
+  label: string;
+  time: string; // ISO 8601
+  done: boolean;
+}
+
+export interface FlightDetail {
+  flight: FlightSummary;
+  risk: CurrentRisk;
+  destinationRisk?: CurrentRisk | null;
+  cancelProbability: number; // 0..1
+  weather: Gauge[];
+  info: FlightInfo;
+  timeline: TimelineStep[];
+  disruptionId?: string | null;
+  alternativesCount: number;
+}
+
 export interface Me {
   id: string;
   fullName?: string;

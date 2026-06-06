@@ -73,8 +73,20 @@ export default function HomePage() {
       />
 
       <div className="relative px-5 pb-[calc(theme(spacing.safe-bottom)+24px)] pt-[calc(theme(spacing.safe-top)+16px)]">
+        {/* brand wordmark */}
+        <div className="animate-c-fade-up mb-4 flex items-center gap-2">
+          <img
+            src="/cine/fogora-mark.png"
+            alt="Fogora"
+            className="h-[30px] w-[30px] rounded-icon object-contain"
+          />
+          <span className="font-display text-[22px] leading-none text-espresso">
+            Fogora
+          </span>
+        </div>
+
         {/* header */}
-        <div className="animate-c-fade-up flex items-center justify-between">
+        <div className="animate-c-fade-up flex items-center justify-between [animation-delay:40ms]">
           <div>
             <span className="mb-2 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase leading-none tracking-[0.14em] text-sky-ink">
               <Sparkles className="h-3.5 w-3.5" strokeWidth={1.8} />

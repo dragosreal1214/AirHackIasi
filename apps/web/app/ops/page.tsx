@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Cloud, Radio, RotateCcw } from "lucide-react";
+import { Radio, RotateCcw } from "lucide-react";
 import { useState } from "react";
 
 import { FogChart } from "@/components/ops/fog-chart";
@@ -42,7 +42,12 @@ export default function OpsDashboard() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-            <Cloud className="h-4 w-4" /> Fogora Ops · Aeroport Iași (LRIA)
+            <img
+              src="/cine/fogora-mark.png"
+              alt="Fogora"
+              className="h-[22px] w-[22px] rounded-icon object-contain"
+            />
+            Fogora Ops · Aeroport Iași (LRIA)
           </div>
           <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
             Monitor risc de ceață
