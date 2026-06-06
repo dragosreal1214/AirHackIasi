@@ -1,6 +1,6 @@
 "use client";
 
-import type { RiskLevel } from "@aerly/shared";
+import type { Alternative, RiskLevel } from "@aerly/shared";
 import {
   CloudFog,
   CloudRain,
@@ -12,15 +12,15 @@ import {
   CheckCircle2,
   Circle,
 } from "lucide-react";
-import Link from "next/link";
 import { useParams } from "next/navigation";
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 
+import { AlternativeCard } from "@/components/passenger/alternative-card";
 import { AppBar } from "@/components/passenger/app-bar";
 import { RouteDisplay } from "@/components/passenger/route-display";
 import { RiskGauge } from "@/components/passenger/risk-gauge";
-import { CButton } from "@/components/ui/button";
 import { GoldCard } from "@/components/ui/card";
+import { useAlternatives, useSelectAlternative } from "@/hooks/use-disruption";
 import { useFlightDetail } from "@/hooks/use-flight-detail";
 import {
   RISK_META,
@@ -78,6 +78,19 @@ function FlightDetailBody({
   const { flight, info, weather, timeline, cancelProbability, disruptionId } =
     data;
   const atRisk = Boolean(disruptionId);
+
+  const alternatives = useAlternatives(disruptionId ?? "");
+  const select = useSelectAlternative();
+  const [selected, setSelected] = useState<Alternative | null>(null);
+  const [selectingId, setSelectingId] = useState<string | null>(null);
+
+  function handleSelect(alt: Alternative) {
+    setSelectingId(alt.id);
+    select.mutate(alt.id, {
+      onSuccess: () => setSelected(alt),
+      onSettled: () => setSelectingId(null),
+    });
+  }
 
   const cancelLevel = data.risk.level;
   const cancelMeta = RISK_META[cancelLevel];
@@ -304,21 +317,47 @@ function FlightDetailBody({
         </div>
       )}
 
-      {/* Alternatives CTA */}
+      {/* Alternatives — listed inline when the flight is at risk */}
       {atRisk && disruptionId && (
-        <Link
-          href={`/d/${disruptionId}`}
-          className="block animate-c-fade-up"
-          style={{ animationDelay: "300ms" }}
-        >
-          <CButton
-            variant="gold"
-            full
-            rightIcon={<ArrowRight className="h-4 w-4" />}
-          >
-            Vezi {data.alternativesCount} alternative
-          </CButton>
-        </Link>
+        <div className="animate-c-fade-up" style={{ animationDelay: "300ms" }}>
+          <h2 className="mb-2.5 px-1 text-[11px] font-bold uppercase tracking-[0.14em] text-accent-deep/70">
+            Alternative recomandate
+          </h2>
+
+          {selected && (
+            <div className="mb-3 flex items-start gap-2 rounded-card border border-risk-low/30 bg-risk-low/[0.1] px-4 py-3 text-sm text-risk-low">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0" strokeWidth={2.2} />
+              <span>
+                Ai ales <b>{selected.title}</b>. Îți ținem locul și te anunțăm.
+              </span>
+            </div>
+          )}
+
+          <div className="space-y-3">
+            {alternatives.isLoading &&
+              [0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="skeleton-shimmer h-28 animate-shimmer rounded-card"
+                />
+              ))}
+
+            {alternatives.data?.map((alt) => (
+              <AlternativeCard
+                key={alt.id}
+                alternative={alt}
+                pending={selectingId === alt.id && select.isPending}
+                onSelect={handleSelect}
+              />
+            ))}
+
+            {alternatives.data && alternatives.data.length === 0 && (
+              <p className="px-1 text-sm text-warm-muted">
+                Nu am găsit alternative momentan.
+              </p>
+            )}
+          </div>
+        </div>
       )}
     </>
   );

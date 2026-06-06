@@ -74,13 +74,13 @@ export default function HomePage() {
 
       <div className="relative px-5 pb-[calc(theme(spacing.safe-bottom)+24px)] pt-[calc(theme(spacing.safe-top)+16px)]">
         {/* brand wordmark */}
-        <div className="animate-c-fade-up mb-4 flex items-center gap-2">
+        <div className="animate-c-fade-up mb-5 flex items-center gap-3">
           <img
             src="/cine/fogora-mark.png"
             alt="Fogora"
-            className="h-[30px] w-[30px] rounded-icon object-contain"
+            className="h-[56px] w-[56px] rounded-icon object-contain drop-shadow-[0_4px_14px_rgba(168,132,47,0.25)]"
           />
-          <span className="font-display text-[22px] leading-none text-espresso">
+          <span className="font-display text-[36px] leading-none tracking-tight text-espresso">
             Fogora
           </span>
         </div>
