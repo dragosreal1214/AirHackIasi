@@ -94,6 +94,24 @@ async def register(payload: RegisterRequest) -> PhoneStartResponse:
         )
         await _audit(db, phone=payload.phone_number, event="register")
 
+        # Best-effort identity check against the operator (Orange KYC Match).
+        try:
+            parts = payload.full_name.strip().split()
+            kyc = await orange_client.orange_client.kyc_match(
+                payload.phone_number,
+                {
+                    "name": payload.full_name.strip(),
+                    "givenName": parts[0] if parts else "",
+                    "familyName": parts[-1] if len(parts) > 1 else "",
+                },
+            )
+            if kyc is not None:
+                await user_service.write_audit(
+                    db, phone_number=payload.phone_number, event="kyc_match", meta=kyc
+                )
+        except Exception:  # noqa: BLE001 - never block signup on KYC
+            pass
+
     challenge_id = secrets.token_urlsafe(16)
     await twilio_client.start_verification(payload.phone_number)
     method = "sms_otp" if settings.twilio_enabled else "dev"

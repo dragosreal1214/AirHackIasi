@@ -14,11 +14,12 @@ from datetime import datetime, timedelta, timezone
 
 from fastapi import HTTPException
 
+from app.config import settings
 from app.data import ground_transport
 from app.ml import airports as registry
 from app.models.schemas import Alternative, Disruption
 from app.services import flight_service, store
-from app.services.risk_service import risk_for
+from app.services.risk_service import risk_at_airport, risk_for
 
 _AIRLINE_BOOKING = {
     "W4": "https://wizzair.com/",
@@ -170,12 +171,14 @@ async def get_disruption(disruption_id: str) -> Disruption:
             detail={"code": "DISRUPTION_NOT_FOUND", "message": "Alertă inexistentă."},
         )
     risk, _ = await risk_for(flight)
+    dest_risk = await risk_at_airport(flight.destination_iata, flight.scheduled_arrival)
     alts = generate_alternatives(flight)
     return Disruption(
         id=disruption_id,
         flight=flight,
         severity=risk.level,
         risk=risk,
+        destination_risk=dest_risk,
         detected_at=datetime.now(timezone.utc).isoformat(),
         alternatives_count=len(alts),
     )
@@ -198,6 +201,28 @@ async def get_alternatives(disruption_id: str) -> list[Alternative]:
     return generate_alternatives(flight)
 
 
-async def select_alternative(alternative_id: str) -> None:
-    # Records the user's choice. No-op for now (no persistence layer yet).
-    return None
+async def select_alternative(
+    user_id: str, alternative_id: str, disruption_id: str | None = None
+) -> None:
+    """Persist the user's chosen alternative (DB mode)."""
+    if not settings.db_enabled:
+        return
+    import uuid as _uuid  # noqa: PLC0415
+
+    from sqlalchemy.ext.asyncio import async_sessionmaker  # noqa: PLC0415
+
+    from app.db.base import get_engine  # noqa: PLC0415
+    from app.db.models import AlternativeSelection  # noqa: PLC0415
+
+    try:
+        uid = _uuid.UUID(user_id)
+    except (ValueError, TypeError):
+        return
+    maker = async_sessionmaker(get_engine(), expire_on_commit=False)
+    async with maker() as db:
+        db.add(
+            AlternativeSelection(
+                user_id=uid, alternative_id=alternative_id, disruption_id=disruption_id
+            )
+        )
+        await db.commit()

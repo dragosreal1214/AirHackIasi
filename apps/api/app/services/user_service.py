@@ -74,6 +74,25 @@ async def get_or_create_demo(db: AsyncSession) -> User:
     return await get_or_create_by_phone(db, DEMO_PHONE)
 
 
+async def update_profile(
+    db: AsyncSession,
+    user_id: str,
+    *,
+    full_name: str | None = None,
+    notification_channels: list[str] | None = None,
+) -> User | None:
+    user = await get_by_id(db, user_id)
+    if user is None:
+        return None
+    if full_name is not None:
+        user.full_name = full_name
+    if notification_channels is not None:
+        user.notification_channels = notification_channels
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
 async def write_audit(
     db: AsyncSession,
     *,

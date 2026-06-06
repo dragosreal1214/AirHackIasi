@@ -1,7 +1,8 @@
 """Disruption + alternatives endpoints."""
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
 
+from app.deps import CurrentUser, get_current_user
 from app.models.schemas import Alternative, Disruption
 from app.services import alternatives_service
 
@@ -25,5 +26,9 @@ async def get_alternatives(disruption_id: str) -> list[Alternative]:
     "/alternatives/{alternative_id}/select",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def select_alternative(alternative_id: str) -> None:
-    await alternatives_service.select_alternative(alternative_id)
+async def select_alternative(
+    alternative_id: str,
+    disruption_id: str | None = None,
+    user: CurrentUser = Depends(get_current_user),
+) -> None:
+    await alternatives_service.select_alternative(user.id, alternative_id, disruption_id)

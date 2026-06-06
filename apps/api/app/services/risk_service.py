@@ -47,6 +47,27 @@ def _risk_from_forecast(fc: dict, dep_iso: str) -> CurrentRisk:
     )
 
 
+async def risk_at_airport(iata: str, when_iso: str) -> CurrentRisk | None:
+    """Fog risk at an arbitrary airport for a time — used for the destination
+    end of a route. Returns None when unavailable/calm."""
+    force = settings.FORCE_FOG_IATA or None
+    if not settings.LIVE_FORECAST and not (force and iata == force):
+        return None
+    try:
+        from app.ml import airports as registry  # noqa: PLC0415
+        from app.ml import fog_forecast  # noqa: PLC0415
+
+        a = registry.get(iata)
+        if a is None:
+            return None
+        fc = await fog_forecast.forecast(a.lat, a.lon, airport=a.iata)
+        if fc.get("available") and fc.get("hourly"):
+            return _risk_from_forecast(fc, when_iso)
+    except Exception:  # noqa: BLE001
+        pass
+    return None
+
+
 async def risk_for(
     flight: FlightSummary, force_fog_iata: str | None = None
 ) -> tuple[CurrentRisk, str | None]:

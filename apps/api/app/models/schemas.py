@@ -68,8 +68,23 @@ class Disruption(CamelModel):
     flight: FlightSummary
     severity: RiskLevel
     risk: CurrentRisk
+    destination_risk: CurrentRisk | None = None
     detected_at: str
     alternatives_count: int
+
+
+class Me(CamelModel):
+    id: str
+    full_name: str | None = None
+    email: str | None = None
+    phone_number: str
+    preferred_language: str = "ro"
+    notification_channels: list[NotificationChannel] = []
+
+
+class UpdateMeRequest(CamelModel):
+    full_name: str | None = None
+    notification_channels: list[NotificationChannel] | None = None
 
 
 class Alternative(CamelModel):

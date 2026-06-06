@@ -112,6 +112,20 @@ class Pnr(Base):
     user: Mapped["User"] = relationship(back_populates="pnrs")
 
 
+class AlternativeSelection(Base):
+    __tablename__ = "alternative_selections"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    disruption_id: Mapped[str | None] = mapped_column(String)
+    alternative_id: Mapped[str] = mapped_column(String)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
 class AuthAuditLog(Base):
     __tablename__ = "auth_audit_log"
 
