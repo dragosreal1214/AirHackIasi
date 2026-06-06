@@ -104,6 +104,48 @@ async def destination_landing_risk(iata: str, when_iso: str) -> CurrentRisk:
     )
 
 
+async def bad_weather_at_airport(iata: str, when_iso: str) -> float:
+    """Non-fog bad-weather probability (storms/precip/wind) at a time, from the
+    live forecast scored by the bad-weather model. 0.0 when unavailable."""
+    if not settings.LIVE_FORECAST and not settings.FORCE_FOG_IATA:
+        return 0.0
+    try:
+        from app.ml import airports as registry  # noqa: PLC0415
+        from app.ml import fog_forecast  # noqa: PLC0415
+        from app.ml.bad_weather_model import bad_weather_model  # noqa: PLC0415
+
+        a = registry.get(iata)
+        if a is None:
+            return 0.0
+        fc = await fog_forecast.forecast(a.lat, a.lon, airport=a.iata)
+        if not (fc.get("available") and fc.get("hourly")):
+            return 0.0
+        when = datetime.fromisoformat(when_iso)
+        if when.tzinfo is None:
+            when = when.replace(tzinfo=timezone.utc)
+        best, best_diff = None, None
+        for h in fc["hourly"]:
+            t = datetime.fromisoformat(h["time"])
+            if t.tzinfo is None:
+                t = t.replace(tzinfo=timezone.utc)
+            diff = abs((t - when).total_seconds())
+            if best_diff is None or diff < best_diff:
+                best, best_diff = h, diff
+        if best is None:
+            return 0.0
+        feats = {
+            "temperature": best["temperature"],
+            "dewpoint_depression": best["dewpointDepression"],
+            "wind_speed": best["windSpeed"],
+            "humidity": best["humidity"],
+            "hour": int(best["time"][11:13]),
+            "month": int(best["time"][5:7]),
+        }
+        return round(bad_weather_model.predict_proba(feats), 4)
+    except Exception:  # noqa: BLE001
+        return 0.0
+
+
 async def risk_for(
     flight: FlightSummary, force_fog_iata: str | None = None
 ) -> tuple[CurrentRisk, str | None]:

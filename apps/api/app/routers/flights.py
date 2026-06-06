@@ -14,8 +14,9 @@ async def search_flights(
     date: str | None = Query(None, description="YYYY-MM-DD"),
     origin: str | None = Query(None, description="from (IATA or city)"),
     destination: str | None = Query(None, description="to (IATA or city)"),
+    time: str | None = Query(None, description="HH:MM (approx departure)"),
 ) -> list[FlightSummary]:
-    return await flight_service.search_flights(q, date, origin, destination)
+    return await flight_service.search_flights(q, date, origin, destination, time)
 
 
 @router.get("/{flight_id}", response_model=FlightDetail)

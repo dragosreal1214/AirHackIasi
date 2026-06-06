@@ -13,7 +13,11 @@ from app.ml import airport_ops
 from app.ml.fog_model import fog_model
 from app.models.schemas import FlightDetail, FlightInfo, Gauge, TimelineStep
 from app.services import alternatives_service, flight_service
-from app.services.risk_service import destination_landing_risk, risk_for
+from app.services.risk_service import (
+    bad_weather_at_airport,
+    destination_landing_risk,
+    risk_for,
+)
 
 
 def _hash(s: str) -> int:
@@ -31,8 +35,8 @@ async def build_flight_detail(flight_id: str) -> FlightDetail | None:
 
     h = _hash(flight.id)
     fog = risk.probability
-    bad_weather = round(0.15 + (h % 35) / 100, 4)  # wind/precip proxy, 0.15..0.49
-    overall = round(0.65 * fog + 0.35 * bad_weather, 4)
+    bad_weather = await bad_weather_at_airport(flight.origin_iata, flight.scheduled_departure)
+    overall = round(0.55 * fog + 0.45 * bad_weather, 4)
 
     def gauge(key: str, label: str, val: float) -> Gauge:
         return Gauge(key=key, label=label, value=round(val, 4), level=fog_model.risk_level(val))

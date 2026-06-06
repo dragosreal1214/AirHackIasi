@@ -62,21 +62,34 @@ def _matches_place(iata: str, city: str, term: str) -> bool:
     return t in iata.lower() or t in city.lower()
 
 
+def _near_time(dep_iso: str, want: str, window_min: int = 150) -> bool:
+    """True if the departure is within `window_min` of the wanted HH:MM."""
+    try:
+        h, m = (int(x) for x in want.split(":")[:2])
+    except (ValueError, IndexError):
+        return True
+    dep = datetime.fromisoformat(dep_iso)
+    want_min = h * 60 + m
+    dep_min = dep.hour * 60 + dep.minute
+    return abs(dep_min - want_min) <= window_min
+
+
 async def search_flights(
     query: str | None = None,
     date: str | None = None,
     origin: str | None = None,
     destination: str | None = None,
+    time: str | None = None,
 ) -> list[FlightSummary]:
-    """Search by flight number/city (query) and/or by route (origin/destination)
-    on a given date. At least one filter must be provided."""
+    """Search by flight number/city (query) and/or by route (origin/destination/
+    time) on a given date. At least one filter must be provided."""
     q = "".join((query or "").lower().split())
     if not q and not origin and not destination:
         return []
     day = date or _today()
     results: list[FlightSummary] = []
-    for (no, direction, other, time) in WEEKLY:
-        s = _summary(no, direction, other, time, day)
+    for (no, direction, other, sched_time) in WEEKLY:
+        s = _summary(no, direction, other, sched_time, day)
         if q and not _matches(no, other, q):
             continue
         if origin and not _matches_place(s.origin_iata, s.origin_city, origin):
@@ -84,6 +97,8 @@ async def search_flights(
         if destination and not _matches_place(
             s.destination_iata, s.destination_city, destination
         ):
+            continue
+        if time and not _near_time(s.scheduled_departure, time):
             continue
         results.append(s)
     results.sort(key=lambda f: f.scheduled_departure)

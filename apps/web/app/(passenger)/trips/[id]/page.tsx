@@ -1,12 +1,13 @@
 "use client";
 
-import type { Alternative, RiskLevel } from "@aerly/shared";
+import type { Alternative, CurrentRisk, RiskLevel } from "@aerly/shared";
 import {
   CloudFog,
   CloudRain,
   Clock,
   Calendar,
   Plane,
+  PlaneLanding,
   ArrowRight,
   CircleAlert,
   CheckCircle2,
@@ -239,6 +240,16 @@ function FlightDetailBody({
         </p>
       </div>
 
+      {/* Landing at destination */}
+      {data.destinationRisk && (
+        <LandingCard
+          risk={data.destinationRisk}
+          destinationIata={flight.destinationIata}
+          destinationCity={flight.destinationCity}
+          ils={data.destinationIls}
+        />
+      )}
+
       {/* Flight info */}
       <div
         className="animate-c-fade-up"
@@ -360,6 +371,93 @@ function FlightDetailBody({
         </div>
       )}
     </>
+  );
+}
+
+function LandingCard({
+  risk,
+  destinationIata,
+  destinationCity,
+  ils,
+}: {
+  risk: CurrentRisk;
+  destinationIata: string;
+  destinationCity: string;
+  ils?: string | null;
+}) {
+  const meta = RISK_META[risk.level];
+  const pct = riskPercent(risk.probability);
+  const autoland = Boolean(ils && ils.toUpperCase().startsWith("CAT III"));
+
+  return (
+    <div
+      className="animate-c-fade-up"
+      style={{ animationDelay: "150ms" }}
+    >
+      <h2 className="mb-2.5 px-1 text-[11px] font-bold uppercase tracking-[0.14em] text-accent-deep/70">
+        Aterizare la {destinationIata}
+      </h2>
+      <GoldCard className="p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-icon bg-sky/15 text-sky-ink">
+              <PlaneLanding className="h-5 w-5" strokeWidth={2} />
+            </span>
+            <div>
+              <div className="font-display text-lg leading-tight tracking-tight text-espresso">
+                {destinationIata}
+              </div>
+              <div className="text-xs font-medium text-warm-muted">
+                {destinationCity}
+              </div>
+            </div>
+          </div>
+
+          {ils && (
+            <span className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-full border border-accent/30 bg-accent/[0.12] px-2.5 py-1 text-[11px] font-bold tracking-tight text-accent-deep">
+              {ils}
+              {autoland && (
+                <span className="rounded-full bg-sky/20 px-1.5 py-px text-[9px] font-bold uppercase tracking-[0.08em] text-sky-ink">
+                  autoland
+                </span>
+              )}
+            </span>
+          )}
+        </div>
+
+        <div className="mt-4 flex items-center gap-3">
+          <span
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold tracking-tight",
+              meta.bg,
+              meta.text,
+              meta.border,
+            )}
+          >
+            {LEVEL_WORD[risk.level]}
+          </span>
+          <span className="flex items-baseline gap-1.5">
+            <span
+              className={cn(
+                "font-display text-2xl leading-none tracking-tight",
+                meta.text,
+              )}
+            >
+              {pct}%
+            </span>
+            <span className="text-[11px] font-medium leading-tight text-warm-muted">
+              risc de perturbare la aterizare
+            </span>
+          </span>
+        </div>
+
+        {risk.explanation && (
+          <p className="mt-4 text-xs leading-relaxed text-warm-muted">
+            {risk.explanation}
+          </p>
+        )}
+      </GoldCard>
+    </div>
   );
 }
 

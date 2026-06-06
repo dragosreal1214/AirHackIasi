@@ -34,7 +34,7 @@ export default function NotificationsPage() {
               {alerts.map((p, i) => (
                 <a
                   key={p.id}
-                  href={`/d/${p.disruptionId}`}
+                  href={`/trips/${p.flight.id}`}
                   className="block animate-c-fade-up"
                   style={{ animationDelay: `${60 + i * 70}ms` }}
                 >

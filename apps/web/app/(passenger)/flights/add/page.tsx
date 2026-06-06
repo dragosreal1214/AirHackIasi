@@ -1,12 +1,13 @@
 "use client";
 
 import type { FlightSummary } from "@aerly/shared";
-import { ArrowRight, MapPin, Plane, Search, SearchX } from "lucide-react";
+import { ArrowRight, Clock, MapPin, Plane, Search, SearchX } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { AppBar } from "@/components/passenger/app-bar";
 import { GoldCard } from "@/components/ui/card";
+import { FilterChips } from "@/components/ui/filter-chips";
 import { CLabel } from "@/components/ui/label";
 import { TextField } from "@/components/ui/text-field";
 import { ApiClientError } from "@/lib/api";
@@ -16,15 +17,21 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { useFlightSearch } from "@/hooks/use-flights";
 import { useAddPnr } from "@/hooks/use-pnrs";
 
-type Mode = "number" | "route";
+type Mode = "route" | "number";
+
+const MODE_OPTIONS: { value: Mode; label: string }[] = [
+  { value: "route", label: "După rută" },
+  { value: "number", label: "După număr zbor" },
+];
 
 export default function AddFlightPage() {
   const router = useRouter();
-  const [mode, setMode] = useState<Mode>("number");
+  const [mode, setMode] = useState<Mode>("route");
   const [flightNo, setFlightNo] = useState("");
   const [origin, setOrigin] = useState("IAS");
   const [destination, setDestination] = useState("");
   const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
   const addPnr = useAddPnr();
   const [error, setError] = useState<string | null>(null);
 
@@ -32,10 +39,17 @@ export default function AddFlightPage() {
   const dOrigin = useDebounce(origin, 300);
   const dDestination = useDebounce(destination, 300);
   const dDate = useDebounce(date, 300);
+  const dTime = useDebounce(time, 300);
+
   const params =
     mode === "number"
       ? { q: dFlightNo, date: dDate || undefined }
-      : { origin: dOrigin, destination: dDestination, date: dDate || undefined };
+      : {
+          origin: dOrigin,
+          destination: dDestination,
+          date: dDate || undefined,
+          time: dTime || undefined,
+        };
   const { data: results, isFetching } = useFlightSearch(params);
 
   async function handleAdd(flight: FlightSummary) {
@@ -57,65 +71,79 @@ export default function AddFlightPage() {
       <AppBar title="Adaugă zbor" backHref="/" />
 
       <div className="animate-c-fade-up px-4 py-5">
-        {/* Mode toggle — cinematic segmented control */}
-        <div className="mb-5 grid grid-cols-2 gap-1 rounded-button border border-[color:var(--gold-border)] bg-white/60 p-1 shadow-glass backdrop-blur-glass">
-          {(["number", "route"] as Mode[]).map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => setMode(m)}
-              className={cn(
-                "rounded-button py-2.5 text-sm font-semibold transition-all duration-180 ease-cinematic",
-                mode === m
-                  ? "bg-accent text-espresso shadow-gold-button"
-                  : "text-warm-muted hover:text-espresso",
-              )}
-            >
-              {m === "number" ? "După număr" : "După rută"}
-            </button>
-          ))}
-        </div>
+        {/* Mode toggle — caută după rută sau după numărul zborului */}
+        <FilterChips
+          options={MODE_OPTIONS}
+          value={mode}
+          onChange={setMode}
+          className="mb-5"
+        />
 
-        {mode === "number" ? (
-          <TextField
-            autoFocus
-            leftIcon={<Search className="h-5 w-5" />}
-            value={flightNo}
-            onChange={(e) => setFlightNo(e.target.value)}
-            placeholder="Număr zbor (ex. W4 3651, RO 702)"
-          />
+        {mode === "route" ? (
+          <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1.5">
+                <CLabel className="px-1">Origine</CLabel>
+                <TextField
+                  leftIcon={<MapPin className="h-5 w-5" />}
+                  value={origin}
+                  onChange={(e) => setOrigin(e.target.value)}
+                  placeholder="IAS"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <CLabel className="px-1">Destinație</CLabel>
+                <TextField
+                  autoFocus
+                  leftIcon={<MapPin className="h-5 w-5" />}
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                  placeholder="OTP / Londra"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1.5">
+                <CLabel className="px-1">Dată</CLabel>
+                <TextField
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <CLabel className="px-1">Oră</CLabel>
+                <TextField
+                  type="time"
+                  leftIcon={<Clock className="h-5 w-5" />}
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
         ) : (
-          <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-2">
             <div className="space-y-1.5">
-              <CLabel className="px-1">De la</CLabel>
+              <CLabel className="px-1">Număr zbor</CLabel>
               <TextField
-                leftIcon={<MapPin className="h-5 w-5" />}
-                value={origin}
-                onChange={(e) => setOrigin(e.target.value)}
-                placeholder="IAS"
+                autoFocus
+                leftIcon={<Search className="h-5 w-5" />}
+                value={flightNo}
+                onChange={(e) => setFlightNo(e.target.value)}
+                placeholder="Număr zbor (ex. W4 3651, RO 702)"
               />
             </div>
             <div className="space-y-1.5">
-              <CLabel className="px-1">Către</CLabel>
+              <CLabel className="px-1">Dată (opțional)</CLabel>
               <TextField
-                autoFocus
-                leftIcon={<MapPin className="h-5 w-5" />}
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-                placeholder="OTP / Londra"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
               />
             </div>
           </div>
         )}
-
-        <div className="mt-2 space-y-1.5">
-          <CLabel className="px-1">Data</CLabel>
-          <TextField
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
-        </div>
 
         <p className="mt-3 px-1 text-xs font-medium text-warm-muted">
           {mode === "number"

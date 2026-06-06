@@ -173,12 +173,13 @@ export interface FlightSearchParams {
   date?: string;
   origin?: string;
   destination?: string;
+  time?: string;
 }
 
 export async function searchFlights(
   params: FlightSearchParams,
 ): Promise<FlightSummary[]> {
-  const { q, date, origin, destination } = params;
+  const { q, date, origin, destination, time } = params;
   if (USE_MOCKS) {
     await delay(250);
     const needle = (q ?? "").trim().toLowerCase().replace(/\s+/g, "");
@@ -196,6 +197,7 @@ export async function searchFlights(
   if (date) sp.set("date", date);
   if (origin) sp.set("origin", origin);
   if (destination) sp.set("destination", destination);
+  if (time) sp.set("time", time);
   return http(`/flights/search?${sp.toString()}`);
 }
 

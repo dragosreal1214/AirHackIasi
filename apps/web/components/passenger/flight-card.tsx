@@ -1,25 +1,66 @@
+"use client";
+
 import type { PnrWithFlight } from "@aerly/shared";
-import { ArrowRight, Calendar, Plane, TriangleAlert } from "lucide-react";
+import {
+  ArrowRight,
+  Calendar,
+  Loader2,
+  Plane,
+  Trash2,
+  TriangleAlert,
+} from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 import { RouteDisplay } from "@/components/passenger/route-display";
 import { RiskBadge } from "@/components/shared/risk-badge";
 import { GoldCard } from "@/components/ui/card";
+import { useDeletePnr } from "@/hooks/use-pnrs";
 import { formatDate, formatTime } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 export function FlightCard({ pnr }: { pnr: PnrWithFlight }) {
   const { flight, currentRisk, disruptionId } = pnr;
   const atRisk = Boolean(disruptionId);
+
+  const [confirming, setConfirming] = useState(false);
+  const deletePnr = useDeletePnr();
+
+  /** Prevent the surrounding Link from navigating when interacting with controls. */
+  const stop = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const onConfirmDelete = (e: React.MouseEvent) => {
+    stop(e);
+    deletePnr.mutate(pnr.id, {
+      onSettled: () => setConfirming(false),
+    });
+  };
 
   return (
     <Link href={`/trips/${flight.id}`} className="block">
     <GoldCard
       active={atRisk}
       interactive
-      className="animate-c-fade-up overflow-hidden p-5"
+      className="animate-c-fade-up relative overflow-hidden p-5"
     >
+      {/* Delete control (corner) — does not trigger navigation */}
+      <button
+        type="button"
+        aria-label="Șterge zborul"
+        onClick={(e) => {
+          stop(e);
+          setConfirming(true);
+        }}
+        className="absolute right-3 top-3 z-10 inline-flex h-7 w-7 items-center justify-center rounded-icon text-warm-faint transition-colors duration-150 ease-cinematic hover:bg-accent/[0.1] hover:text-accent-deep active:scale-[0.94]"
+      >
+        <Trash2 className="h-3.5 w-3.5" />
+      </button>
+
       {/* Status pill row + date */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3 pr-9">
         {currentRisk ? (
           <RiskBadge level={currentRisk.level} />
         ) : (
@@ -64,11 +105,45 @@ export function FlightCard({ pnr }: { pnr: PnrWithFlight }) {
         </div>
       </div>
 
-      {/* Vezi detalii */}
-      <div className="mt-4 flex items-center justify-end gap-1.5 border-t border-[color:var(--gold-border)] pt-3 text-sm font-bold tracking-tight text-accent-deep">
-        Vezi detalii
-        <ArrowRight className="h-4 w-4" />
-      </div>
+      {/* Footer — confirm row replaces "Vezi detalii" while confirming */}
+      {confirming ? (
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-[color:var(--gold-border)] pt-3">
+          <span className="text-sm font-semibold tracking-tight text-espresso">
+            Ștergi acest zbor?
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={(e) => {
+                stop(e);
+                setConfirming(false);
+              }}
+              disabled={deletePnr.isPending}
+              className="rounded-button border border-[color:var(--gold-border)] px-3 py-1.5 text-xs font-semibold tracking-tight text-warm-muted transition-colors duration-150 ease-cinematic hover:text-espresso disabled:opacity-50"
+            >
+              Anulează
+            </button>
+            <button
+              type="button"
+              onClick={onConfirmDelete}
+              disabled={deletePnr.isPending}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-button border border-[color:var(--risk-high)] px-3 py-1.5 text-xs font-bold tracking-tight text-[color:var(--risk-high)] transition-colors duration-150 ease-cinematic hover:bg-[color:var(--risk-high)]/[0.1] disabled:opacity-50",
+              )}
+            >
+              {deletePnr.isPending && (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              )}
+              Șterge
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-4 flex items-center justify-end gap-1.5 border-t border-[color:var(--gold-border)] pt-3 text-sm font-bold tracking-tight text-accent-deep">
+          Vezi detalii
+          <ArrowRight className="h-4 w-4" />
+        </div>
+      )}
     </GoldCard>
     </Link>
   );
