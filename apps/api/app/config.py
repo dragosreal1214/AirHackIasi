@@ -65,6 +65,12 @@ class Settings(BaseSettings):
     ORANGE_TOKEN_PATH: str = "/openidconnect/playground/v1.0/token"
     ORANGE_SIM_SWAP_PATH: str = "/camara/playground/api/sim-swap/v1/check"
     ORANGE_KYC_MATCH_PATH: str = "/camara/playground/api/kyc-match/v0.2/match"
+    ORANGE_REACHABILITY_PATH: str = (
+        "/camara/playground/api/device-reachability-status/v0.6/retrieve"
+    )
+    ORANGE_LOCATION_VERIFY_PATH: str = (
+        "/camara/playground/api/device-location-verification/v1/verify"
+    )
     # Return canned sandbox responses without calling Orange. Use while the
     # real app/subscription is awaiting activation on the portal.
     ORANGE_MOCK: bool = False

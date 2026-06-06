@@ -15,6 +15,7 @@ from app.config import settings
 from app.models.schemas import Disruption
 from app.services import store
 from app.services.integrations import twilio_client
+from app.services.integrations.orange_client import orange_client
 
 logger = structlog.get_logger(__name__)
 
@@ -25,10 +26,10 @@ def render_message(disruption: Disruption) -> str:
     f = disruption.flight
     pct = round(disruption.risk.probability * 100)
     return (
-        f"⚠️ Aerly: zborul {f.flight_number} ({f.origin_iata}→{f.destination_iata}) "
+        f"⚠️ Fogora: zborul {f.flight_number} ({f.origin_iata}→{f.destination_iata}) "
         f"are risc de ceață {pct}% la plecare.\n"
         f"Decide din timp — avem alternative pre-calculate.\n"
-        f"Vezi alternative: https://aerly.app/d/{disruption.id}"
+        f"Vezi alternative: https://fogora.app/trips/{f.id}"
     )
 
 
@@ -50,6 +51,13 @@ async def dispatch(
         return {"status": "skipped", "reason": "unknown_disruption"}
 
     channels = channels or DEFAULT_CHANNELS
+
+    # Orange Device Reachability — pick the channel that can actually be reached.
+    # If the data path is down but SMS works, don't waste a WhatsApp attempt.
+    reach = await orange_client.device_reachability(phone_number)
+    if reach is not None and not reach.get("data") and reach.get("sms"):
+        channels = [c for c in channels if c == "sms"] or ["sms"]
+
     body = render_message(disruption)
     results: dict[str, dict] = {}
 

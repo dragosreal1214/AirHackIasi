@@ -9,9 +9,9 @@ from app.services import notification_service
 async def test_high_risk_alert_dispatched() -> None:
     res = await notification_service.dispatch("+40712345678", "d_001")
     assert res["status"] == "sent"
-    # Romanian alert copy referencing the fog risk and a deep link.
+    # Romanian alert copy referencing the fog risk and a deep link to the flight.
     assert "risc de ceață" in res["preview"]
-    assert "/d/d_001" in res["preview"]
+    assert "/trips/fl_ro632" in res["preview"]
     # In dev mode both channels "send" (logged) successfully.
     assert res["channels"]["whatsapp"]["ok"] is True
     assert res["channels"]["sms"]["ok"] is True

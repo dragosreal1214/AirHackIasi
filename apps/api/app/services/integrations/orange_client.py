@@ -163,5 +163,64 @@ class OrangeClient:
             {"phoneNumber": phone_number, **applicant},
         )
 
+    async def device_reachability(self, phone_number: str) -> dict[str, Any] | None:
+        """How the device is reachable right now — used to pick the best channel.
+
+        Returns {"reachable": bool, "data": bool, "sms": bool, "status": str}, or
+        None when Orange is disabled/unavailable (caller keeps its defaults).
+        """
+        if settings.ORANGE_MOCK:
+            return {"reachable": True, "data": True, "sms": True, "status": "CONNECTED_DATA"}
+        body = await self._post(
+            settings.ORANGE_REACHABILITY_PATH,
+            {"device": {"phoneNumber": phone_number}},
+        )
+        if body is None:
+            return None
+        # CAMARA returns connectivityStatus / reachabilityStatus like
+        # CONNECTED_DATA | CONNECTED_SMS | NOT_CONNECTED, or a list of types.
+        status = str(
+            body.get("reachabilityStatus") or body.get("connectivityStatus") or ""
+        ).upper()
+        types = {str(t).upper() for t in (body.get("reachabilityType") or [])}
+        data = status == "CONNECTED_DATA" or "DATA" in types or bool(body.get("data"))
+        sms = status in ("CONNECTED_DATA", "CONNECTED_SMS") or "SMS" in types or bool(body.get("sms"))
+        return {
+            "reachable": status != "NOT_CONNECTED" and (data or sms),
+            "data": data,
+            "sms": sms,
+            "status": status or ("CONNECTED" if (data or sms) else "UNKNOWN"),
+        }
+
+    async def verify_location(
+        self, phone_number: str, lat: float, lon: float, radius_m: int = 5000
+    ) -> dict[str, Any] | None:
+        """Is the device within `radius_m` of (lat, lon)? (geofencing-style check)
+
+        Returns {"within": bool, "result": str, "matchRate": int|None}, or None
+        when Orange is disabled/unavailable.
+        """
+        if settings.ORANGE_MOCK:
+            return {"within": phone_number in SANDBOX_IDENTITIES, "result": "TRUE", "matchRate": 95}
+        body = await self._post(
+            settings.ORANGE_LOCATION_VERIFY_PATH,
+            {
+                "device": {"phoneNumber": phone_number},
+                "area": {
+                    "areaType": "CIRCLE",
+                    "center": {"latitude": lat, "longitude": lon},
+                    "radius": radius_m,
+                },
+            },
+        )
+        if body is None:
+            return None
+        result = str(body.get("verificationResult") or "").upper()
+        return {
+            "within": result in ("TRUE", "PARTIAL"),
+            "result": result or "UNKNOWN",
+            "matchRate": body.get("matchRate"),
+        }
+
 
 orange_client = OrangeClient()

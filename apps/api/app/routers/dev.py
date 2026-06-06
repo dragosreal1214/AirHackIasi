@@ -84,3 +84,24 @@ async def orange_kyc_match(phone: str) -> dict[str, Any]:
     applicant = orange_client.SANDBOX_IDENTITIES.get(phone, {})
     result = await orange_client.orange_client.kyc_match(phone, applicant)
     return {"applicant": applicant, "result": result}
+
+
+@router.get("/orange/reachability")
+async def orange_reachability(phone: str) -> dict[str, Any]:
+    """Device Reachability — how the phone can be reached (data/SMS). The
+    dispatcher uses this to pick the channel. Sandbox: +40789103050..3."""
+    return {"reachability": await orange_client.orange_client.device_reachability(phone)}
+
+
+@router.get("/orange/location")
+async def orange_location(
+    phone: str, lat: float = 47.1785, lon: float = 27.6206, radius_m: int = 5000
+) -> dict[str, Any]:
+    """Device Location Verification (geofencing-style) — is the phone within
+    `radius_m` of a point? Defaults to LRIA (Iași airport). Sandbox numbers
+    report inside the area."""
+    return {
+        "location": await orange_client.orange_client.verify_location(
+            phone, lat, lon, radius_m
+        )
+    }
