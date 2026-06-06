@@ -112,35 +112,50 @@ export default function HelpPage() {
   return (
     <>
       <AppBar title="Ajutor" subtitle="Întrebări frecvente" backHref="/" />
-      <div className="animate-fade-up px-4 pb-12 pt-5">
-        <h2 className="font-display text-[28px] leading-tight tracking-tight text-espresso">
+      <div className="px-4 pb-12 pt-5">
+        <h2 className="animate-c-fade-up font-display text-[28px] leading-tight tracking-tight text-espresso">
           Ajutor &amp; întrebări
         </h2>
-        <p className="mt-1.5 text-sm font-medium leading-relaxed text-warm-muted">
+        <p
+          className="mt-1.5 animate-c-fade-up text-sm font-medium leading-relaxed text-warm-muted"
+          style={{ animationDelay: "60ms" }}
+        >
           Tot ce trebuie să știi despre alerte, risc și ce faci când zborul tău e
           în pericol.
         </p>
 
         <div className="mt-6 space-y-3">
           {FAQS.map((faq, i) => (
-            <FaqRow
+            <div
               key={faq.q}
-              faq={faq}
-              open={openIndex === i}
-              onToggle={() => setOpenIndex((cur) => (cur === i ? null : i))}
-            />
+              className="animate-c-fade-up"
+              style={{ animationDelay: `${120 + i * 60}ms` }}
+            >
+              <FaqRow
+                faq={faq}
+                open={openIndex === i}
+                onToggle={() => setOpenIndex((cur) => (cur === i ? null : i))}
+              />
+            </div>
           ))}
         </div>
 
         {/* Contact suport */}
-        <GoldCard elevated className="mt-7 p-5 text-center">
+        <GoldCard
+          elevated
+          className="mt-7 animate-c-fade-up p-5 text-center"
+          style={{ animationDelay: `${120 + FAQS.length * 60}ms` }}
+        >
           <h3 className="font-display text-xl leading-tight tracking-tight text-espresso">
             Tot blocat?
           </h3>
           <p className="mt-1.5 text-sm font-medium leading-relaxed text-warm-muted">
             Echipa noastră de suport îți răspunde non-stop, în limba română.
           </p>
-          <a href={`tel:${SUPPORT_TEL}`} className="mt-4 block">
+          <a
+            href={`tel:${SUPPORT_TEL}`}
+            className="mt-4 block transition-transform duration-120 ease-cinematic active:scale-[0.98]"
+          >
             <CButton variant="gold" full rightIcon={<Phone className="h-[18px] w-[18px]" strokeWidth={2.2} />}>
               Contact suport
             </CButton>

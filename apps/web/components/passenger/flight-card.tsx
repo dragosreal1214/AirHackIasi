@@ -14,7 +14,7 @@ export function FlightCard({ pnr }: { pnr: PnrWithFlight }) {
   return (
     <GoldCard
       active={atRisk}
-      className="animate-fade-up overflow-hidden p-5"
+      className="animate-c-fade-up overflow-hidden p-5"
     >
       {/* Status pill row + date */}
       <div className="flex items-center justify-between gap-3">
@@ -78,17 +78,17 @@ export function FlightCard({ pnr }: { pnr: PnrWithFlight }) {
 
 export function FlightCardSkeleton() {
   return (
-    <div className="animate-pulse rounded-card border border-[color:var(--gold-border)] bg-white/[0.52] p-5 shadow-glass">
+    <div className="rounded-card border border-[color:var(--gold-border)] bg-white/[0.52] p-5 shadow-glass">
       <div className="flex items-center justify-between">
-        <div className="h-6 w-24 rounded-full bg-accent/[0.12]" />
-        <div className="h-4 w-20 rounded bg-accent/[0.1]" />
+        <div className="skeleton-shimmer h-6 w-24 animate-shimmer rounded-full" />
+        <div className="skeleton-shimmer h-4 w-20 animate-shimmer rounded" />
       </div>
       <div className="mt-5 flex items-center justify-between">
-        <div className="h-9 w-16 rounded bg-accent/[0.12]" />
-        <div className="h-4 flex-1 mx-3 rounded bg-accent/[0.08]" />
-        <div className="h-9 w-16 rounded bg-accent/[0.12]" />
+        <div className="skeleton-shimmer h-9 w-16 animate-shimmer rounded" />
+        <div className="skeleton-shimmer mx-3 h-4 flex-1 animate-shimmer rounded" />
+        <div className="skeleton-shimmer h-9 w-16 animate-shimmer rounded" />
       </div>
-      <div className="mt-5 h-4 w-40 rounded bg-accent/[0.1]" />
+      <div className="skeleton-shimmer mt-5 h-4 w-40 animate-shimmer rounded" />
     </div>
   );
 }

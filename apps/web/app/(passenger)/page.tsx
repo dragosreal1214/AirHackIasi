@@ -1,121 +1,184 @@
 "use client";
 
-import type { PnrStatus } from "@aerly/shared";
-import { Bell, PlaneTakeoff, Plus } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-
-import { AppBar } from "@/components/passenger/app-bar";
-import { EmptyState } from "@/components/passenger/empty-state";
 import {
-  FlightCard,
-  FlightCardSkeleton,
-} from "@/components/passenger/flight-card";
-import { CButton } from "@/components/ui/button";
-import { FilterChips } from "@/components/ui/filter-chips";
-import { usePnrs } from "@/hooks/use-pnrs";
+  ArrowUpRight,
+  FileText,
+  type LucideIcon,
+  LifeBuoy,
+  Luggage,
+  Plane,
+  Sparkles,
+  User,
+} from "lucide-react";
+import Link from "next/link";
 
-const FILTERS: { value: PnrStatus; label: string }[] = [
-  { value: "active", label: "Active" },
-  { value: "completed", label: "Trecute" },
-  { value: "cancelled", label: "Anulate" },
+import { cn } from "@/lib/utils";
+
+type MenuItem = {
+  href: string;
+  icon: LucideIcon;
+  title: string;
+  sub: string;
+  tone: "sand" | "sky";
+};
+
+const MENU: MenuItem[] = [
+  {
+    href: "/trips",
+    icon: Luggage,
+    title: "Călătoriile mele",
+    sub: "Viitoare & trecute",
+    tone: "sand",
+  },
+  {
+    href: "/help",
+    icon: LifeBuoy,
+    title: "Ajutor perturbări",
+    sub: "Întârziat sau anulat?",
+    tone: "sky",
+  },
+  {
+    href: "/compensation",
+    icon: FileText,
+    title: "Compensație",
+    sub: "Îți știi drepturile",
+    tone: "sand",
+  },
+  {
+    href: "/profile",
+    icon: User,
+    title: "Profil",
+    sub: "Cont & alerte",
+    tone: "sky",
+  },
 ];
 
 export default function HomePage() {
-  const [status, setStatus] = useState<PnrStatus>("active");
-  const { data: pnrs, isLoading, isError, refetch } = usePnrs(status);
-  const atRiskCount = pnrs?.filter((p) => p.disruptionId).length ?? 0;
-  const count = pnrs?.length ?? 0;
-
   return (
-    <>
-      <AppBar
-        title="Zborurile tale"
-        action={
-          <Link
-            href="/notifications"
-            aria-label="Notificări"
-            className="relative flex h-9 w-9 items-center justify-center rounded-icon border border-[color:var(--gold-border)] bg-white/60 text-espresso backdrop-blur-glass transition-transform duration-120 active:scale-95"
-          >
-            <Bell className="h-5 w-5" />
-            {atRiskCount > 0 && (
-              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-risk-high" />
-            )}
-          </Link>
-        }
+    <div
+      className="no-sb relative min-h-full overflow-y-auto"
+      style={{
+        background:
+          "linear-gradient(180deg, #E7F0F8 0%, var(--background) 40%, rgb(var(--color-cream)) 72%, #EBE0CB 100%)",
+      }}
+    >
+      {/* soft sky glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-72"
+        style={{
+          background:
+            "radial-gradient(120% 80% at 50% -20%, rgba(156,196,228,0.5) 0%, transparent 60%)",
+        }}
       />
 
-      <div className="animate-fade-up space-y-4 px-4 py-4">
-        <FilterChips
-          options={FILTERS}
-          value={status}
-          onChange={setStatus}
+      <div className="relative px-5 pb-[calc(theme(spacing.safe-bottom)+24px)] pt-[calc(theme(spacing.safe-top)+16px)]">
+        {/* header */}
+        <div className="animate-c-fade-up flex items-center justify-between">
+          <div>
+            <span className="mb-2 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase leading-none tracking-[0.14em] text-sky-ink">
+              <Sparkles className="h-3.5 w-3.5" strokeWidth={1.8} />
+              Cer senin azi
+            </span>
+            <h1 className="font-display text-[28px] leading-[1.08] text-espresso">
+              Bun venit
+            </h1>
+          </div>
+        </div>
+
+        {/* primary action card */}
+        <Link
+          href="/flights/add"
+          className="animate-c-fade-up relative mt-[22px] block overflow-hidden rounded-[24px] p-[22px] [animation-delay:60ms]"
+          style={{
+            background:
+              "linear-gradient(135deg, rgb(var(--color-accent-soft)) 0%, rgb(var(--color-accent)) 52%, rgb(var(--color-accent-deep)) 100%)",
+            border: "1px solid rgba(200,162,78,0.35)",
+            boxShadow:
+              "0 2px 0 rgba(255,255,255,0.32) inset, inset 0 0 0 0.5px rgba(200,162,78,0.18), 0 14px 34px rgba(168,132,47,0.30)",
+          }}
+        >
+          {/* circle embellishment */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -right-7 -top-7 h-[150px] w-[150px] rounded-full bg-white/[0.16]"
+          />
+          <div className="absolute right-[18px] top-[18px] text-espresso/50">
+            <ArrowUpRight className="h-6 w-6" strokeWidth={1.8} />
+          </div>
+          <span className="grid h-[50px] w-[50px] place-items-center rounded-[16px] border border-espresso/[0.12] bg-espresso/[0.14] text-espresso">
+            <Plane className="h-[26px] w-[26px]" strokeWidth={1.7} />
+          </span>
+          <div className="mt-10">
+            <div className="font-display text-[26px] leading-[1.05] text-espresso">
+              Verifică un zbor
+            </div>
+            <div className="mt-1 text-[13px] font-medium leading-snug text-espresso/[0.72]">
+              Status &amp; risc de perturbare în timp real
+            </div>
+          </div>
+        </Link>
+
+        {/* gold gradient divider */}
+        <div
+          aria-hidden
+          className="my-[15px] h-px"
+          style={{
+            background:
+              "linear-gradient(to right, transparent, rgba(200,162,78,0.2) 30%, rgba(200,162,78,0.2) 70%, transparent)",
+          }}
         />
 
-        {/* Section header + count */}
-        <div className="flex items-baseline justify-between">
-          <h2 className="font-display text-2xl leading-tight tracking-tight text-espresso">
-            Călătoriile tale
-          </h2>
-          {!isLoading && !isError && count > 0 && (
-            <span className="text-xs font-bold uppercase tracking-[0.14em] text-accent-deep/70">
-              {count} {count === 1 ? "zbor" : "zboruri"}
-            </span>
-          )}
+        {/* menu grid */}
+        <div className="grid grid-cols-2 gap-3">
+          {MENU.map((item, i) => (
+            <MenuCard key={item.href} item={item} delay={0.12 + i * 0.06} />
+          ))}
         </div>
 
-        <div className="space-y-3">
-          {isLoading && (
-            <>
-              <FlightCardSkeleton />
-              <FlightCardSkeleton />
-            </>
-          )}
+        {/* footer note */}
+        <p className="animate-c-fade-up mt-[22px] text-center text-[12px] font-normal leading-relaxed text-warm-faint [animation-delay:400ms]">
+          Aerly veghează ca tu să nu fie nevoie.
+        </p>
+      </div>
+    </div>
+  );
+}
 
-          {isError && (
-            <div className="rounded-card border border-[color:var(--gold-border)] bg-white/[0.52] p-6 text-center text-sm font-medium text-warm-muted shadow-glass backdrop-blur-glass">
-              Nu am putut încărca zborurile.
-              <button
-                type="button"
-                onClick={() => refetch()}
-                className="ml-1 font-bold text-accent-deep"
-              >
-                Reîncearcă
-              </button>
-            </div>
-          )}
+function MenuCard({ item, delay }: { item: MenuItem; delay: number }) {
+  const { icon: Icon, tone } = item;
+  const tints =
+    tone === "sky"
+      ? { ic: "text-sky-ink", icbg: "bg-sky/[0.32]" }
+      : { ic: "text-warm-ink", icbg: "bg-[rgba(205,183,146,0.30)]" };
 
-          {pnrs && pnrs.length === 0 && (
-            <EmptyState
-              icon={<PlaneTakeoff className="h-7 w-7" />}
-              title="Niciun zbor adăugat"
-              description="Adaugă un zbor și te anunțăm din timp dacă apare risc de ceață la Iași."
-              action={
-                <Link href="/flights/add">
-                  <CButton variant="gold" rightIcon={<Plus className="h-4 w-4" />}>
-                    Adaugă zbor
-                  </CButton>
-                </Link>
-              }
-            />
-          )}
-
-          {pnrs && pnrs.length > 0 && (
-            <>
-              {pnrs.map((pnr) => (
-                <FlightCard key={pnr.id} pnr={pnr} />
-              ))}
-              <Link
-                href="/flights/add"
-                className="flex items-center justify-center gap-1.5 rounded-card border border-dashed border-[color:var(--gold-border-strong)] py-3.5 text-sm font-bold tracking-tight text-accent-deep transition-colors duration-150 hover:bg-accent/[0.08]"
-              >
-                <Plus className="h-4 w-4" />
-                Adaugă zbor
-              </Link>
-            </>
-          )}
+  return (
+    <Link
+      href={item.href}
+      className="animate-c-fade-up flex min-h-[132px] flex-col justify-between rounded-[20px] border border-[color:var(--gold-border)] bg-white/50 p-[18px] backdrop-blur-glass transition-transform duration-150 ease-cinematic active:scale-[0.97]"
+      style={{
+        animationDelay: `${delay}s`,
+        boxShadow:
+          "0 1px 0 rgba(255,255,255,0.5) inset, inset 0 0 0 0.5px rgba(200,162,78,0.10), 0 8px 22px rgba(33,24,14,0.08)",
+      }}
+    >
+      <span
+        className={cn(
+          "grid h-[46px] w-[46px] place-items-center rounded-[14px]",
+          tints.icbg,
+          tints.ic,
+        )}
+      >
+        <Icon className="h-6 w-6" strokeWidth={1.6} />
+      </span>
+      <div>
+        <div className="text-[16px] font-semibold leading-[1.15] text-espresso">
+          {item.title}
+        </div>
+        <div className="mt-0.5 text-[12px] font-normal leading-snug text-warm-muted">
+          {item.sub}
         </div>
       </div>
-    </>
+    </Link>
   );
 }

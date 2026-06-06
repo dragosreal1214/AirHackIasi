@@ -83,9 +83,9 @@ export default function CompensationPage() {
     <>
       <AppBar title="Compensație" backHref="/" />
 
-      <div className="animate-fade-up px-4 py-5">
+      <div className="px-4 py-5">
         {/* Intro */}
-        <div className="mb-5 flex items-start gap-3">
+        <div className="mb-5 flex animate-c-fade-up items-start gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-icon border border-[var(--gold-border-strong)] bg-accent/[0.12] text-accent-deep shadow-glass">
             <Scale className="h-[22px] w-[22px]" strokeWidth={1.8} />
           </div>
@@ -101,7 +101,7 @@ export default function CompensationPage() {
         </div>
 
         {/* Distance band */}
-        <div className="space-y-2">
+        <div className="animate-c-fade-up space-y-2" style={{ animationDelay: "70ms" }}>
           <CLabel className="px-1">Distanța zborului</CLabel>
           <FilterChips
             options={DISTANCE_OPTIONS}
@@ -114,7 +114,7 @@ export default function CompensationPage() {
         </div>
 
         {/* Known routes */}
-        <div className="mt-5 space-y-2">
+        <div className="mt-5 animate-c-fade-up space-y-2" style={{ animationDelay: "140ms" }}>
           <CLabel className="px-1">Sau alege o rută din Iași (LRIA)</CLabel>
           <div className="grid grid-cols-2 gap-2">
             {KNOWN_ROUTES.map((r) => {
@@ -151,13 +151,17 @@ export default function CompensationPage() {
         </div>
 
         {/* Cause */}
-        <div className="mt-5 space-y-2">
+        <div className="mt-5 animate-c-fade-up space-y-2" style={{ animationDelay: "210ms" }}>
           <CLabel className="px-1">Cauza perturbării</CLabel>
           <FilterChips options={CAUSE_OPTIONS} value={cause} onChange={setCause} />
         </div>
 
         {/* Result */}
-        <GoldCard elevated className="mt-6 animate-scale-in p-5">
+        <GoldCard
+          elevated
+          className="mt-6 animate-c-scale-in p-5"
+          style={{ animationDelay: "280ms" }}
+        >
           <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-accent-deep/70">
             <Sparkles className="h-3.5 w-3.5" />
             Estimare compensație
@@ -216,7 +220,10 @@ export default function CompensationPage() {
           </div>
         </GoldCard>
 
-        <p className="mt-4 px-1 text-xs font-medium leading-relaxed text-warm-muted">
+        <p
+          className="mt-4 animate-c-fade-up px-1 text-xs font-medium leading-relaxed text-warm-muted"
+          style={{ animationDelay: "340ms" }}
+        >
           Estimare orientativă. Suma poate fi redusă cu 50% dacă ți se oferă o
           redirecționare cu o întârziere limitată (art. 7(2)). Aceasta nu
           constituie consultanță juridică.

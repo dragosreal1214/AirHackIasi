@@ -49,13 +49,13 @@ export default function DisruptionPage() {
     <>
       <AppBar title="Alertă zbor" subtitle="Risc & alternative" backHref="/" />
 
-      <div className="animate-fade-up space-y-5 px-4 py-5">
+      <div className="space-y-5 px-4 py-5">
         {/* Hero */}
         {disruption.isLoading && (
-          <div className="h-64 animate-pulse rounded-card bg-warm-faint/20" />
+          <div className="skeleton-shimmer h-64 animate-shimmer rounded-card" />
         )}
         {flight && disruption.data && (
-          <GoldCard elevated className="p-5">
+          <GoldCard elevated className="animate-c-fade-up p-5">
             <div className="flex items-center justify-between">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-risk-high/[0.13] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-risk-high">
                 <AlertTriangle className="h-3.5 w-3.5" strokeWidth={2.2} />
@@ -104,10 +104,14 @@ export default function DisruptionPage() {
         )}
 
         {/* Weather / risk panel */}
-        {disruption.data && <WeatherRiskPanel risk={disruption.data.risk} />}
+        {disruption.data && (
+          <div className="animate-c-fade-up" style={{ animationDelay: "70ms" }}>
+            <WeatherRiskPanel risk={disruption.data.risk} />
+          </div>
+        )}
 
         {/* Alternatives */}
-        <div>
+        <div className="animate-c-fade-up" style={{ animationDelay: "140ms" }}>
           <div className="mb-3 flex items-center gap-2 px-1">
             <Sparkles className="h-4 w-4 text-accent-deep" strokeWidth={2} />
             <h2 className="font-display text-xl leading-tight tracking-tight text-espresso">
@@ -127,23 +131,32 @@ export default function DisruptionPage() {
               [0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className="h-40 animate-pulse rounded-card bg-warm-faint/20"
+                  className="skeleton-shimmer h-40 animate-shimmer rounded-card"
+                  style={{ animationDelay: `${i * 150}ms` }}
                 />
               ))}
 
-            {alternatives.data?.map((alt) => (
-              <AlternativeCard
+            {alternatives.data?.map((alt, i) => (
+              <div
                 key={alt.id}
-                alternative={alt}
-                onSelect={setConfirming}
-                pending={select.isPending}
-              />
+                className="animate-c-fade-up"
+                style={{ animationDelay: `${180 + i * 70}ms` }}
+              >
+                <AlternativeCard
+                  alternative={alt}
+                  onSelect={setConfirming}
+                  pending={select.isPending}
+                />
+              </div>
             ))}
           </div>
         </div>
 
         {/* Support */}
-        <GoldCard className="flex items-center justify-between p-4">
+        <GoldCard
+          className="flex animate-c-fade-up items-center justify-between p-4"
+          style={{ animationDelay: "240ms" }}
+        >
           <div className="text-sm text-warm-ink">Întrebări? Sună la suport.</div>
           <a
             href="tel:+40212014000"
@@ -155,7 +168,10 @@ export default function DisruptionPage() {
         </GoldCard>
 
         {/* Ghost links */}
-        <div className="flex flex-col gap-1 pt-1">
+        <div
+          className="flex animate-c-fade-up flex-col gap-1 pt-1"
+          style={{ animationDelay: "300ms" }}
+        >
           <Link
             href="/compensation"
             className="inline-flex items-center justify-center gap-1.5 py-2 text-sm font-semibold text-accent-deep transition-opacity duration-120 active:opacity-60"

@@ -42,7 +42,7 @@ export default function AddFlightPage() {
     setError(null);
     try {
       await addPnr.mutateAsync({ flightId: flight.id });
-      router.push("/");
+      router.push("/trips");
     } catch (e) {
       setError(e instanceof ApiClientError ? e.message : "Nu am putut adăuga zborul.");
     }
@@ -56,7 +56,7 @@ export default function AddFlightPage() {
     <>
       <AppBar title="Adaugă zbor" backHref="/" />
 
-      <div className="animate-fade-up px-4 py-5">
+      <div className="animate-c-fade-up px-4 py-5">
         {/* Mode toggle — cinematic segmented control */}
         <div className="mb-5 grid grid-cols-2 gap-1 rounded-button border border-[color:var(--gold-border)] bg-white/60 p-1 shadow-glass backdrop-blur-glass">
           {(["number", "route"] as Mode[]).map((m) => (

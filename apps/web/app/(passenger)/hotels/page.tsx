@@ -135,16 +135,22 @@ export default function HotelsPage() {
   return (
     <>
       <AppBar title="Cazare" backHref="/" />
-      <div className="animate-fade-up px-4 py-5">
-        <h1 className="font-display text-3xl leading-tight tracking-tight text-espresso">
+      <div className="px-4 py-5">
+        <h1 className="animate-c-fade-up font-display text-3xl leading-tight tracking-tight text-espresso">
           Hoteluri partenere
         </h1>
-        <p className="mt-1.5 max-w-sm text-sm font-medium leading-relaxed text-warm-muted">
+        <p
+          className="mt-1.5 max-w-sm animate-c-fade-up text-sm font-medium leading-relaxed text-warm-muted"
+          style={{ animationDelay: "60ms" }}
+        >
           Cazare peste noapte lângă Aeroportul Iași (LRIA) dacă zborul tău este
           anulat sau reprogramat. Tarife negociate pentru pasageri Aerly.
         </p>
 
-        <div className="-mx-4 mt-5 px-4">
+        <div
+          className="-mx-4 mt-5 animate-c-fade-up px-4"
+          style={{ animationDelay: "120ms" }}
+        >
           <FilterChips options={SORT_OPTIONS} value={sort} onChange={setSort} />
         </div>
 
@@ -153,8 +159,8 @@ export default function HotelsPage() {
             <GoldCard
               key={hotel.id}
               elevated
-              className="animate-fade-up overflow-hidden p-0"
-              style={{ animationDelay: `${i * 50}ms` }}
+              className="animate-c-fade-up overflow-hidden p-0"
+              style={{ animationDelay: `${160 + i * 70}ms` }}
             >
               {/* Gradient placeholder image */}
               <div
@@ -209,7 +215,7 @@ export default function HotelsPage() {
                   href={hotel.bookingUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-4 block"
+                  className="mt-4 block transition-transform duration-120 ease-cinematic active:scale-[0.98]"
                 >
                   <CButton variant="gold" full>
                     Rezervă

@@ -12,7 +12,7 @@ export function CRing({ size = 112, className }: CRingProps) {
   return (
     <div
       className={cn(
-        "relative grid animate-scale-in place-items-center",
+        "relative grid animate-c-scale-in place-items-center",
         className,
       )}
       style={{ width: size, height: size }}
@@ -40,7 +40,7 @@ export function CRing({ size = 112, className }: CRingProps) {
           strokeWidth="4"
           strokeLinecap="round"
           strokeDasharray="301"
-          className="cring-ring"
+          className="animate-ring-draw"
         />
       </svg>
       <svg
@@ -58,39 +58,9 @@ export function CRing({ size = 112, className }: CRingProps) {
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeDasharray="60"
-          className="cring-check"
+          className="animate-draw-check"
         />
       </svg>
-      <style jsx>{`
-        .cring-ring {
-          animation: cRingDraw 0.7s cubic-bezier(0.3, 0.7, 0.3, 1) 0.1s both;
-        }
-        .cring-check {
-          animation: cDrawCheck 0.4s ease-out 0.55s both;
-        }
-        @keyframes cRingDraw {
-          from {
-            stroke-dashoffset: 301;
-          }
-          to {
-            stroke-dashoffset: 0;
-          }
-        }
-        @keyframes cDrawCheck {
-          from {
-            stroke-dashoffset: 60;
-          }
-          to {
-            stroke-dashoffset: 0;
-          }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .cring-ring,
-          .cring-check {
-            animation-duration: 0.01ms;
-          }
-        }
-      `}</style>
     </div>
   );
 }

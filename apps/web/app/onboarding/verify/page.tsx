@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Clock } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -63,42 +63,73 @@ export default function VerifyPage() {
 
   if (success) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center px-6 text-center animate-fade-up">
-        <CRing size={120} />
-        <h1 className="mt-8 font-display text-3xl tracking-tight text-espresso">
+      <div className="cine-surface flex min-h-screen flex-1 flex-col items-center justify-center px-8 text-center">
+        <div
+          className="rounded-full border border-accent/30 bg-white/50 p-5 animate-c-scale-in"
+          style={{
+            boxShadow:
+              "0 0 0 8px rgba(200,162,78,0.07), 0 8px 24px rgba(33,24,14,0.08)",
+          }}
+        >
+          <CRing size={108} />
+        </div>
+        <h1
+          className="mt-7 font-display text-3xl tracking-tight text-espresso animate-c-fade-up"
+          style={{ animationDelay: "200ms" }}
+        >
           Gata, ești înăuntru.
         </h1>
-        <p className="mt-2 text-warm-muted">Te ducem la zborurile tale…</p>
+        <p
+          className="mt-2 text-warm-muted animate-c-fade-up"
+          style={{ animationDelay: "280ms" }}
+        >
+          Te ducem la zborurile tale…
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-1 flex-col px-6 pt-safe-top animate-fade-up">
-      <div className="pt-6">
+    <div className="cine-surface flex min-h-screen flex-1 flex-col px-6 pt-safe-top">
+      <div className="pt-6 animate-c-fade-up">
         <Link
           href="/onboarding/phone"
           aria-label="Înapoi"
-          className="-ml-1 flex h-[34px] w-[34px] items-center justify-center rounded-icon border border-[color:var(--gold-border)] bg-white/60 text-espresso backdrop-blur-glass transition-all duration-120 ease-cinematic active:scale-95"
+          className="-ml-1 flex h-[42px] w-[42px] items-center justify-center rounded-full border border-[rgba(200,167,97,0.65)] bg-white/60 text-warm-ink shadow-[0_0_12px_rgba(200,167,97,0.16)] backdrop-blur-lg transition-all duration-120 ease-cinematic active:scale-95"
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
       </div>
 
-      <h1 className="mt-8 font-display text-3xl tracking-tight text-espresso">
+      <h1
+        className="mt-8 font-display text-3xl leading-tight tracking-tight text-espresso animate-c-fade-up"
+        style={{ animationDelay: "60ms" }}
+      >
         Verifică numărul
       </h1>
-      <p className="mt-2 text-warm-muted">
-        Am trimis un cod de 6 cifre la{" "}
-        <span className="font-semibold text-espresso">{maskPhone(phone)}</span>.
+      <p
+        className="mt-2.5 text-[15px] leading-relaxed text-warm-muted animate-c-fade-up"
+        style={{ animationDelay: "120ms" }}
+      >
+        Am trimis un cod de 6 cifre la
+        <br />
+        <span className="font-semibold tracking-wide text-espresso">
+          {maskPhone(phone)}
+        </span>
+        .
       </p>
 
-      <OtpInput
-        value={code}
-        onChange={onChange}
-        disabled={pending}
-        className="mt-10"
-      />
+      {/* OTP container with premium gold border + staggered cell entrance */}
+      <div
+        className="mt-8 rounded-[18px] border border-accent/25 bg-white/55 p-5 backdrop-blur-lg animate-c-fade-up [&_input:nth-child(1)]:[animation-delay:200ms] [&_input:nth-child(2)]:[animation-delay:260ms] [&_input:nth-child(3)]:[animation-delay:320ms] [&_input:nth-child(4)]:[animation-delay:380ms] [&_input:nth-child(5)]:[animation-delay:440ms] [&_input:nth-child(6)]:[animation-delay:500ms] [&_input]:animate-c-scale-in"
+        style={{
+          animationDelay: "180ms",
+          boxShadow:
+            "0 4px 16px rgba(33,24,14,0.06), inset 0 1px 0 rgba(255,255,255,0.8)",
+        }}
+      >
+        <OtpInput value={code} onChange={onChange} disabled={pending} />
+      </div>
 
       {error && (
         <p className="mt-4 text-sm font-semibold text-risk-high">{error}</p>
@@ -107,7 +138,11 @@ export default function VerifyPage() {
         <p className="mt-4 text-sm text-warm-muted">Se verifică…</p>
       )}
 
-      <p className="mt-6 text-sm text-warm-muted">
+      <div
+        className="mt-6 flex items-center gap-1.5 text-sm text-warm-muted animate-c-fade-up"
+        style={{ animationDelay: "260ms" }}
+      >
+        <Clock className="h-4 w-4 text-warm-faint" />
         N-ai primit codul?{" "}
         <Link
           href="/onboarding/phone"
@@ -115,7 +150,7 @@ export default function VerifyPage() {
         >
           Trimite din nou
         </Link>
-      </p>
+      </div>
 
       {isDev && (
         <p className="mt-8 rounded-card border border-[color:var(--gold-border)] bg-accent-soft/15 px-4 py-3 text-xs text-accent-deep">

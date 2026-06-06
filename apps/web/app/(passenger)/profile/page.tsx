@@ -103,9 +103,9 @@ export default function ProfilePage() {
   return (
     <>
       <AppBar title="Profil" subtitle="Contul tău Aerly" />
-      <div className="animate-fade-up px-4 pb-10 pt-5">
+      <div className="px-4 pb-10 pt-5">
         {/* Avatar */}
-        <div className="flex flex-col items-center text-center">
+        <div className="flex animate-c-fade-up flex-col items-center text-center">
           <div className="rounded-full bg-gradient-to-br from-accent-soft via-accent to-accent-deep p-[2.5px] shadow-gold-button">
             <div className="flex h-[88px] w-[88px] items-center justify-center rounded-full bg-ivory text-2xl font-bold tracking-tight text-espresso">
               AP
@@ -118,16 +118,19 @@ export default function ProfilePage() {
         </div>
 
         {/* Personal */}
-        <SectionLabel>Personal</SectionLabel>
-        <GoldCard elevated className="overflow-hidden p-0">
+        <div className="animate-c-fade-up" style={{ animationDelay: "70ms" }}>
+          <SectionLabel>Personal</SectionLabel>
+          <GoldCard elevated className="overflow-hidden p-0">
           <PRow icon={User} label="Nume" value="Andrei Pop" />
           <PRow icon={Phone} label="Telefon" value="+40 ••• ••• 678" />
           <PRow icon={Mail} label="Email" value="Adaugă" href="#" last />
-        </GoldCard>
+          </GoldCard>
+        </div>
 
         {/* Canale */}
-        <SectionLabel>Canale de notificare</SectionLabel>
-        <GoldCard className="overflow-hidden p-0">
+        <div className="animate-c-fade-up" style={{ animationDelay: "140ms" }}>
+          <SectionLabel>Canale de notificare</SectionLabel>
+          <GoldCard className="overflow-hidden p-0">
           {CHANNELS.map(({ icon, label, note, on }, i) => (
             <PRow
               key={label}
@@ -152,27 +155,32 @@ export default function ProfilePage() {
               }
             />
           ))}
-        </GoldCard>
+          </GoldCard>
+        </div>
 
         {/* Mai multe */}
-        <SectionLabel>Mai multe</SectionLabel>
-        <GoldCard className="overflow-hidden p-0">
+        <div className="animate-c-fade-up" style={{ animationDelay: "210ms" }}>
+          <SectionLabel>Mai multe</SectionLabel>
+          <GoldCard className="overflow-hidden p-0">
           <PRow icon={Building2} label="Hoteluri partenere" href="/hotels" />
           <PRow icon={Calculator} label="Calculează compensația" href="/compensation" />
           <PRow icon={HelpCircle} label="Ajutor & întrebări" href="/help" last />
-        </GoldCard>
+          </GoldCard>
+        </div>
 
         {/* Cont */}
-        <SectionLabel>Cont</SectionLabel>
-        <CButton
-          variant="ghost"
-          full
-          onClick={logout}
-          className="h-12 gap-2 rounded-card border border-[var(--gold-border)] bg-ivory/70 text-sm text-warm-ink shadow-glass active:scale-[0.985]"
-        >
-          <LogOut className="h-4 w-4" strokeWidth={2.2} />
-          Deconectează-te
-        </CButton>
+        <div className="animate-c-fade-up" style={{ animationDelay: "280ms" }}>
+          <SectionLabel>Cont</SectionLabel>
+          <CButton
+            variant="ghost"
+            full
+            onClick={logout}
+            className="h-12 gap-2 rounded-card border border-[var(--gold-border)] bg-ivory/70 text-sm text-warm-ink shadow-glass active:scale-[0.985]"
+          >
+            <LogOut className="h-4 w-4" strokeWidth={2.2} />
+            Deconectează-te
+          </CButton>
+        </div>
 
         <p className="mt-7 px-1 text-center text-xs font-medium text-warm-faint">
           Aerly · Cu un aer înainte.

@@ -61,14 +61,26 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col px-6 pb-safe-bottom pt-12 animate-fade-up">
-      <h1 className="font-display text-4xl leading-tight text-espresso">Creează cont</h1>
-      <p className="mt-1.5 text-sm text-warm-muted">
+    <div className="cine-surface flex min-h-screen flex-1 flex-col px-6 pb-safe-bottom pt-12">
+      <h1
+        className="font-display text-4xl leading-tight tracking-tight text-espresso animate-c-fade-up"
+        style={{ animationDelay: "40ms" }}
+      >
+        Creează cont
+      </h1>
+      <p
+        className="mt-1.5 text-sm text-warm-muted animate-c-fade-up"
+        style={{ animationDelay: "100ms" }}
+      >
         Îți confirmăm numărul printr-un cod SMS.
       </p>
 
-      <GoldCard elevated className="mt-6 space-y-5 p-5">
-        <div className="space-y-2">
+      <GoldCard
+        elevated
+        className="mt-6 space-y-5 p-5 animate-c-fade-up"
+        style={{ animationDelay: "160ms" }}
+      >
+        <div className="space-y-2 animate-c-fade-up" style={{ animationDelay: "220ms" }}>
           <CLabel htmlFor="reg-name">Nume complet</CLabel>
           <TextField
             id="reg-name"
@@ -79,7 +91,7 @@ export default function RegisterPage() {
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 animate-c-fade-up" style={{ animationDelay: "280ms" }}>
           <CLabel htmlFor="reg-email">Email</CLabel>
           <TextField
             id="reg-email"
@@ -91,7 +103,7 @@ export default function RegisterPage() {
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 animate-c-fade-up" style={{ animationDelay: "340ms" }}>
           <CLabel htmlFor="reg-phone">Număr de telefon</CLabel>
           <PhoneField
             id="reg-phone"
@@ -101,7 +113,7 @@ export default function RegisterPage() {
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 animate-c-fade-up" style={{ animationDelay: "400ms" }}>
           <CLabel htmlFor="reg-password">Parolă</CLabel>
           <TextField
             id="reg-password"

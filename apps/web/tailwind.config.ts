@@ -80,11 +80,43 @@ const config: Config = {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
+        // --- Demo cinematic vocabulary (Aerly Cinematic.html @keyframes) ---
+        "c-fade": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        "c-fade-up": {
+          from: { opacity: "0", transform: "translateY(16px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "c-scale-in": {
+          from: { opacity: "0", transform: "scale(.96)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
+        "hint-bob": {
+          "0%,100%": { transform: "translateY(0)", opacity: ".8" },
+          "50%": { transform: "translateY(7px)", opacity: "1" },
+        },
+        "ring-draw": {
+          from: { strokeDashoffset: "301" },
+          to: { strokeDashoffset: "0" },
+        },
+        "draw-check": {
+          from: { strokeDashoffset: "60" },
+          to: { strokeDashoffset: "0" },
+        },
       },
       animation: {
         "fade-up": "fade-up .4s cubic-bezier(.2,.7,.2,1) both",
         "scale-in": "scale-in .3s cubic-bezier(.2,.7,.2,1) both",
         shimmer: "shimmer 1.6s linear infinite",
+        // --- Demo cinematic vocabulary ---
+        "c-fade": "c-fade .5s cubic-bezier(.2,.7,.2,1) both",
+        "c-fade-up": "c-fade-up .55s cubic-bezier(.2,.7,.2,1) both",
+        "c-scale-in": "c-scale-in .4s cubic-bezier(.2,.7,.2,1) both",
+        "hint-bob": "hint-bob 1.8s ease-in-out infinite",
+        "ring-draw": "ring-draw .7s cubic-bezier(.3,.7,.3,1) .1s both",
+        "draw-check": "draw-check .4s ease-out .55s both",
       },
     },
   },
