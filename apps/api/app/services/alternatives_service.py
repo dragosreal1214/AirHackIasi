@@ -15,6 +15,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException
 
 from app.data import ground_transport
+from app.ml import airports as registry
 from app.models.schemas import Alternative, Disruption
 from app.services import flight_service, store
 from app.services.risk_service import risk_for
@@ -26,6 +27,13 @@ _AIRLINE_BOOKING = {
     "OS": "https://www.austrian.com/",
     "A2": "https://www.animawings.com/",
     "H4": "https://www.hisky.aero/",
+}
+
+# Nearby airports a passenger can drive to and depart from instead.
+# origin_iata -> [(alternate_iata, drive_minutes)]
+_NEARBY: dict[str, list[tuple[str, int]]] = {
+    "IAS": [("BCM", 100), ("SCV", 75)],
+    "OTP": [("CLJ", 320)],
 }
 
 
@@ -108,6 +116,38 @@ def generate_alternatives(flight) -> list[Alternative]:
                     action_label=f"Rezervă {label} pe {o['provider']}",
                 )
             )
+
+    # 3. Reroute via a nearby airport (drive there + fly to the destination).
+    for k, (alt_iata, drive) in enumerate(_NEARBY.get(flight.origin_iata, [])):
+        ap = registry.get(alt_iata)
+        alt_city = ap.city if ap else alt_iata
+        dep = datetime.fromisoformat(flight.scheduled_departure) + timedelta(minutes=30)
+        flight_leg = 120
+        arr = dep + timedelta(minutes=drive + flight_leg)
+        cost = 140.0
+        rel = 0.74
+        hrs = round(drive / 60, 1)
+        raw.append(
+            Alternative(
+                id=f"alt_reroute_{k}",
+                rank=0,
+                type="reroute_airport",
+                title=f"Reroute via {alt_city} ({alt_iata})",
+                subtitle=f"Transfer auto ~{hrs}h + zbor către {flight.destination_city}",
+                departure=dep.isoformat(),
+                arrival=arr.isoformat(),
+                duration_minutes=drive + flight_leg,
+                cost_eur=cost,
+                reliability=rel,
+                score=_score(
+                    hours_lost=_hours_lost(flight.scheduled_departure, dep.isoformat()) + drive / 60,
+                    reliability=rel,
+                    cost=cost,
+                ),
+                action_url="https://www.aerodatabox.com/",
+                action_label="Vezi detalii reroute",
+            )
+        )
 
     raw.sort(key=lambda a: a.score, reverse=True)
     for i, a in enumerate(raw):
