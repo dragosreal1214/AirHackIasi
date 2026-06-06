@@ -4,10 +4,25 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from fastapi import HTTPException, Request
+from fastapi import Header, HTTPException, Request
 
 from app.config import settings
 from app.services import jwt_service
+
+
+async def require_api_key(
+    x_api_key: str | None = Header(default=None, alias="X-API-Key"),
+) -> str | None:
+    """Gate the public developer API. Open (key-less) until PUBLIC_API_KEYS is set."""
+    keys = settings.public_api_keys
+    if not keys:
+        return None  # open access (still rate-limited)
+    if x_api_key not in keys:
+        raise HTTPException(
+            status_code=401,
+            detail={"code": "INVALID_API_KEY", "message": "Missing or invalid X-API-Key header."},
+        )
+    return x_api_key
 
 
 @dataclass(frozen=True)

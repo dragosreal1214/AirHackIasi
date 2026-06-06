@@ -88,6 +88,11 @@ class Settings(BaseSettings):
     # (e.g. "IAS") so the whole disruption flow is showable on a clear day.
     FORCE_FOG_IATA: str = ""
 
+    # --- Public developer API (fog predictor) ---
+    # Comma-separated API keys; empty = open access (rate-limited by IP).
+    PUBLIC_API_KEYS: str = ""
+    PUBLIC_RATE_LIMIT: str = "60/minute"
+
     # --- Web Push (VAPID) ---
     VAPID_PUBLIC_KEY: str = ""
     VAPID_PRIVATE_KEY: str = ""
@@ -98,6 +103,10 @@ class Settings(BaseSettings):
     @property
     def push_enabled(self) -> bool:
         return bool(self.VAPID_PUBLIC_KEY and self.VAPID_PRIVATE_KEY)
+
+    @property
+    def public_api_keys(self) -> set[str]:
+        return {k.strip() for k in self.PUBLIC_API_KEYS.split(",") if k.strip()}
 
     @property
     def db_enabled(self) -> bool:

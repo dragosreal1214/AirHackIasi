@@ -11,7 +11,7 @@ from slowapi.errors import RateLimitExceeded
 
 from app.config import settings
 from app.rate_limit import limiter
-from app.routers import auth, dev, disruptions, flights, health, me, ml, pnrs, push
+from app.routers import auth, dev, disruptions, flights, health, me, ml, pnrs, public, push
 
 logger = structlog.get_logger(__name__)
 
@@ -67,9 +67,17 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(
-    title="Aerly API",
+    title="Fogora API",
     version="0.1.0",
-    description="Fog disruption copilot backend.",
+    description=(
+        "Fog-disruption copilot backend.\n\n"
+        "**Public Fog Predictor API** (for external developers) lives under "
+        "`/api/public/v1` — predict fog probability from weather features, get a "
+        "live hourly forecast per airport, and read model metadata. Auth via an "
+        "`X-API-Key` header; rate-limited. See `docs/public-api.md`."
+    ),
+    contact={"name": "Fogora", "url": "https://fogora.app"},
+    license_info={"name": "Demo / hackathon use"},
     lifespan=lifespan,
 )
 
@@ -96,6 +104,9 @@ app.include_router(me.router, prefix=prefix)
 app.include_router(push.router, prefix=prefix)
 app.include_router(disruptions.router, prefix=prefix)
 app.include_router(ml.router, prefix=prefix)
+
+# Public developer API (separate namespace, API-key gated).
+app.include_router(public.router, prefix="/api")
 
 if settings.DEBUG:
     app.include_router(dev.router, prefix=prefix)
