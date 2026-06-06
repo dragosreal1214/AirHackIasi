@@ -37,7 +37,15 @@ async def dispatch(
     disruption_id: str,
     channels: list[str] | None = None,
 ) -> dict:
+    # Resolve curated or derived (d_<flight_id>) disruptions.
     disruption = store.DISRUPTIONS.get(disruption_id)
+    if disruption is None:
+        try:
+            from app.services import alternatives_service  # noqa: PLC0415
+
+            disruption = await alternatives_service.get_disruption(disruption_id)
+        except Exception:  # noqa: BLE001
+            disruption = None
     if disruption is None:
         return {"status": "skipped", "reason": "unknown_disruption"}
 

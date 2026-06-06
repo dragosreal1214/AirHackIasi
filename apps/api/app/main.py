@@ -40,8 +40,29 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         twilio=settings.twilio_enabled,
         orange=settings.orange_enabled,
         fog_model="loaded" if not fog_model.using_fallback else "fallback",
+        monitor=settings.MONITOR_INTERVAL_MINUTES,
     )
+
+    monitor_task = None
+    if settings.MONITOR_INTERVAL_MINUTES > 0:
+        import asyncio
+
+        from app.services import disruption_monitor
+
+        async def _loop() -> None:
+            while True:
+                await asyncio.sleep(settings.MONITOR_INTERVAL_MINUTES * 60)
+                try:
+                    await disruption_monitor.scan_and_notify()
+                except Exception:  # noqa: BLE001
+                    logger.warning("monitor_loop_error", exc_info=True)
+
+        monitor_task = asyncio.create_task(_loop())
+
     yield
+
+    if monitor_task is not None:
+        monitor_task.cancel()
     logger.info("api_stopping")
 
 

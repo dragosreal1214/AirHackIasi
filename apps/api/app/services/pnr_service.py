@@ -9,20 +9,18 @@ the flight's origin airport.
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
 
 from fastapi import HTTPException
 
 from app.config import settings
 from app.models.schemas import (
     CreatePnrInput,
-    CurrentRisk,
     FlightSummary,
-    FogWindow,
     PnrStatus,
     PnrWithFlight,
 )
 from app.services import flight_service, store
+from app.services.risk_service import risk_for
 
 
 @asynccontextmanager
@@ -36,59 +34,11 @@ async def _session():
         yield db
 
 
-def _risk_from_forecast(fc: dict, dep_iso: str) -> CurrentRisk:
-    dep = datetime.fromisoformat(dep_iso)
-    best = None
-    best_diff = None
-    for h in fc["hourly"]:
-        t = datetime.fromisoformat(h["time"])
-        if t.tzinfo is None:
-            t = t.replace(tzinfo=timezone.utc)
-        diff = abs((t - dep).total_seconds())
-        if best_diff is None or diff < best_diff:
-            best_diff, best = diff, h
-    level = best["level"] if best else "low"
-    prob = best["probability"] if best else 0.05
-    window = None
-    if fc.get("windows"):
-        w = fc["windows"][0]
-        window = FogWindow(start=w["start"], end=w["end"])
-    explanation = fc["peak"]["explanation"] if (level != "low" and fc.get("peak")) else None
-    return CurrentRisk(
-        level=level,
-        probability=round(prob, 4),
-        prediction_for=dep_iso,
-        fog_window=window if level != "low" else None,
-        explanation=explanation,
-    )
-
-
-async def _risk_for(flight: FlightSummary) -> tuple[CurrentRisk, str | None]:
-    """(risk, disruption_id) — curated demo if present, else live forecast."""
-    for d in store.DISRUPTIONS.values():
-        if d.flight.id == flight.id:
-            return d.risk, d.id
-    if not settings.LIVE_FORECAST:
-        return CurrentRisk(level="low", probability=0.05, prediction_for=flight.scheduled_departure), None
-    try:
-        from app.ml import airports as registry  # noqa: PLC0415
-        from app.ml import fog_forecast  # noqa: PLC0415
-
-        a = registry.get(flight.origin_iata)
-        if a is not None:
-            fc = await fog_forecast.forecast(a.lat, a.lon, airport=a.iata)
-            if fc.get("available") and fc.get("hourly"):
-                return _risk_from_forecast(fc, flight.scheduled_departure), None
-    except Exception:  # noqa: BLE001 - never block on forecast
-        pass
-    return CurrentRisk(level="low", probability=0.05, prediction_for=flight.scheduled_departure), None
-
-
 async def _enrich(flight_id: str, *, pnr_id: str, status: str, **extra) -> PnrWithFlight | None:
     flight = flight_service.get_flight(flight_id)
     if flight is None:
         return None
-    risk, disruption_id = await _risk_for(flight)
+    risk, disruption_id = await risk_for(flight)
     return PnrWithFlight(
         id=pnr_id,
         status=status,  # type: ignore[arg-type]
@@ -136,7 +86,7 @@ async def create_pnr(user_id: str, payload: CreatePnrInput) -> PnrWithFlight:
             status_code=404,
             detail={"code": "FLIGHT_NOT_FOUND", "message": "Zborul nu există."},
         )
-    risk, disruption_id = await _risk_for(flight)
+    risk, disruption_id = await risk_for(flight)
 
     if not settings.db_enabled:
         if any(p.flight.id == flight.id and p.status == "active" for p in store.PNR_STORE):

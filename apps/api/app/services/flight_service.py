@@ -71,6 +71,25 @@ async def search_flights(query: str, date: str | None = None) -> list[FlightSumm
     return results[:40]
 
 
+def flights_between(
+    origin_iata: str, dest_iata: str, after_iso: str, within_hours: int = 30
+) -> list[FlightSummary]:
+    """Scheduled flights on the same O-D pair departing after `after_iso`."""
+    after = datetime.fromisoformat(after_iso)
+    end = after + timedelta(hours=within_hours)
+    results: list[FlightSummary] = []
+    for day_offset in range((within_hours // 24) + 2):
+        date = (after.date() + timedelta(days=day_offset)).isoformat()
+        for (no, direction, other, time) in WEEKLY:
+            s = _summary(no, direction, other, time, date)
+            if s.origin_iata == origin_iata and s.destination_iata == dest_iata:
+                dep = datetime.fromisoformat(s.scheduled_departure)
+                if after < dep <= end:
+                    results.append(s)
+    results.sort(key=lambda f: f.scheduled_departure)
+    return results
+
+
 def get_flight(flight_id: str) -> FlightSummary | None:
     # Curated demo flights (e.g. the fog-disruption scenario) come first.
     for f in store.FLIGHT_CATALOG:

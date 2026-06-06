@@ -6,7 +6,7 @@ from fastapi import APIRouter
 
 from app.config import settings
 from app.models.schemas import TestNotificationRequest
-from app.services import notification_service
+from app.services import disruption_monitor, notification_service
 from app.services.integrations import orange_client, twilio_client
 
 router = APIRouter(prefix="/dev", tags=["dev"])
@@ -49,6 +49,14 @@ async def send_test_notification(payload: TestNotificationRequest) -> dict[str, 
 async def twilio_status() -> dict[str, Any]:
     """Validate Twilio creds + Verify service (sends no SMS)."""
     return await twilio_client.healthcheck()
+
+
+@router.post("/run-monitor")
+async def run_monitor(force_fog: str | None = None) -> dict[str, Any]:
+    """Run the proactive disruption scan now. `force_fog=IAS` simulates fog at
+    that airport so alerts dispatch even on a clear day."""
+    disruption_monitor.reset_dedupe()
+    return await disruption_monitor.scan_and_notify(force_fog_iata=force_fog)
 
 
 @router.get("/orange/status")

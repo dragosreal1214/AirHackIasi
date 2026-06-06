@@ -73,6 +73,12 @@ class Settings(BaseSettings):
 
     # Compute per-flight risk from the live Open-Meteo forecast. Off in tests.
     LIVE_FORECAST: bool = True
+    # Background disruption monitor cadence; 0 disables the loop (use the
+    # dev trigger instead). Set e.g. 15 to scan + notify every 15 minutes.
+    MONITOR_INTERVAL_MINUTES: int = 0
+    # Demo switch: force high fog risk for flights departing this airport
+    # (e.g. "IAS") so the whole disruption flow is showable on a clear day.
+    FORCE_FOG_IATA: str = ""
 
     # ----- Feature flags (derived) -----
 
