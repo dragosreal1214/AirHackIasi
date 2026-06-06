@@ -84,7 +84,7 @@ export default function LoginPage() {
           style={{ transform: `translateY(${p * -22}px) scale(${1 - p * 0.04})`, opacity: 1 - p * 1.1 }}
         >
           <img
-            src="/cine/fogora-mark.png"
+            src="/cine/fogora-mark-256.png"
             alt="Fogora"
             className="mt-3 h-[88px] w-[88px] object-contain drop-shadow-[0_6px_26px_rgba(0,0,0,0.55)]"
           />

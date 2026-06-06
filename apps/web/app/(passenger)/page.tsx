@@ -10,8 +10,12 @@ import {
   Sparkles,
   User,
 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
+import { useEffect } from "react";
 
+import { getMe, getPnrs } from "@/lib/api";
+import { pnrKeys } from "@/hooks/use-pnrs";
 import { cn } from "@/lib/utils";
 
 type MenuItem = {
@@ -54,6 +58,14 @@ const MENU: MenuItem[] = [
 ];
 
 export default function HomePage() {
+  const qc = useQueryClient();
+
+  // Warm the most-used screens so the bottom-nav tabs open instantly.
+  useEffect(() => {
+    qc.prefetchQuery({ queryKey: pnrKeys.list("active"), queryFn: () => getPnrs("active") });
+    qc.prefetchQuery({ queryKey: ["me"], queryFn: getMe });
+  }, [qc]);
+
   return (
     <div
       className="no-sb relative min-h-full overflow-y-auto"
@@ -76,7 +88,7 @@ export default function HomePage() {
         {/* brand wordmark */}
         <div className="animate-c-fade-up mb-5 flex items-center gap-3">
           <img
-            src="/cine/fogora-mark.png"
+            src="/cine/fogora-mark-256.png"
             alt="Fogora"
             className="h-[56px] w-[56px] rounded-icon object-contain drop-shadow-[0_4px_14px_rgba(168,132,47,0.25)]"
           />

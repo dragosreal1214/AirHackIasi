@@ -14,7 +14,7 @@ export function CWord({ light, size = 32, className, ...props }: CWordProps) {
       {...props}
     >
       <img
-        src="/cine/fogora-mark.png"
+        src="/cine/fogora-mark-256.png"
         alt=""
         aria-hidden
         style={{ width: size, height: size }}

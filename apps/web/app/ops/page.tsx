@@ -43,7 +43,7 @@ export default function OpsDashboard() {
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
             <img
-              src="/cine/fogora-mark.png"
+              src="/cine/fogora-mark-256.png"
               alt="Fogora"
               className="h-[22px] w-[22px] rounded-icon object-contain"
             />

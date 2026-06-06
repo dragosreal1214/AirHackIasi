@@ -28,7 +28,7 @@ export function AppBar({
         </Link>
       ) : (
         <img
-          src="/cine/fogora-mark.png"
+          src="/cine/fogora-mark-256.png"
           alt="Fogora"
           className="h-[26px] w-[26px] flex-shrink-0 rounded-icon object-contain"
         />

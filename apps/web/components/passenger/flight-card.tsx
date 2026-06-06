@@ -1,6 +1,7 @@
 "use client";
 
 import type { PnrWithFlight } from "@aerly/shared";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowRight,
   Calendar,
@@ -16,6 +17,7 @@ import { RouteDisplay } from "@/components/passenger/route-display";
 import { RiskBadge } from "@/components/shared/risk-badge";
 import { GoldCard } from "@/components/ui/card";
 import { useDeletePnr } from "@/hooks/use-pnrs";
+import { getFlightDetail } from "@/lib/api";
 import { formatDate, formatTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +27,15 @@ export function FlightCard({ pnr }: { pnr: PnrWithFlight }) {
 
   const [confirming, setConfirming] = useState(false);
   const deletePnr = useDeletePnr();
+  const qc = useQueryClient();
+
+  // Warm the flight-detail cache before the user taps, so the screen is instant.
+  const prefetch = () =>
+    qc.prefetchQuery({
+      queryKey: ["flight-detail", flight.id],
+      queryFn: () => getFlightDetail(flight.id),
+      staleTime: 60_000,
+    });
 
   /** Prevent the surrounding Link from navigating when interacting with controls. */
   const stop = (e: React.MouseEvent) => {
@@ -40,7 +51,13 @@ export function FlightCard({ pnr }: { pnr: PnrWithFlight }) {
   };
 
   return (
-    <Link href={`/trips/${flight.id}`} className="block">
+    <Link
+      href={`/trips/${flight.id}`}
+      prefetch
+      onMouseEnter={prefetch}
+      onPointerDown={prefetch}
+      className="block"
+    >
     <GoldCard
       active={atRisk}
       interactive
