@@ -117,6 +117,7 @@ class Me(CamelModel):
 
 class UpdateMeRequest(CamelModel):
     full_name: str | None = None
+    email: str | None = None
     notification_channels: list[NotificationChannel] | None = None
 
 

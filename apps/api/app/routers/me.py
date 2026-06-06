@@ -69,6 +69,7 @@ async def update_me(
             db,
             user.id,
             full_name=payload.full_name,
+            email=payload.email,
             notification_channels=payload.notification_channels,
         )
         if u is None:

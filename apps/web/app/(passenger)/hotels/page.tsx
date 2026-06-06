@@ -79,7 +79,7 @@ export default function HotelsPage() {
                 interactive
                 className="overflow-hidden p-0"
               >
-                {/* Gradient placeholder image */}
+                {/* Hero image with gradient fallback */}
                 <div
                   className={cn(
                     "relative flex h-32 items-center justify-center overflow-hidden bg-gradient-to-br",
@@ -97,6 +97,20 @@ export default function HotelsPage() {
                   <span className="select-none font-display text-6xl tracking-tighter text-white/35">
                     {hotel.name.charAt(0)}
                   </span>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={hotel.image}
+                    alt={hotel.name}
+                    loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent"
+                  />
                   <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full border border-white/30 bg-black/20 px-2.5 py-1 text-xs font-bold tracking-tight text-white backdrop-blur-lg">
                     <MapPin className="h-3 w-3" strokeWidth={2.4} />
                     {hotel.distanceKm.toFixed(1)} km

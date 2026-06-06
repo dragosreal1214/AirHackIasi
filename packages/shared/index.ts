@@ -218,6 +218,7 @@ export interface Me {
 
 export interface UpdateMeInput {
   fullName?: string;
+  email?: string;
   notificationChannels?: NotificationChannel[];
 }
 

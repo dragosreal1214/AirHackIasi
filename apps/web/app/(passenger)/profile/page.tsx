@@ -16,14 +16,17 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 
 import { AppBar } from "@/components/passenger/app-bar";
 import { CButton } from "@/components/ui/button";
 import { GoldCard } from "@/components/ui/card";
+import { TextField } from "@/components/ui/text-field";
 import { useMe, useUpdateMe } from "@/hooks/use-me";
 import { clearTokens } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const CHANNELS: {
   channel: NotificationChannel;
@@ -119,6 +122,153 @@ function PRow({
   return <div className={rowClass}>{content}</div>;
 }
 
+function EditableRow({
+  icon: Icon,
+  label,
+  value,
+  emptyLabel,
+  loading,
+  type = "text",
+  placeholder,
+  validate,
+  onSave,
+  saving,
+  last,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value?: string;
+  emptyLabel: string;
+  loading?: boolean;
+  type?: "text" | "email";
+  placeholder?: string;
+  validate?: (v: string) => string | null;
+  onSave: (value: string) => void;
+  saving?: boolean;
+  last?: boolean;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value ?? "");
+  const [error, setError] = useState<string | null>(null);
+
+  function open() {
+    setDraft(value ?? "");
+    setError(null);
+    setEditing(true);
+  }
+
+  function save() {
+    const trimmed = draft.trim();
+    const err = validate?.(trimmed) ?? null;
+    if (err) {
+      setError(err);
+      return;
+    }
+    onSave(trimmed);
+    setEditing(false);
+  }
+
+  const rowClass = cn(
+    "px-4 py-3",
+    !last && "border-b border-[var(--gold-border)]",
+  );
+
+  if (editing) {
+    return (
+      <div className={rowClass}>
+        <div className="flex items-center gap-3">
+          <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-icon border border-[var(--gold-border)] bg-accent/[0.12] text-accent-deep shadow-glass">
+            <Icon className="h-[18px] w-[18px]" strokeWidth={2} />
+          </span>
+          <span className="min-w-0 flex-1 text-[15px] font-semibold leading-tight text-espresso">
+            {label}
+          </span>
+        </div>
+        <div className="mt-3">
+          <TextField
+            autoFocus
+            type={type}
+            inputMode={type === "email" ? "email" : "text"}
+            value={draft}
+            placeholder={placeholder}
+            aria-label={label}
+            aria-invalid={error ? true : undefined}
+            onChange={(e) => {
+              setDraft(e.target.value);
+              if (error) setError(null);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                save();
+              }
+            }}
+          />
+          {error && (
+            <p className="mt-1.5 px-1 text-xs font-medium text-risk-critical">{error}</p>
+          )}
+          <div className="mt-2.5 flex gap-2">
+            <CButton
+              size="md"
+              full
+              className="h-11"
+              disabled={saving}
+              onClick={save}
+            >
+              {saving ? "Se salvează…" : "Salvează"}
+            </CButton>
+            <CButton
+              variant="ghost"
+              size="md"
+              className="h-11 px-4 text-sm text-warm-muted"
+              disabled={saving}
+              onClick={() => setEditing(false)}
+            >
+              Anulează
+            </CButton>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const filled = Boolean(value);
+
+  return (
+    <button
+      type="button"
+      disabled={loading}
+      onClick={open}
+      className={cn(
+        rowClass,
+        "flex min-h-[52px] w-full items-center gap-3 text-left transition-transform duration-120 ease-cinematic active:scale-[0.985] disabled:active:scale-100",
+      )}
+    >
+      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-icon border border-[var(--gold-border)] bg-accent/[0.12] text-accent-deep shadow-glass">
+        <Icon className="h-[18px] w-[18px]" strokeWidth={2} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[15px] font-semibold leading-tight text-espresso">
+          {label}
+        </span>
+        {loading ? (
+          <Shimmer className="mt-1 h-3 w-24 rounded" />
+        ) : (
+          <span
+            className={cn(
+              "mt-0.5 block truncate text-xs font-medium",
+              filled ? "text-warm-muted" : "text-accent-deep",
+            )}
+          >
+            {filled ? value : emptyLabel}
+          </span>
+        )}
+      </span>
+      <ChevronRight className="h-4 w-4 flex-shrink-0 text-warm-faint" strokeWidth={2.2} />
+    </button>
+  );
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const { data: me, isLoading } = useMe();
@@ -166,21 +316,37 @@ export default function ProfilePage() {
         <div className="animate-c-fade-up" style={{ animationDelay: "70ms" }}>
           <SectionLabel>Personal</SectionLabel>
           <GoldCard elevated className="overflow-hidden p-0">
-          <PRow
+          <EditableRow
             icon={User}
             label="Nume"
-            value={isLoading ? <Shimmer className="h-3.5 w-24 rounded" /> : me?.fullName ?? "—"}
+            value={me?.fullName}
+            emptyLabel="Adaugă-ți numele"
+            loading={isLoading}
+            placeholder="Numele complet"
+            saving={updateMe.isPending}
+            onSave={(fullName) => updateMe.mutate({ fullName })}
           />
           <PRow
             icon={Phone}
             label="Telefon"
             value={isLoading ? <Shimmer className="h-3.5 w-28 rounded" /> : me?.phoneNumber}
+            trailing={
+              <span className="text-[11px] font-medium text-warm-faint">
+                autentificare prin telefon
+              </span>
+            }
           />
-          <PRow
+          <EditableRow
             icon={Mail}
             label="Email"
-            value={isLoading ? <Shimmer className="h-3.5 w-20 rounded" /> : me?.email ?? "Adaugă"}
-            href={me?.email ? undefined : "#"}
+            value={me?.email}
+            emptyLabel="Adaugă email"
+            loading={isLoading}
+            type="email"
+            placeholder="nume@exemplu.ro"
+            saving={updateMe.isPending}
+            validate={(v) => (EMAIL_RE.test(v) ? null : "Introdu o adresă de email validă")}
+            onSave={(email) => updateMe.mutate({ email })}
             last
           />
           </GoldCard>

@@ -23,7 +23,7 @@ export default function HotelDetailPage() {
       <AppBar title={hotel.name} backHref="/hotels" />
 
       <div className="pb-safe-bottom">
-        {/* Large gradient hero */}
+        {/* Large hero image with gradient fallback */}
         <div
           className={cn(
             "relative flex h-56 items-center justify-center overflow-hidden bg-gradient-to-br",
@@ -41,6 +41,19 @@ export default function HotelDetailPage() {
           <span className="select-none font-display text-[7rem] leading-none tracking-tighter text-white/35">
             {hotel.name.charAt(0)}
           </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={hotel.image}
+            alt={hotel.name}
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent"
+          />
           <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full border border-white/30 bg-black/20 px-3 py-1.5 text-xs font-bold tracking-tight text-white backdrop-blur-lg">
             <MapPin className="h-3.5 w-3.5" strokeWidth={2.4} />
             {hotel.distanceKm.toFixed(1)} km de LRIA

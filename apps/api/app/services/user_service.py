@@ -79,6 +79,7 @@ async def update_profile(
     user_id: str,
     *,
     full_name: str | None = None,
+    email: str | None = None,
     notification_channels: list[str] | None = None,
 ) -> User | None:
     user = await get_by_id(db, user_id)
@@ -86,6 +87,8 @@ async def update_profile(
         return None
     if full_name is not None:
         user.full_name = full_name
+    if email is not None:
+        user.email = email
     if notification_channels is not None:
         user.notification_channels = notification_channels
     await db.commit()
