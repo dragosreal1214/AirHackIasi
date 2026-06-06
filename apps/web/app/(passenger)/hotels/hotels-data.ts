@@ -36,8 +36,7 @@ export const HOTELS: Hotel[] = [
     reviews: 1284,
     blurb: "5 stele în centru · spa și transfer gratuit",
     gradient: "from-[#c8a24e] via-[#e8c97a] to-[#b8924e]",
-    image:
-      "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=800&q=70",
+    image: "/hotels/international.webp",
     bookingUrl: "https://www.booking.com/hotel/ro/international-iasi.ro.html",
     phone: "+40232942020",
     amenities: [
@@ -84,8 +83,7 @@ export const HOTELS: Hotel[] = [
     reviews: 671,
     blurb: "Aproape de aeroport · mic dejun inclus",
     gradient: "from-[#7c6f5a] via-[#a8987c] to-[#6a5e48]",
-    image:
-      "https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=800&q=70",
+    image: "/hotels/select.jpg",
     bookingUrl: "https://www.booking.com/hotel/ro/select-iasi.ro.html",
     phone: "+40232415415",
     amenities: [
@@ -132,8 +130,7 @@ export const HOTELS: Hotel[] = [
     reviews: 803,
     blurb: "Clasic și confortabil · parcare gratuită",
     gradient: "from-[#5a7a5a] via-[#82a882] to-[#3e5e3e]",
-    image:
-      "https://images.unsplash.com/photo-1455587734955-081b22074882?auto=format&fit=crop&w=800&q=70",
+    image: "/hotels/moldova.jpg",
     bookingUrl: "https://www.booking.com/hotel/ro/moldova-iasi.ro.html",
     phone: "+40232142100",
     amenities: [
@@ -156,8 +153,7 @@ export const HOTELS: Hotel[] = [
     reviews: 1097,
     blurb: "Cel mai aproape de LRIA · check-in 24/7",
     gradient: "from-[#c8a24e] via-[#e8c97a] to-[#b8924e]",
-    image:
-      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=70",
+    image: "/hotels/ramada.jpg",
     bookingUrl: "https://www.booking.com/hotel/ro/ramada-iasi.ro.html",
     phone: "+40232999999",
     amenities: [
