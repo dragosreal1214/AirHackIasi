@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     API_V1_PREFIX: str = "/api/v1"
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
+    # Always allow Vercel + Railway PaaS domains (prod + preview) without listing each.
+    CORS_ORIGIN_REGEX: str | None = r"https://.*\.(vercel\.app|up\.railway\.app)"
 
     # --- Database (Supabase Postgres). Empty -> in-memory store. ---
     DATABASE_URL: str = ""
