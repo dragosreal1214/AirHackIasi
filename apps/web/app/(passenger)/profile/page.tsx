@@ -275,18 +275,26 @@ export default function ProfilePage() {
   const { data: me, isLoading } = useMe();
   const updateMe = useUpdateMe();
 
-  const channels = me?.notificationChannels ?? [];
   const [pushNote, setPushNote] = useState<string | null>(null);
+  // Optimistic override: the toggle flips instantly and reverts on error.
+  const [override, setOverride] = useState<NotificationChannel[] | null>(null);
+  const channels = override ?? me?.notificationChannels ?? [];
 
   async function toggleChannel(channel: NotificationChannel) {
     if (!me) return;
-    const isOn = channels.includes(channel);
+    const prev = channels;
+    const isOn = prev.includes(channel);
+    const next = isOn ? prev.filter((c) => c !== channel) : [...prev, channel];
 
-    // Enabling push needs the browser's permission + a SW subscription.
+    // 1) Activate immediately (optimistic slide).
+    setOverride(next);
+    setPushNote(null);
+
+    // 2) Enabling push needs the browser permission + a SW subscription.
     if (channel === "push" && !isOn) {
-      setPushNote(null);
       const res = await subscribeToPush();
       if (res !== "ok") {
+        setOverride(prev); // deactivate on error
         setPushNote(
           res === "denied"
             ? "Permite notificările din setările browserului/telefonului."
@@ -299,10 +307,17 @@ export default function ProfilePage() {
       setPushNote("Notificările push sunt active pe acest dispozitiv.");
     }
 
-    const next = isOn
-      ? channels.filter((c) => c !== channel)
-      : [...channels, channel];
-    updateMe.mutate({ notificationChannels: next });
+    // 3) Persist; revert the slide if the save fails.
+    updateMe.mutate(
+      { notificationChannels: next },
+      {
+        onSuccess: () => setOverride(null),
+        onError: () => {
+          setOverride(prev);
+          setPushNote("Nu am putut salva preferința. Reîncearcă.");
+        },
+      },
+    );
   }
 
   function logout() {
