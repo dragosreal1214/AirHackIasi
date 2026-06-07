@@ -4,6 +4,9 @@
  * floats over the app. Persisted in localStorage so it survives navigation. */
 export const DEMO_KEY = "fogora_demo";
 
+/** The demo account — alerts are sent here (incl. WhatsApp) during a demo. */
+export const DEMO_PHONE = "+40770675731";
+
 export function isDemoEnabled(): boolean {
   if (typeof window === "undefined") return false;
   return window.localStorage.getItem(DEMO_KEY) === "1";

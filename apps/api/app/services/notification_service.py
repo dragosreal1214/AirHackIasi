@@ -54,13 +54,17 @@ async def dispatch(
     if disruption.risk.level not in ("high", "critical"):
         return {"status": "skipped", "reason": "risk_not_high", "level": disruption.risk.level}
 
+    explicit = channels is not None
     channels = channels or DEFAULT_CHANNELS
 
     # Orange Device Reachability — pick the channel that can actually be reached.
     # If the data path is down but SMS works, don't waste a WhatsApp attempt.
-    reach = await orange_client.device_reachability(phone_number)
-    if reach is not None and not reach.get("data") and reach.get("sms"):
-        channels = [c for c in channels if c == "sms"] or ["sms"]
+    # Skipped when the caller asked for specific channels (an explicit WhatsApp
+    # request — e.g. the demo — is always honored).
+    if not explicit:
+        reach = await orange_client.device_reachability(phone_number)
+        if reach is not None and not reach.get("data") and reach.get("sms"):
+            channels = [c for c in channels if c == "sms"] or ["sms"]
 
     body = render_message(disruption)
     results: dict[str, dict] = {}

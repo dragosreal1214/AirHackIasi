@@ -4,7 +4,7 @@ import { BellRing, Check, Loader2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { fireDemoAlert } from "@/lib/api";
-import { syncDemoFromQuery } from "@/lib/demo";
+import { DEMO_PHONE, syncDemoFromQuery } from "@/lib/demo";
 import { cn } from "@/lib/utils";
 
 type State = "idle" | "sending" | "done" | "error";
@@ -25,7 +25,8 @@ export function DemoTrigger() {
     if (state === "sending") return;
     setState("sending");
     try {
-      await fireDemoAlert();
+      // Targets the demo account so the alert lands on WhatsApp + push + SMS.
+      await fireDemoAlert(DEMO_PHONE);
       setState("done");
     } catch {
       setState("error");
