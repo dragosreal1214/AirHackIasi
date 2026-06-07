@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { AuthGuard } from "@/components/passenger/auth-guard";
 import { BottomNav } from "@/components/passenger/bottom-nav";
+import { DemoTrigger } from "@/components/passenger/demo-trigger";
 import { DesktopSidebar } from "@/components/passenger/desktop-sidebar";
 
 export default function PassengerLayout({ children }: { children: ReactNode }) {
@@ -19,6 +20,7 @@ export default function PassengerLayout({ children }: { children: ReactNode }) {
             {children}
           </div>
           <BottomNav />
+          <DemoTrigger />
         </AuthGuard>
       </div>
     </div>

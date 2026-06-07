@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import { getForecast, getMe, getPnrs } from "@/lib/api";
 import { pnrKeys } from "@/hooks/use-pnrs";
 import { getAccessToken } from "@/lib/auth";
+import { isDemoEnabled } from "@/lib/demo";
 import { cn } from "@/lib/utils";
 
 type MenuItem = {
@@ -86,8 +87,13 @@ export default function HomePage() {
   // Live weather greeting for Iași — reflects today's actual fog outlook.
   const forecast = useQuery({ queryKey: ["forecast", "IAS"], queryFn: () => getForecast("IAS") });
   const peakLevel = forecast.data?.peak?.level;
+  // Demo mode forces the fog greeting so the story stays coherent on a clear day.
+  const [demo, setDemo] = useState(false);
+  useEffect(() => {
+    setDemo(isDemoEnabled());
+  }, []);
   const greeting =
-    peakLevel === "high" || peakLevel === "critical"
+    demo || peakLevel === "high" || peakLevel === "critical"
       ? { Icon: CloudFog, text: "Risc de ceață azi", tone: "text-risk-high" }
       : peakLevel === "moderate"
         ? { Icon: CloudFog, text: "Vizibilitate variabilă azi", tone: "text-risk-moderate" }

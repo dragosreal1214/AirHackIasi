@@ -52,6 +52,15 @@ Zborul-vedeta apare **automat**, fără setări:
 
 ## 3. Declanșează alerta (momentul WOW)
 
+### Cel mai simplu — din UI (fără terminal)
+Deschide aplicația o dată cu **`?demo=1`** (ex. `http://localhost:3000/?demo=1`).
+Atunci:
+- mesajul de pe Acasă devine **„Risc de ceață azi"** (coerent cu povestea), și
+- apare o pastilă plutitoare **„Declanșează alerta"** — un tap și alerta pleacă.
+
+Dezactivezi cu `?demo=0`.
+
+### Din terminal (alternativ)
 Într-un terminal pregătit dinainte:
 
 ```powershell

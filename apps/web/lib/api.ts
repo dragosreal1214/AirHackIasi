@@ -427,4 +427,23 @@ export async function getAirportRiskBoard(
   return res.json();
 }
 
+// ---------------------------------------------------------------------------
+// Demo mode — one-click alert trigger (hits the dev endpoints)
+// ---------------------------------------------------------------------------
+
+export async function fireDemoAlert(phone?: string): Promise<unknown> {
+  if (phone) {
+    const res = await fetch(`${API_URL}/api/v1/dev/send-notification`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phoneNumber: phone, disruptionId: "d_001", channels: ["push", "whatsapp", "sms"] }),
+    });
+    if (!res.ok) throw new ApiClientError("DEMO", `Alerta a eșuat (${res.status})`);
+    return res.json();
+  }
+  const res = await fetch(`${API_URL}/api/v1/dev/run-monitor?force_fog=IAS`, { method: "POST" });
+  if (!res.ok) throw new ApiClientError("DEMO", `Scanarea a eșuat (${res.status})`);
+  return res.json();
+}
+
 export { ApiClientError, USE_MOCKS };
